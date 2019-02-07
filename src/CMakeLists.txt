@@ -1,0 +1,2 @@
+add_subdirectory(anchor_vs_one_partner)
+add_subdirectory(anchor_vs_many_partners)
