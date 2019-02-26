@@ -30,6 +30,7 @@ make
 ```
 
 All executable files will be in src/anchor_vs_*/anchor_vs_*
+
 (Windows) Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
 VC -> Native Tools x64. Else, you should install “CMake” module while VS 2017 installing)
 
