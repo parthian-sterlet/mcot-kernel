@@ -29,7 +29,7 @@ cmake ..
 make
 ```
 
-All executable files will be in src/anchor_vs_*/anchor_vs_*
+All executable files will be in tmp/src/anchor_vs_<one_partner, many_partners>/anchor_vs_<one_partner, many_partners>/
 
 (Windows) Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
 VC -> Native Tools x64. Else, you should install “CMake” module while VS 2017 installing)
@@ -41,20 +41,20 @@ cd tmp
 cmake ..
 MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 ```
-Programs should be in src/anchor_vs_<one_partner, many_partners>/Release/
+Programs should be in tmp/src/anchor_vs_<one_partner, many_partners>/Release/
 
 ## Command line arguments
 
 The command line for one-partner option:
 
 
-`./mcot_anchor.exe <1 fasta> <2 anchor.motif> <3 partner.motif> <4 upper limit of spacer length> <5 path to whole-genome promoters>`
+`./anchor_vs_one_partner <1 fasta> <2 anchor.motif> <3 partner.motif> <4 upper limit of spacer length> <5 path to whole-genome promoters>`
 
 
 The command line for many-partner option:
 
 
-`./mcot.exe <1 fasta> <2 anchor.motif> <3 partners.library> <4 upper limit of spacer length> <5 path to whole-genome promoters>`
+`./anchor_vs_many_partners <1 fasta> <2 anchor.motif> <3 partners.library> <4 upper limit of spacer length> <5 path to whole-genome promoters>`
 
 
 
