@@ -1,12 +1,12 @@
-int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, profile *real, int mot)
+int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, profile *real, int &all_pos)
 {
 	int i, j, n; 			
     int compl1;	
 	int word=1;	
 	int len1=mat->len+word-1;//dlina vyborki obu4eniya	
 	int cod[SEQLEN];
-	int all_pos=0;
-	int rec_pos=0;
+	//int all_pos=0;
+//	int rec_pos=0;
 	int nseq_rec=0;
 	for(n=0;n<nseq_pro;n++)
 	{		
@@ -21,9 +21,9 @@ int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, 
 			{	
 				strncpy(d2,&seq[compl1][n][i],len1);
 				d2[len1]='\0';
-				GetSostPro(d2,word,cod);
-				all_pos++;
 				if(strstr(d2,"n")!=NULL){continue;}
+				GetSostPro(d2,word,cod);								
+				all_pos++;
 				  double score=0;
     			  for(j=0;j<len1;j++)
 				  {
@@ -33,7 +33,7 @@ int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, 
 				  score/=mat->raz;			
 				  if(score>=thr)			  
 				  {
-					  rec_pos++;
+	//				  rec_pos++;
 					  real->nsit[n]++;
 		//			  printf("Seq %d, StaPos %d_Compl %d Sco %f ->Interval %d Site %d\n",n+1,i+1,compl1,score,k+1,real_sites[k][n]);						
 				  }			 
@@ -52,7 +52,7 @@ int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, 
 	}*/
 	all_pos/=2;
 	for(n=0;n<nseq_pro;n++)if(real->nsit[n]>0)nseq_rec++;
-	FILE *out_stat;
+	/*FILE *out_stat;
 	if(mot==0)
 	{
 		if((out_stat=fopen("rec_pos.txt","wt"))==NULL)    
@@ -71,7 +71,7 @@ int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, 
 
 	}
 	fprintf(out_stat,"Motif %d\tThr %f\t%3f\t%d\t%d\t%.3e\t%d\t%d\t\n",mot,thr,(double)nseq_rec/nseq_pro,nseq_rec,nseq_pro,(double)rec_pos/all_pos,rec_pos,all_pos);
-	fclose(out_stat);
+	fclose(out_stat);*/
 	return 1;
 }
 int pwm_rec1(matrices *mat,double thr,int len_pro,int nseq_pro,char ***seq, profile *real)
@@ -82,7 +82,6 @@ int pwm_rec1(matrices *mat,double thr,int len_pro,int nseq_pro,char ***seq, prof
 	int len1=mat->len+word-1;//dlina vyborki obu4eniya	
 	int cod[SEQLEN];		
 	char cepx[3]="+-";			
-//	int half0=len1/2;			
 	for(n=0;n<nseq_pro;n++)
 	{		
 		int len_pro1=strlen(seq[0][n]);				
@@ -98,8 +97,8 @@ int pwm_rec1(matrices *mat,double thr,int len_pro,int nseq_pro,char ***seq, prof
 				else ista=len21-i;
 				strncpy(d,&seq[compl1][n][ista],len1);
 				d[len1]='\0';
-				GetSostPro(d,word,cod);
 				if(strstr(d,"n")!=NULL){continue;}
+				GetSostPro(d,word,cod);				
 				double score=0;
     			for(j=0;j<len1;j++)
 				{
@@ -108,7 +107,7 @@ int pwm_rec1(matrices *mat,double thr,int len_pro,int nseq_pro,char ***seq, prof
 				score-=mat->min;
 				score/=mat->raz;			
 				if(score>=thr)			  
-				{					  					  					  
+				{
 					real->sta[n][x]=i;							  
 					real->cep[n][x]=cepx[compl1];
 					real->sco[n][x]=score;

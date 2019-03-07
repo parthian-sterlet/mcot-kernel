@@ -171,7 +171,6 @@ int matrices::mem_in(int length)
 	}
 	return 1;
 }
-// Отчищение памяти
 void matrices::mem_out(int len)
 {
 	int i;
@@ -479,15 +478,15 @@ struct combi {
 	double freq[4][MATLEN+SPACLEN];	
 //	void ini(int len_a, int len_p, int len_sp);
 //	void mem_out(void);
-	int fprintf_all(char *file, int mot, char *motif_a, char *motif_p, int len_a, int len_p, int len_sp);
+	int fprintf_all(char *file, int mot_a, int mot_p,char *motif_a, char *motif_p, int len_a, int len_p, int len_sp);
 };
-int combi::fprintf_all(char *file, int mot, char *motif_a, char *motif_p, int len_a, int len_p, int len_sp)
+int combi::fprintf_all(char *file, int mot_a, int mot_p,char *motif_a, char *motif_p, int len_a, int len_p, int len_sp)
 {
 	char head[4][10];
-	strcpy(head[0],"DirectAP\0");
-	strcpy(head[1],"DirectPA\0");
-	strcpy(head[2],"Invert\0");
-	strcpy(head[3],"Evert\0");	
+	strcpy(head[0],"Direct AP");
+	strcpy(head[1],"Direct PA");
+	strcpy(head[2],"Inverted");
+	strcpy(head[3],"Everted");	
 	int n_partial;
 	n_partial=Min(len_a,len_p);//partial overlap
 	n_partial--;
@@ -502,16 +501,16 @@ int combi::fprintf_all(char *file, int mot, char *motif_a, char *motif_p, int le
 		printf("Input file %s can't be opened!\n", file);
 		return -1;
 	}
-	fprintf(out,"%d\tA %s P %s\t",mot,motif_a,motif_p);
+	fprintf(out,"%d,%d\tA %s P %s\t",mot_a,mot_p,motif_a,motif_p);
 	int i,j;	
-	for(j=n_full;j>=1;j--)fprintf(out,"\t%d%c",j,in);		
+	for(j=n_full-1;j>=0;j--)fprintf(out,"\t%d%c",j,in);		
 	for(j=n_partial;j>=1;j--)fprintf(out,"\t%d%c",j,bo);		
-	for(j=0;j<len_sp;j++)fprintf(out,"\t%d%c",j,sp);
+	for(j=0;j<=len_sp;j++)fprintf(out,"\t%d%c",j,sp);
 	fprintf(out,"\n");
 	for(i=3;i>=0;i--)
 	{
 		fprintf(out,"\t\t%s",head[i]);
-		for(j=0;j<n_tot;j++)fprintf(out,"\t%f",freq[i][j]);
+		for(j=0;j<n_tot;j++)fprintf(out,"\t%f",100*freq[i][j]);
 		fprintf(out,"\n");
 	}	
 	fclose(out);
@@ -526,17 +525,17 @@ int combi::fprintf_all(char *file, int mot, char *motif_a, char *motif_p, int le
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, n, mot; 
-	char file_fasta[80], mypath_data[200], prom[200], file_pfm_anchor[2][50], partner_db[80];	
+	char file_fasta[80], mypath_data[200], prom[200], file_pfm_anchor[2][50];	
 	char ***seq;// peaks
 	char file_hist[80], file_pval[5][80], file_pval_table[80];
 	char name[2][MOT_NAME_LEN];
 	char xreal[]="real", xrand[]="rand", xreal_one[]="real_one";
 
-	if(argc!=6)
+	if(argc!=7)
 	{
 		printf ("%s 1file_fasta",argv[0]);//1int thresh_num_min 2int thresh_num_max
 		printf("2 motif1 3motif2 ");
-		printf("4int shift 5char path_data\n");//9char mot_anchor 
+		printf(" 4int spacer_min 5int spacer_max 6char path_genome\n");//9char mot_anchor 
         return -1;
 	}
 	int thresh_num_min = 1, thresh_num_max  = 5;	// 1 5    or 5 5
@@ -548,35 +547,46 @@ int main(int argc, char *argv[])
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min=6, s_ncycle_small=2000, s_ncycle_large=20000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul=0.001;//for similarity okruglenie 4astotnyh matric	
-	int shift = atoi(argv[4]);
-
-	strcpy(mypath_data,argv[5]); //folder meme_matrices			
+	int shift_min = atoi(argv[4]); // minimal spacer length
+	int shift_max = atoi(argv[5]); // upper bound of spacer length
+	int nseq_genome, len_genome;	
+	strcpy(mypath_data,argv[6]); //folder genome	.../hs, mm, at, mp	
 	
 	strcpy(prom,mypath_data);	
 
-	if(strstr(mypath_data,"hocomoco_hs") !=NULL || strstr(mypath_data,"maps\\hg")!=NULL) 
+	if(strstr(mypath_data,"hs") !=NULL || strstr(mypath_data,"maps\\hg")!=NULL) 
 	{
-		strcat(prom,"ups2kb.plain"); strcpy(partner_db,"hs_core");
+		strcat(prom,"ups2kb.plain");
+		len_genome=2000;
+		nseq_genome=19795;
 	}
 	else
 	{
-		if(strstr(mypath_data,"hocomoco_mm") !=NULL || strstr(mypath_data,"maps\\mm")!=NULL) 
+		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"maps\\mm")!=NULL) 
 		{
-			strcat(prom,"ups2kb.plain");strcpy(partner_db,"mm_core");
+			strcat(prom,"ups2kb.plain");
+			len_genome=2000;
+			nseq_genome=19991;
 		}
 		else
 		{
-			if(strstr(mypath_data,"dapseq") !=NULL || strstr(mypath_data,"maps\\at")!=NULL) {
-				strcat(prom,"ups1500.plain"); strcpy(partner_db,"dapseq");
+			if(strstr(mypath_data,"at") !=NULL || strstr(mypath_data,"maps\\at")!=NULL) 
+			{
+				strcat(prom,"ups1500.plain");
+				len_genome=1500;
+				nseq_genome=27202;
 			}
 			else
 			{
-				if(strstr(mypath_data,"moss") !=NULL) {
-					strcat(prom,"ups1500.plain"); strcpy(partner_db,"moss");
+				if(strstr(mypath_data,"mp") !=NULL) //Marchantia polymorpha
+				{
+					strcat(prom,"ups1500.plain");
+					len_genome=1500;
+					nseq_genome=18672;
 				}
 				else
 				{
-					printf("Error partner database %s\n", partner_db);
+					printf("Error species %s\n",mypath_data);
 					return -1;
 				}
 			}
@@ -729,26 +739,26 @@ int main(int argc, char *argv[])
 		printf("Input file %s can't be opened!\n", file_pval_table);
 		return -1;
 	}
-	fprintf(out_pval_table,"MotifNumber");
-	fprintf(out_pval_table,"\tMotifName");
-	fprintf(out_pval_table,"\tAnyPv");
-	fprintf(out_pval_table,"\tFullPv");
-	fprintf(out_pval_table,"\tPartPv");
-	fprintf(out_pval_table,"\tOverPv");
-	fprintf(out_pval_table,"\tSpacPv");
+	fprintf(out_pval_table,"Motif Num");
+	fprintf(out_pval_table,"\tMotif Name");
+	fprintf(out_pval_table,"\tAny Pv");
+	fprintf(out_pval_table,"\tFull Pv");
+	fprintf(out_pval_table,"\tPart Pv");
+	fprintf(out_pval_table,"\tOver Pv");
+	fprintf(out_pval_table,"\tSpac Pv");
 	fprintf(out_pval_table,"\t");
-	fprintf(out_pval_table,"\tAnyAsy");
-	fprintf(out_pval_table,"\tFullAsy");
-	fprintf(out_pval_table,"\tPartAsy");
-	fprintf(out_pval_table,"\tOverAsy");
-	fprintf(out_pval_table,"\tSpacAsy");	
+	fprintf(out_pval_table,"\tAny Asy");
+	fprintf(out_pval_table,"\tFull Asy");
+	fprintf(out_pval_table,"\tPart Asy");
+	fprintf(out_pval_table,"\tOver Asy");
+	fprintf(out_pval_table,"\tSpac Asy");	
 	fprintf(out_pval_table,"\t");
-	fprintf(out_pval_table,"\tSimTot");	
-	fprintf(out_pval_table,"\tSimEDpre");	
+	fprintf(out_pval_table,"\tSim Pv");	
+	/*fprintf(out_pval_table,"\tSimEDpre");	
 	fprintf(out_pval_table,"\tSimPCpre");	
 	fprintf(out_pval_table,"\tSimED");	
-	fprintf(out_pval_table,"\tSimPC");	
-	fprintf(out_pval_table,"\n");	
+	fprintf(out_pval_table,"\tSimPC");	*/	
+	fprintf(out_pval_table,"\n");
 	fclose(out_pval_table);
 
 	FILE *out_pval[5];
@@ -756,10 +766,17 @@ int main(int argc, char *argv[])
 	double pwm_anchor[2][MATLEN][OLIGNUM];
 	int len_motif[2];
 
+	FILE *out_stat;
+	if((out_stat=fopen("rec_pos.txt","wt"))==NULL)    
+	{
+		printf("Input file can't be opened!\n");
+		return -1;
+	}	
+	fprintf(out_stat,"Motif Num\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
 	for(mot=0;mot<2;mot++)	
 	{		
 		printf("Mot %d\n",mot); 				
-		int length=pfm_to_pwm_one(file_pfm_anchor[mot],&matrix[mot]);
+		int length=pfm_to_pwm(file_pfm_anchor[mot],&matrix[mot]);
 		for(i=0;i<length;i++)for(j=0;j<OLIGNUM;j++)pwm_anchor[mot][i][j]=matrix[mot].wei[i][j];													
 		if (length<=0 || length>=MATLEN)
 		{
@@ -776,7 +793,7 @@ int main(int argc, char *argv[])
 		double *fp_rate;
 		fp_rate=new double [n_thr_touzet];
 		if(fp_rate==NULL){puts("Out of memory...");return -1;}
-		int piptd=pwm_iz_pwm_thr_dist(pwm_anchor[mot],length,prom,n_thr_touzet,thr_touzet[mot],fp_rate,partner_db);
+		int piptd=pwm_iz_pwm_thr_dist(pwm_anchor[mot],length,prom,n_thr_touzet,thr_touzet[mot],fp_rate,mypath_data,nseq_genome,len_genome);
 		if(piptd==-1)
 		{
 			printf("FP rate table error\n");
@@ -818,7 +835,8 @@ int main(int argc, char *argv[])
 	
 		//int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, profile *real)  count all sites
 		////recognition 1st		
-		int wm_rec=pwm_rec0(&matrix[mot],thr[mot][NUM_THR-1],length_fasta_max,nseq_real,seq,&real_one[mot],mot);
+		int all_pos=0;//total number of available positions
+		int wm_rec=pwm_rec0(&matrix[mot],thr[mot][NUM_THR-1],length_fasta_max,nseq_real,seq,&real_one[mot],all_pos);
 		if(wm_rec==-1)
 		{
 			printf("Motif %d recognition 1st stage error\n", mot);
@@ -878,6 +896,8 @@ int main(int argc, char *argv[])
 			real[mot][j].count_sites();
 		}
 		//initiation of profiles for various thresholds
+		int rec_seq[NUM_THR], rec_pos[NUM_THR];
+		for(i=0;i<NUM_THR;i++)rec_seq[i]=rec_pos[i]=0;
 		for(i=0;i<nseq_real;i++)
 		{
 			int inx[NUM_THR];
@@ -889,14 +909,22 @@ int main(int argc, char *argv[])
 				{
 					if(sco>=thr[mot][j])
 					{
+						rec_pos[j]++;						
 						real[mot][j].sta[i][inx[j]]=real_one[mot].sta[i][k];
 						real[mot][j].cep[i][inx[j]]=real_one[mot].cep[i][k];
 						real[mot][j].sco[i][inx[j]]=sco;
 						inx[j]++;
+						if(inx[j]==1)rec_seq[j]++;
 						break;
 					}
 				}
 			}
+		}
+		for(j=0;j<NUM_THR;j++)
+		{
+			fprintf(out_stat,"%d\t%s\t%d\t%f\t",mot,name[mot],j+1,thr[mot][j]);
+			fprintf(out_stat,"%f\t%d\t%d\t",100*(double)rec_seq[j]/nseq_real,rec_seq[j],nseq_real);
+			fprintf(out_stat,"%g\t%d\t%d\n",(double)rec_pos[j]/all_pos,rec_pos[j],all_pos);
 		}
 		for(j=0;j<NUM_THR;j++)
 		{
@@ -909,6 +937,7 @@ int main(int argc, char *argv[])
 			}
 		}		
 	}
+	fclose(out_stat);
 	for(mot=0;mot<2;mot++)len_motif[mot]=matrix[mot].len;	
 
 	int len_anchor, len_partner;
@@ -936,6 +965,7 @@ int main(int argc, char *argv[])
 		}
 		for(mot_p=0;mot_p<2;mot_p++)	//partner
 		{
+			if(mot_p==0 && mot_a==1)continue;
 			len_partner=len_motif[mot_p];
 	//one thresh  rand - &rand_hom_one,&rand_one[ap]   real - real_one[0],real_one[ap]
 	//many thresh rand - &rand_hom[j],&rand[ap][k]     real - real[0][j],real[ap][k]			
@@ -1027,13 +1057,13 @@ int main(int argc, char *argv[])
 						thr_err_rand[k++]=thr_err_real[i];
 					}		
 				}					
-				int proj=projoin_one(xreal_one,name[mot_a],name[mot_p],real_one[mot_a],real_one[mot_p],shift,len_anchor,len_partner,thr_err_real,nseq_real,seq,&table_one.observed,&hist_obs_one,peak_len_real);		
+				int proj=projoin_one(xreal_one,name[mot_a],name[mot_p],real_one[mot_a],real_one[mot_p],shift_min,shift_max,len_anchor,len_partner,thr_err_real,nseq_real,seq,&table_one.observed,&hist_obs_one,peak_len_real);		
 				if(proj==-1)
 				{
 					printf("Projoin Real error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				hist_obs_one.fprintf_all(file_hist,mot,name[mot_a],name[mot_p],len_anchor,len_partner,shift);
+				hist_obs_one.fprintf_all(file_hist,mot_a,mot_p,name[mot_a],name[mot_p],len_anchor,len_partner,shift_max);
 			}// one threshold
 			//many thresholds
 			//strcat(file_throw_err0,"_thr");
@@ -1085,14 +1115,14 @@ int main(int argc, char *argv[])
 					}*/
 					table[j][k].ini();
 	//				hist_exp[j][k].ini(len_anchor,len_partner,shift);
-					int proj=projoin_one(xrand,name[mot_a],name[mot_p],rand_hom[j],rand[mot_p][k],shift,len_anchor,len_partner,thr_err_rand,nseq_rand,seq,&table[j][k].expected,&hist_exp[j][k],peak_len_rand);		
+					int proj=projoin_one(xrand,name[mot_a],name[mot_p],rand_hom[j],rand[mot_p][k],shift_min,shift_max,len_anchor,len_partner,thr_err_rand,nseq_rand,seq,&table[j][k].expected,&hist_exp[j][k],peak_len_rand);		
 					if(proj==-1)
 					{
 						printf("Projoin Rand error Anc 0 Par %d\n", mot);
 						return -1;
 					}
 		//			hist_obs[j][k].ini(len_anchor,len_partner,shift);
-					proj=projoin_one(xreal,name[mot_a],name[mot_p],real[mot_a][j],real[mot_p][k],shift,len_anchor,len_partner,thr_err_real,nseq_real,seq,&table[j][k].observed,&hist_obs[j][k],peak_len_real);		
+					proj=projoin_one(xreal,name[mot_a],name[mot_p],real[mot_a][j],real[mot_p][k],shift_min,shift_max,len_anchor,len_partner,thr_err_real,nseq_real,seq,&table[j][k].observed,&hist_obs[j][k],peak_len_real);		
 					if(proj==-1)
 					{
 						printf("Projoin Real error Anc 0 Par %d\n", mot);
@@ -1150,14 +1180,15 @@ int main(int argc, char *argv[])
 				if((out_pval[i]=fopen(file_pval0,"wt"))==NULL)
 				{
 					printf("Input file %s can't be opened!\n", file_pval0);
-					return -1;
+					return -1;									
 				}
+				fprintf(out_pval[i],"Anchor Thr\tPartner Thr\t\tReal CE+\tReal Total\tRand CE+\tRand Total\tFold\tP-value\n");
 			}
 			for(j=0;j<NUM_THR;j++)
 			{
 				for(k=0;k<NUM_THR;k++)
 				{		
-					for(i=0;i<5;i++)fprintf(out_pval[i],"AncThr %d\tPartThr %d\t\t",j+1,k+1);												
+					for(i=0;i<5;i++)fprintf(out_pval[i],"A %d\tP %d\t\t",j+1,k+1);												
 					fprintf(out_pval[0],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.any, table[j][k].observed.two_sites,table[j][k].expected.any,table[j][k].expected.two_sites,table[j][k].fold_a,table[j][k].pvalue_a);
 					fprintf(out_pval[1],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.full, table[j][k].observed.two_sites,table[j][k].expected.full,table[j][k].expected.two_sites,table[j][k].fold_f,table[j][k].pvalue_f);
 					fprintf(out_pval[2],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.partial, table[j][k].observed.two_sites,table[j][k].expected.partial,table[j][k].expected.two_sites,table[j][k].fold_p,table[j][k].pvalue_p);
@@ -1264,10 +1295,12 @@ int main(int argc, char *argv[])
 			fprintf(out_pval_table,"\t");
 			double pvalue_similarity_tot;
 			double pval_sim[4]={1,1,1,1};
-			if(mot_a==mot_p)pvalue_similarity_tot=1E-300;
-			else pvalue_similarity_tot=pfm_similarity(&matrix[mot_a],&matrix[mot_p],s_granul,s_overlap_min,s_ncycle_small,s_ncycle_large,pval_sim);
-			fprintf(out_pval_table,"\t%g",pvalue_similarity_tot);
-			for(i=0;i<4;i++)fprintf(out_pval_table,"\t%g",pval_sim[i]);
+			if(mot_a!=mot_p)
+			{
+				pvalue_similarity_tot=pfm_similarity(&matrix[mot_a],&matrix[mot_p],s_granul,s_overlap_min,s_ncycle_small,s_ncycle_large,pval_sim);
+				fprintf(out_pval_table,"\t%g",pvalue_similarity_tot);
+				//for(i=0;i<4;i++)fprintf(out_pval_table,"\t%g",pval_sim[i]);
+			}			
 			fprintf(out_pval_table,"\n");
 			fclose(out_pval_table);
 			for(j=0;j<NUM_THR;j++)

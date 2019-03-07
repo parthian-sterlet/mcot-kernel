@@ -1,4 +1,4 @@
-int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile prf_p, int shift, int len_a, int len_p, int *thr_pre_err,
+int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile prf_p, int shift_min, int shift_max, int len_a, int len_p, int *thr_pre_err,
 			int nseq, char ***seq, count *sample, combi *hist, int *peak_len)
 {	
 	int n, k,j, x,y;
@@ -39,11 +39,12 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
  			printf("Input file %s can't be opened!\n",filebest);
 			return -1;
 		}
+		fprintf(outbest,"#Seq\tA Start\tA End\tP Start\tP End\tMutual Loc\tLoc Type\tStrands\tMutual Ori\tA Score\tP Score\tA Seq\tP Seq\n");
 	}
 	int noverp=Min(len_p,len_a);//partial overlap
-	//noverp--;
+	noverp--;
 	int noveri=1+abs(len_p-len_a)/2;// full overlap	
-	int cepi_len=shift+noveri+noverp;	
+	int cepi_len=shift_max+noveri+noverp+1;	
 	//hist->n_tot=cepi_len;
 	int nover=noveri+noverp;
 	int n_peak_over=0, n_peak_spacer=0, n_peak_full_over=0, n_peak_part_over=0;// no. of peak CE overlap, spacer only CE, full overlap, partial overlap
@@ -70,7 +71,8 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
 	int nseq_join_sites=0;// both sites are present
 	int nseq_rec_tot[2]={0,0};//sequences recognized by 1st(2nd) profile	
 	int nseq_rec_err[2]={0,0};//sequences that should be ignored in comparison of two profiles
-	char oris[4][10]={"DirectAP","DirectPA","Invert","Evert"};//direct_anchor_partner, direct partner_anchor, invert_anchor_partner, evert_anchor_partner
+	char oris[4][10]={"DirectAP","DirectPA","Inverted","Everted"};//direct_anchor_partner, direct partner_anchor, invert_anchor_partner, evert_anchor_partner
+	char locs[3][10]={"Full","Partial","Spacer"};
 
 	for(n=0;n<nseq;n++)
 	{						
@@ -118,23 +120,51 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
 	//				printf("1x=%d\t%d\t%d\t\t",x,xsta,xend);
 		//			printf("1y=%d\t%d\t%d\t\n",y,ysta,yend);
 					int ysum=ysta+yend;						
-					int sta_min=Min(xsta,ysta);
-					int sta_max=Max(xsta,ysta);
-					int end_min=Min(xend,yend);
-					int end_max=Max(xend,yend);
-					int take_distance=0;					
+					int take_distance=0;			
+					int partlial_len=-1;
+					int full_len=-1;
+					int spacer_len=-1;
 					int cepi_pos;
-				//	if(sta_max-sta_min<shift_max || end_max-end_min<shift_max)take_distance=1;
-					if((xsta<=ysta && ysta<=xend) || (xsta<=yend && yend<=xend))take_distance=1;//overlap
-					else 
+					int cat[4]={0,0,0,0};
+					if(xsta<=ysta && ysta<=xend)cat[0]=1;
+					if(xsta<=yend && yend<=xend)cat[1]=1;
+					if(ysta<=xsta && xsta<=yend)cat[2]=1;
+					if(ysta<=xend && xend<=yend)cat[3]=1;
+					if(cat[0]==1 && cat[1]==1)
 					{
-						if((ysta<=xsta && xsta<=yend) || (ysta<=xend && xend<=yend))take_distance=1;//overlap
-						else 
+						take_distance=1;//full overlap
+						full_len=Min(ysta-xsta,xend-yend);
+					}
+					else
+					{
+						if(cat[2]==1 && cat[3]==1)
 						{
-							int dif=sta_max-end_min;
-							if(dif>0 && dif<=shift)take_distance=1;//no overlap
+							take_distance=1;//full overlap
+							full_len=Min(xsta-ysta,yend-xend);
 						}
 					}
+					if(take_distance==0)
+					{
+						if(cat[0]==1 && cat[3]==1)
+						{
+							take_distance=1;//partial overlap
+							partlial_len=xend-ysta+1;
+						}
+						else 
+						{
+							if(cat[1]==1 && cat[2]==1)
+							{
+								take_distance=1;//partial overlap
+								partlial_len=yend-xsta+1;
+							}
+						}
+					}
+					if(take_distance==0)//check for spacer
+					{
+						if(xend<ysta)spacer_len=ysta-xend-1;
+						if(yend<xsta)spacer_len=xsta-yend-1;
+						if(spacer_len>=shift_min && spacer_len<=shift_max)take_distance=1;//spacer
+					}					
 					if(take_distance==1)
 					{															
 //							printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
@@ -184,10 +214,10 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
 							}
 						}							
 						cepi_sit_one[ori_ce][cepi_pos]++;
-						if(cepi_pos<noveri)n_ce_full_over_here++;
+						if(full_len!=-1)n_ce_full_over_here++;
 						else
 						{
-							if(cepi_pos<nover)n_ce_part_over_here++;	
+							if(partlial_len!=-1)n_ce_part_over_here++;	
 							else n_ce_spacer_here++;
 						}																							
 						int dir;
@@ -201,7 +231,15 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
 						{
 							fprintf(outbest,"Seq %d\t",n+1);	
 						//	if(pre[1][y].cep=='-'){Mix(&x1,&y1);Mix(&zero1,&one1);}
-							fprintf(outbest,"%d\t%d\t%d\t%d\t%d\t%c%c\t%s\t",prf_a.sta[n][y]-prf_p.sta[n][x],prf_a.sta[n][y]+len_a-prf_p.sta[n][x]-len_p,cepi_pos,1+prf_a.sta[n][y],1+prf_p.sta[n][x],prf_a.cep[n][y],prf_p.cep[n][x],oris[ori_ce]);												
+							fprintf(outbest,"%d\t%d\t",prf_a.sta[n][y],prf_a.sta[n][y]+len_a-1);
+							fprintf(outbest,"%d\t%d\t",prf_p.sta[n][x],prf_p.sta[n][x]+len_p-1);
+							if(full_len!=-1)fprintf(outbest,"%d%c\t%s",full_len,locs[0][0],locs[0]);
+							else
+							{
+								if(partlial_len!=-1)fprintf(outbest,"%d%c\t%s",partlial_len,locs[1][0],locs[1]);	
+								else fprintf(outbest,"%d%c\t%s",spacer_len,locs[2][0],locs[2]);	
+							}
+							fprintf(outbest,"\t%c%c\t%s\t",prf_a.cep[n][y],prf_p.cep[n][x],oris[ori_ce]);												
 							fprintf(outbest,"%f\t%f\t",prf_a.sco[n][y],prf_p.sco[n][x]);							
 							{
 								char dseq[2][MATLEN], compl1;											
@@ -294,7 +332,7 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
 		}
 	}
 	//                                      join_file seq(join_sites) 4islo par,4islo par (na kajdy sayt po 1 best pare  n_site[0,1]=1st,2nd profile_total_sites  sequences with both sites(no overlap)   
-	fprintf(out2,"%s Anc_%d(%d) Par %d(%d)\tSpacer %d\t",rera,prf_a.mot,prf_a.nam,prf_p.mot,prf_p.nam,shift);
+	fprintf(out2,"%s Anc_%d(%d) Par %d(%d)\tSpacer %d..%d\t",rera,prf_a.mot,prf_a.nam,prf_p.mot,prf_p.nam,shift_min,shift_max);
 	fprintf(out2,"\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t",rec_seq,tot,tot,prf_a.nsit_all,prf_p.nsit_all,nseq_rec[0], nseq_rec[1],nseq_join_sites,prf_a.nseq_rec-nseq_rec_err[0], prf_p.nseq_rec-nseq_rec_err[1]);
 	fprintf(out2,"%d\t%d\t%d\t%d\n",n_peak_full_over,n_peak_part_over,n_peak_over,n_peak_spacer);
 	fclose(out2);
@@ -508,7 +546,7 @@ int projoin_one(char *rera, char *motif_a, char *motif_p,profile prf_a, profile 
 	sample->spacer=n_peak_spacer;
 	return 1;	
 }
-int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int len_a, int len_p, int *thr_pre_err,
+int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min, int shift_max, int len_a, int len_p, int *thr_pre_err,
 			int nseq, char ***seq, count *sample, combi *hist, int *peak_len)
 {	
 	int n, k,j, x,y;
@@ -547,11 +585,12 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int
  			printf("Input file %s can't be opened!\n",filebest);
 			return -1;
 		}
+		fprintf(outbest,"#Seq\tA Start\tA End\tP Start\tP End\tMutual Loc\tLoc Type\tStrands\tMutual Ori\tA Score\tP Score\tA Seq\tP Seq\n");
 	}
 	int noverp=Min(len_p,len_a);//partial overlap
-	//noverp--;
+	noverp--;
 	int noveri=1+abs(len_p-len_a)/2;// full overlap	
-	int cepi_len=shift+noveri+noverp;	
+	int cepi_len=shift_max+noveri+noverp+1;	
 	//hist->n_tot=cepi_len;
 	int nover=noveri+noverp;
 	int n_peak_over=0, n_peak_spacer=0, n_peak_full_over=0, n_peak_part_over=0;// no. of peak CE overlap, spacer only CE, full overlap, partial overlap
@@ -578,7 +617,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int
 	int nseq_join_sites=0;// both sites are present
 	int nseq_rec_tot[2]={0,0};//sequences recognized by 1st(2nd) profile	
 	int nseq_rec_err[2]={0,0};//sequences that should be ignored in comparison of two profiles
-	char oris[4][10]={"DirectAP","DirectPA","Invert","Evert"};//direct_anchor_partner, direct partner_anchor, invert_anchor_partner, evert_anchor_partner
+	char oris[4][10]={"DirectAP","DirectPA","Inverted","Everted"};//direct_anchor_partner, direct partner_anchor, invert_anchor_partner, evert_anchor_partner
+	char locs[3][10]={"Full","Partial","Spacer"};
 
 	for(n=0;n<nseq;n++)
 	{						
@@ -626,23 +666,52 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int
 	//				printf("1x=%d\t%d\t%d\t\t",x,xsta,xend);
 		//			printf("1y=%d\t%d\t%d\t\n",y,ysta,yend);
 					int ysum=ysta+yend;						
-					int sta_min=Min(xsta,ysta);
-					int sta_max=Max(xsta,ysta);
-					int end_min=Min(xend,yend);
-					int end_max=Max(xend,yend);
-					int take_distance=0;					
+					int take_distance=0;	
+					int partlial_len=-1;
+					int full_len=-1;
+					int spacer_len=-1;
 					int cepi_pos;
+					int cat[4]={0,0,0,0};
+					if(xsta<=ysta && ysta<=xend)cat[0]=1;
+					if(xsta<=yend && yend<=xend)cat[1]=1;
+					if(ysta<=xsta && xsta<=yend)cat[2]=1;
+					if(ysta<=xend && xend<=yend)cat[3]=1;
 				//	if(sta_max-sta_min<shift_max || end_max-end_min<shift_max)take_distance=1;
-					if((xsta<=ysta && ysta<=xend) || (xsta<=yend && yend<=xend))take_distance=1;//overlap
-					else 
+					if(cat[0]==1 && cat[1]==1)
 					{
-						if((ysta<=xsta && xsta<=yend) || (ysta<=xend && xend<=yend))take_distance=1;//overlap
-						else 
+						take_distance=1;//full overlap
+						full_len=Min(ysta-xsta,xend-yend);
+					}
+					else
+					{
+						if(cat[2]==1 && cat[3]==1)
 						{
-							int dif=sta_max-end_min;
-							if(dif>0 && dif<=shift)take_distance=1;//no overlap
+							take_distance=1;//full overlap
+							full_len=Min(xsta-ysta,yend-xend);
 						}
 					}
+					if(take_distance==0)
+					{
+						if(cat[0]==1 && cat[3]==1)
+						{
+							take_distance=1;//partial overlap
+							partlial_len=xend-ysta+1;
+						}
+						else 
+						{
+							if(cat[1]==1 && cat[2]==1)
+							{
+								take_distance=1;//partial overlap
+								partlial_len=yend-xsta+1;
+							}
+						}
+					}
+					if(take_distance==0)//check for spacer
+					{
+						if(xend<ysta)spacer_len=ysta-xend-1;
+						if(yend<xsta)spacer_len=xsta-yend-1;
+						if(spacer_len>=shift_min && spacer_len<=shift_max)take_distance=1;//spacer
+					}					
 					if(take_distance==1)
 					{															
 //							printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
@@ -709,7 +778,15 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int
 						{
 							fprintf(outbest,"Seq %d\t",n+1);	
 						//	if(pre[1][y].cep=='-'){Mix(&x1,&y1);Mix(&zero1,&one1);}
-							fprintf(outbest,"%d\t%d\t%d\t%d\t%d\t%c%c\t%s\t",prf_a.sta[n][y]-prf_p.sta[n][x],prf_a.sta[n][y]+len_a-prf_p.sta[n][x]-len_p,cepi_pos,1+prf_a.sta[n][y],1+prf_p.sta[n][x],prf_a.cep[n][y],prf_p.cep[n][x],oris[ori_ce]);												
+							fprintf(outbest,"%d\t%d\t",prf_a.sta[n][y],prf_a.sta[n][y]+len_a-1);
+							fprintf(outbest,"%d\t%d\t",prf_p.sta[n][x],prf_p.sta[n][x]+len_p-1);							
+							if(full_len!=-1)fprintf(outbest,"%d%c\t%s",full_len,locs[0][0],locs[0]);
+							else
+							{
+								if(partlial_len!=-1)fprintf(outbest,"%d%c\t%s",partlial_len,locs[1][0],locs[1]);	
+								else fprintf(outbest,"%d%c\t%s",spacer_len,locs[2][0],locs[2]);	
+							}
+							fprintf(outbest,"\t%c%c\t%s\t",prf_a.cep[n][y],prf_p.cep[n][x],oris[ori_ce]);																								
 							fprintf(outbest,"%f\t%f\t",prf_a.sco[n][y],prf_p.sco[n][x]);							
 							{
 								char dseq[2][MATLEN], compl1;											
@@ -802,7 +879,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int
 		}
 	}
 	//                                      join_file seq(join_sites) 4islo par,4islo par (na kajdy sayt po 1 best pare  n_site[0,1]=1st,2nd profile_total_sites  sequences with both sites(no overlap)   
-	fprintf(out2,"%s Anc_%d(%d) Par %d(%d)\tSpacer %d\t",rera,prf_a.mot,prf_a.nam,prf_p.mot,prf_p.nam,shift);
+	fprintf(out2,"%s Anc_%d(%d) Par %d(%d)\tSpacer %d..%d\t",rera,prf_a.mot,prf_a.nam,prf_p.mot,prf_p.nam,shift_min,shift_max);
 	fprintf(out2,"\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t",rec_seq,tot,tot,prf_a.nsit_all,prf_p.nsit_all,nseq_rec[0], nseq_rec[1],nseq_join_sites,prf_a.nseq_rec-nseq_rec_err[0], prf_p.nseq_rec-nseq_rec_err[1]);
 	fprintf(out2,"%d\t%d\t%d\t%d\n",n_peak_full_over,n_peak_part_over,n_peak_over,n_peak_spacer);
 	fclose(out2);
@@ -1015,3 +1092,4 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift, int
 	sample->spacer=n_peak_spacer;
 	return 1;	
 }
+

@@ -15,31 +15,13 @@ void PWMScore(double &min,double &raz, int len1, double (*pwm)[OLIGNUM])
 	 }	
 	raz-=min;
 }
-int pwm_iz_pwm_thr_dist(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int n_thr_touzet, double *thr_touzet, double *fp_rate, char *partner_db)
+int pwm_iz_pwm_thr_dist(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int n_thr_touzet, double *thr_touzet, double *fp_rate, char *species, int nseq_pro, int len_pro) 
 {
-	int i, j, n, nseq_pro, len_pro; 
+	int i, j, n; 
 	char dp[SEQLEN];	
 	double p;
 	FILE *in;
 
-	if(strstr(partner_db,"hs")!=NULL){len_pro=2000;nseq_pro=19795;}
-	else 
-	{
-		if(strstr(partner_db,"mm")!=NULL){len_pro=2000;nseq_pro=19991;}
-		else 
-		{
-			if(strstr(partner_db,"dapseq")!=NULL){len_pro=1500;nseq_pro=27202;}
-			else
-			{
-				if(strstr(partner_db,"moss")!=NULL){len_pro=1500;nseq_pro=18672;}
-				else
-				{
-					printf("Partner databasee %s is wrong\n",partner_db);
-					return -1;
-				}
-			}
-		}
-	}	            	
    int compl2[2]={0,1};
    int compl1;
    //if(compl_==0)compl2[1]=-1;
