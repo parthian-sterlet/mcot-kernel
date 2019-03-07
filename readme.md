@@ -130,7 +130,7 @@ Finally, MCOT estimates  the similarity of anchor and partner motifs with the mo
 
 MCOT gives the following output data:
 
-* __Detailed recognition statistics__. For each motif and each recognition threshold (five in total) MCOT provides (1) the number* and the name of the motif, (2) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
+* __File <rec_pos.txt>, detailed recognition statistics__. For each motif and each recognition threshold (five in total) MCOT provides (1) the number* and the name of the motif, (2) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
 
 *If the option ‘one partner’ is applied, than 0,1 are the numbers of the motifs. If the option ‘many partners’ is applied, than 0 is an anchor motif and 1,2, ... is the list of potential partners to be tested. 
 
@@ -151,22 +151,94 @@ Example
 |1          |Partner     | 0.959810  | 18.60      | 1403       | 7543        | 3.94E-04     | 1575      | 4002535         |
 
 
-* __The summary for statistical significances for all pairs of anchor-partner motifs__ represents the calculation results for different potential CE variants: a homotypic CE,  one or several heterotypic CE(s) depending on the option one/many partners. Any - any co-occurrence of the motifs, Full - full overlap, Part - partial overlap, Over - Partial or Full overlap, Spac - spacer. The list contains (a) for each pair of motifs five p-values (Pv) of CE enrichment in five computation flows; (b) for each heterotypic pair the p-value for similarity of the anchor and the partner motifs. Next, for each computation flow the asymmetry (Asy) coefficient reflects to the tendency to have more conserved either the anchor or the partner motif within the CE.
+* __File <out_pval>, the summary for statistical significances for all pairs of anchor-partner motifs__ represents the calculation results for different potential CE variants: a homotypic CE,  one or several heterotypic CE(s) depending on the option one/many partners. Any - any co-occurrence of the motifs, Full - full overlap, Part - partial overlap, Over - Partial or Full overlap, Spac - spacer. The list contains (a) for each pair of motifs five p-values (Pv) of CE enrichment in five computation flows; (b) for each heterotypic pair the p-value for similarity of the anchor and the partner motifs. Next, for each computation flow the asymmetry (Asy) coefficient reflects to the tendency to have more conserved either the anchor or the partner motif within the CE.
 
 Example for one-partner option:
+
+
+
+
+|Motif Num|   Motif Name | Any Pv | Full Pv | Part Pv | Over Pv | Spac Pv |    | Any Asy | Full Asy |  Part Asy | Over Asy | Spac Asy |   | Sim Pv |
+|---------|--------------|--------|---------|---------|---------|---------|----|---------|----------|-----------|----------|----------|---|--------|
+|0,0      | First First  |7.8E-16 | 1       |5.9E-08  | 3.2E-07 | 4.0E-13 |    | 0.47    |0.00      | -0.07     | -0.06    | 0.95     |   |        |
+|0,1      | First Second |4.6E-10 |1        | 4.0E-09 | 3.0E-06 | 6.6E-05 |    | 0.43    | 0.00     | 0.00      | -0.03    | 0.19     |   | 1      |
+|1,1      | Second Second|5.6E-02 |1        |7.8E-03  | 1.0E-02 | 4.3E-02 |    | 0.00    | 0.03     | 0.09      | 0.08     | 0.04     |   |        |
+
+ 
 
 Example for many partners option:
 
 
-* __The abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from zero to the maximal spacer length (‘S’).
+
+|Motif Num|   Motif Name | Any Pv | Full Pv | Part Pv | Over Pv | Spac Pv |    | Any Asy | Full Asy |  Part Asy | Over Asy | Spac Asy |   | Sim Pv |
+|---------|--------------|--------|---------|---------|---------|---------|----|---------|----------|-----------|----------|----------|---|--------|
+|0,0      | Anchor       |8.1E-16 | 1       | 2.7E-07 | 5.6E-07 | 2.8E-14 |    | 0.52    | 0.00     | -0.09     | -0.09    | 0.82     |   |        |
+|0,1      | Partner 1    |4.7E-02 | 1       | 0.21    | 0.92    | 3.0E-02 |    | 0.01    | 0.00     | -0.01     | 0.00     | 0.31     |   | 1      |
+|0,2      | Partner 2    |0.59    | 0.29    | 0.36    | 0.16    | 0.11    |    | 0.03    | -0.01    | -0.04     | -0.05    | 0.09     |   | 1      |
+
+
+
+* __File <out_hist>, the abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from zero to the maximal spacer length (‘S’).
 
 Example:
 
-* __The 2x2 tables of CE significance for five computation flows for all motifs pairs and for  all 5x5 combination of motifs conservation__. Each line of output file contains data concerning one 2x2 contingency table, in particular (1) the designation of conservation (PWM threshold (t), 1/5 are the most stringent/permissive) for each motif (see above); (2) four counts for 2x2 contingency table, ‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) and permuted (Rand) datasets. Finally, the table contains the fold and p-value computed by Fisher’s exact test.
+
+
+
+|0,1  |              | 1F | 10P | 9P | 8P | 7P | 6P | 5P | 4P | 3P | 2P | 1P | 0S | 1S | 2S |
+|-----|--------------|----|-----|----|----|----|----|----|----|----|----|----|----|----|----|
+|     | Everted      |    |     |    |    |    |    |0.93|0.03|0.13|0.20|0.19|0.09|0.19|0.08|
+|     | Inverted     |    |     |    |0.72|    |0.04|0.12|0.04|0.16|0.20|0.19|0.19|0.20|0.17|
+|     | DirectPA     |    |     |    |    |    |    |    |0.05|0.01|0.08|0.04|0.07|0.09|0.17|
+|     | DirectAP     |    |     |    |3.31|    |0.03|0.34|0.15|0.11|0.30|0.23|0.13|0.08|0.16|
+
+
+* __Files <fisher\_*>, the 2x2 tables of CE significance for five computation flows for all motifs pairs and for  all 5x5 combination of motifs conservation__. Each line of output file contains data concerning one 2x2 contingency table, in particular (1) the designation of conservation (PWM threshold (t), 1/5 are the most stringent/permissive) for each motif (see above); (2) four counts for 2x2 contingency table, ‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) and permuted (Rand) datasets. Finally, the table contains the fold and p-value computed by Fisher’s exact test.
 
 Example for a one computation flow
 
-* __The list of predicted CEs__. For each recognized CE MCOT provides (1) the header of a peak, (2) the start and the end positions of each motif in a peak, (3) mutual location (Full / Partial / Spacer types and the respective base pair measures, see above), (4) the strands of the motifs in a peak and the mutual orientation of the motifs (one of four types), (5) PWM scores and DNA sequences of the motifs.
+
+
+|Anchor Thr|Partner Thr|  |Real CE+|Real Total|Rand CE+|Rand Total|Fold|P-value|
+|----------|-----------|--|--------|----------|--------|----------|----|-------|
+|1         |1          |  |29      |248       |467     |9672      |2.42|3.0E-05|
+|1         |2          |  |25      |202       |370     |7878      |2.64|2.6E-05|
+|1         |3          |  |64      |326       |599     |12714     |4.17|4.8E-21|
+|1         |4          |  |62      |451       |940     |17589     |2.57|6.1E-11|
+|1         |5          |  |51      |476       |945     |18564     |2.10|1.7E-06|
+|2         |1          |  |21      |139       |223     |5421      |3.67|9.0E-07|
+|2         |2          |  |12      |119       |207     |4641      |2.26|1.7E-02|
+|2         |3          |  |24      |173       |290     |6747      |3.23|1.4E-06|
+|2         |4          |  |21      |268       |508     |10452     |1.61|4.3E-02|
+|2         |5          |  |17      |309       |584     |12051     |1.14|0.68   |
+|3         |1          |  |15      |171       |321     |6669      |1.82|4.0E-02|
+|3         |2          |  |7       |139       |270     |5421      |1.01|1.00   |
+|3         |3          |  |15      |234       |483     |9126      |1.21|0.54   |
+|3         |4          |  |19      |330       |664     |12870     |1.12|0.70   |
+|3         |5          |  |20      |353       |670     |13767     |1.16|0.53   |
+|4         |1          |  |20      |208       |420     |8112      |1.86|1.4E-02|
+|4         |2          |  |9       |186       |376     |7254      |0.93|1      |
+|4         |3          |  |12      |283       |569     |11037     |0.82|1      |
+|4         |4          |  |22      |379       |776     |14781     |1.11|0.72   |
+|4         |5          |  |20      |441       |847     |17199     |0.92|1      |
+|5         |1          |  |19      |220       |418     |8580      |1.77|2.4E-02|
+|5         |2          |  |10      |172       |310     |6708      |1.26|0.56   |
+|5         |3          |  |13      |280       |485     |10920     |1.05|1.00   |
+|5         |4          |  |25      |379       |804     |14781     |1.21|0.36   |
+|5         |5          |  |20      |430       |829     |16770     |0.94|1      |
+
+
+
+* __Files <*.best>, the list of predicted CEs__. For each recognized CE MCOT provides (1) the header of a peak, (2) the start and the end positions of each motif in a peak, (3) mutual location (Full / Partial / Spacer types and the respective base pair measures, see above), (4) the strands of the motifs in a peak and the mutual orientation of the motifs (one of four types), (5) PWM scores and DNA sequences of the motifs.
+
+
+
+|\#Seq    |Anchor start|Anchor end|Partner start|Partner end|Mutual Loc|Loc Type|Strands|Mutual Ori|Anchor score|Partner score|Anchor seq  |Partner seq  | 
+|---------|------------|----------|-------------|-----------|----------|--------|-------|----------|------------|-------------|------------|-------------|
+|Seq 491  |135         |146       |134          |146        |0F        |Full    |+-     |Evert     |0.918       |0.937        |ccaggatgtcaa|ttgacatcctggg|
+|Seq 493  |354         |365       |378          |390        |12S       |Spacer  |+-     |Invert    |0.936       |0.955        |tgaggaagtgaa|ttgacattcttcc|
+|Seq 513  |156         |167       |148          |160        |5P        |Partial |--     |DirectAP  |0.949       |0.959        |agaggaaatgac|atgacagattggg|
+
 
 ## References
 
