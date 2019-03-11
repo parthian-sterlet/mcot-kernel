@@ -491,7 +491,7 @@ int combi::fprintf_all(char *file, int mot_a, int mot_p,char *motif_a, char *mot
 	n_partial=Min(len_a,len_p);//partial overlap
 	n_partial--;
 	int n_full=1+abs(len_a-len_p)/2;// full overlap	
-	int n_tot=n_full+n_partial+len_sp;
+	int n_tot=n_full+n_partial+len_sp+1;
 	char sp='S';//spacer
 	char bo='P';//partial
 	char in='F';//full
@@ -1267,7 +1267,7 @@ int main(int argc, char *argv[])
 					pval_tot_min[i]=pow(10,-pval_tot_min[i]);
 				}
 			}		
-			double asy[5]={0,0,0,0,0};
+			/*double asy[5]={0,0,0,0,0};
 			for(j=0;j<NUM_THR;j++)
 			{
 				for(k=j+1;k<NUM_THR;k++)
@@ -1281,7 +1281,7 @@ int main(int argc, char *argv[])
 				{
 					asy[i]/=mnoj;					
 				}
-			}
+			}*/
 			if((out_pval_table=fopen(file_pval_table,"at"))==NULL)
 			{
 				printf("Input file %s can't be opened!\n", file_pval_table);
@@ -1291,8 +1291,8 @@ int main(int argc, char *argv[])
 			fprintf(out_pval_table,"A %s P %s",name[mot_a],name[mot_p]);			
 			for(i=0;i<5;i++)fprintf(out_pval_table,"\t%g",pval_tot_min[i]);
 			fprintf(out_pval_table,"\t");
-			for(i=0;i<5;i++)fprintf(out_pval_table,"\t%f",asy[i]);
-			fprintf(out_pval_table,"\t");
+			//for(i=0;i<5;i++)fprintf(out_pval_table,"\t%f",asy[i]);
+			//fprintf(out_pval_table,"\t");
 			double pvalue_similarity_tot;
 			double pval_sim[4]={1,1,1,1};
 			if(mot_a!=mot_p)
