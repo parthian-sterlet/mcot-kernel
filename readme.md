@@ -82,7 +82,7 @@ The command line for many-partner option:
 `<partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of human/mouse core (396/353) and full (747/509) collections of motifs (Kulakovskiy et al., 2018, http://hocomoco11.autosome.ru/); and the library of 514 motifs from Plant Cistrome of A. thaliana motifs (http://neomorph.salk.edu/dap_web/pages/index.php, O’Malley et al., 2016).
 
 
-`<minimal spacer length> = integer value from 0 to <maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)`
+`<minimal spacer length>` = integer value from 0 to <maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
 
 `<upper limit of spacer length>` = integer value from 0 to 100 (the default value 30 is recommended)
