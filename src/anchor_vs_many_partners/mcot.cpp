@@ -11,7 +11,7 @@
 #define Max(a,b) ((a)>(b))? (a):(b);
 #define SEQLEN 12000 // max length of peak in input fasta
 #define MATLEN 50 //max matrix length
-#define SPACLEN 100 //max upper bound of spacer length
+#define SPACLEN 150 //max upper bound of spacer length
 #define OLIGNUM 4// di 16 mono 4
 #define NMAT_HS_CORE 403 // total count of matrices in hocomoco human core collection +1(anchor)
 #define NMAT_MM_CORE 359 // total count of matrices in hocomoco mouse core collection +1(anchor)
