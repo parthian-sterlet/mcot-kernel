@@ -11,7 +11,7 @@
 #define Max(a,b) ((a)>(b))? (a):(b);
 #define SEQLEN 12000
 #define MATLEN 50 //max matrix length
-#define SPACLEN 100 //max spacer length
+#define SPACLEN 150 //max spacer length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
 #define NUM_PVAL 30000 // max 4islo porogov v tablice Touzet
