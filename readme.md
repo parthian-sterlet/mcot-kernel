@@ -151,18 +151,18 @@ Example
 |1          |Partner     | 0.959810  | 18.60      | 1403       | 7543        | 3.94E-04     | 1575      | 4002535         |
 
 
-* __File <out_pval>, the summary for statistical significances for all pairs of anchor-partner motifs__ represents the calculation results for different potential CE variants: a homotypic CE,  one or several heterotypic CE(s) depending on the option one/many partners. Any - any co-occurrence of the motifs, Full - full overlap, Part - partial overlap, Over - Partial or Full overlap, Spac - spacer. The list contains (a) for each pair of motifs five p-values (Pv) of CE enrichment in five computation flows; (b) for each heterotypic pair the p-value for similarity of the anchor and the partner motifs. Next, for each computation flow the asymmetry (Asy) coefficient reflects to the tendency to have more conserved either the anchor or the partner motif within the CE.
+* __File <out_pval>, the summary for statistical significances for all pairs of anchor-partner motifs__ represents the calculation results for different potential CE variants: a homotypic CE,  one or several heterotypic CE(s) depending on the option one/many partners. Any - any co-occurrence of the motifs, Full - full overlap, Part - partial overlap, Over - Partial or Full overlap, Spac - spacer. The list contains (a) for each pair of motifs five p-values (Pv) of CE enrichment in five computation flows; (b) for each heterotypic pair the p-value for similarity of the anchor and the partner motifs. 
 
 Example for one-partner option:
 
 
 
 
-|Motif Num|   Motif Name | Any Pv | Full Pv | Part Pv | Over Pv | Spac Pv |    | Any Asy | Full Asy |  Part Asy | Over Asy | Spac Asy |   | Sim Pv |
-|---------|--------------|--------|---------|---------|---------|---------|----|---------|----------|-----------|----------|----------|---|--------|
-|0,0      | First First  |7.8E-16 | 1       |5.9E-08  | 3.2E-07 | 4.0E-13 |    | 0.47    |0.00      | -0.07     | -0.06    | 0.95     |   |        |
-|0,1      | First Second |4.6E-10 |1        | 4.0E-09 | 3.0E-06 | 6.6E-05 |    | 0.43    | 0.00     | 0.00      | -0.03    | 0.19     |   | 1      |
-|1,1      | Second Second|5.6E-02 |1        |7.8E-03  | 1.0E-02 | 4.3E-02 |    | 0.00    | 0.03     | 0.09      | 0.08     | 0.04     |   |        |
+|Motif Num|   Motif Name | Any Pv | Full Pv | Part Pv | Over Pv | Spac Pv |    | Sim Pv |
+|---------|--------------|--------|---------|---------|---------|---------|----|--------|
+|0,0      | First First  |7.8E-16 | 1       |5.9E-08  | 3.2E-07 | 4.0E-13 |    |        |
+|0,1      | First Second |4.6E-10 |1        | 4.0E-09 | 3.0E-06 | 6.6E-05 |    | 1      |
+|1,1      | Second Second|5.6E-02 |1        |7.8E-03  | 1.0E-02 | 4.3E-02 |    |        |
 
  
 
@@ -170,11 +170,11 @@ Example for many partners option:
 
 
 
-|Motif Num|   Motif Name | Any Pv | Full Pv | Part Pv | Over Pv | Spac Pv |    | Any Asy | Full Asy |  Part Asy | Over Asy | Spac Asy |   | Sim Pv |
-|---------|--------------|--------|---------|---------|---------|---------|----|---------|----------|-----------|----------|----------|---|--------|
-|0,0      | Anchor       |8.1E-16 | 1       | 2.7E-07 | 5.6E-07 | 2.8E-14 |    | 0.52    | 0.00     | -0.09     | -0.09    | 0.82     |   |        |
-|0,1      | Partner 1    |4.7E-02 | 1       | 0.21    | 0.92    | 3.0E-02 |    | 0.01    | 0.00     | -0.01     | 0.00     | 0.31     |   | 1      |
-|0,2      | Partner 2    |0.59    | 0.29    | 0.36    | 0.16    | 0.11    |    | 0.03    | -0.01    | -0.04     | -0.05    | 0.09     |   | 1      |
+|Motif Num|   Motif Name | Any Pv | Full Pv | Part Pv | Over Pv | Spac Pv |    | Sim Pv |
+|---------|--------------|--------|---------|---------|---------|---------|----|--------|
+|0,0      | Anchor       |8.1E-16 | 1       | 2.7E-07 | 5.6E-07 | 2.8E-14 |    |        |
+|0,1      | Partner 1    |4.7E-02 | 1       | 0.21    | 0.92    | 3.0E-02 |    | 1      |
+|0,2      | Partner 2    |0.59    | 0.29    | 0.36    | 0.16    | 0.11    |    | 1      |
 
 
 
