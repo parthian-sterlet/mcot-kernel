@@ -23,7 +23,7 @@ long double DirectFact(int n)
     if (n == 0)return 1; 
     else return n*DirectFact(n-1);
 }
-//0.5*LN(2*ох()*A170)+A170*(LN(A170)-1)
+//0.5*LN(2*п╬я┘()*A170)+A170*(LN(A170)-1)
 //formula stirlinga
 long double ApproxLnFact(int n)
 {
@@ -62,10 +62,12 @@ long double FicsherExact(int *x)
 	//printf("Internal %d\t%d\t%d\t%d\t\t%Lf\t%Lf\n", x[0],x[1],x[2],x[3],redo, ret);
 	return ret;
 }
-int fisher_exact_test(int a, int b, int c, int d, double &fold, double &pvalue)//int matrix_opt =1 int tail=0
+int fisher_exact_test(int a, int b, int c, int d, double &pvalue, int depletion_check)//int matrix_opt =1 int tail=0
 {            
+	double limit=1E-300;
+	double fold=1;
 	//printf("Syntax %s: 1file_input 2file_output 3int mode(0 abcd=input, 1 a,a+b,c,c+d=input) 4int 2x2 optimization_column(1,0 yes,no stroki,kolonki) 5int report pvalue one-tailed test (1 enr -1 depl 0 two-tailed)", argv[0]);	
-	if(b==0 || d==0){fold=0;pvalue=1;return 0;}
+	if(b==0 || d==0){pvalue=1;return 0;}
 	if(a<0 || b<0)return -1;
 	if(c<0 || d<0)return -1;
 	if(a>b || c>d)return -1;
@@ -74,7 +76,7 @@ int fisher_exact_test(int a, int b, int c, int d, double &fold, double &pvalue)/
 	d = d - c;
 	if(c>0)fold=((double)a/(a+b))/((double)c/(c+d));
 	else fold=1.01;
-	if(fold<1){pvalue=1;return 0;}
+	if(fold<1 && depletion_check==0){pvalue=1;return 0;}
 	//x[0]=a;x[1]=b;x[2]=c;x[3]=d;
 	int min = 0;
 	int num;
@@ -139,6 +141,7 @@ int fisher_exact_test(int a, int b, int c, int d, double &fold, double &pvalue)/
 	}
 	//printf("External sum %Lf\n", ret_b);		
 	pvalue=ret_a + ret_b;
+	if(pvalue<limit)pvalue=limit;
 	/*if (tail == 0)pvalue=ret_a + ret_b;
 	else
 	{

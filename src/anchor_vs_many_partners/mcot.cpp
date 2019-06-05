@@ -11,7 +11,7 @@
 #define Max(a,b) ((a)>(b))? (a):(b);
 #define SEQLEN 12000 // max length of peak in input fasta
 #define MATLEN 50 //max matrix length
-#define SPACLEN 150 //max upper bound of spacer length
+#define SPACLEN 100 //max upper bound of spacer length
 #define OLIGNUM 4// di 16 mono 4
 #define NMAT_HS_CORE 403 // total count of matrices in hocomoco human core collection +1(anchor)
 #define NMAT_MM_CORE 359 // total count of matrices in hocomoco mouse core collection +1(anchor)
@@ -272,17 +272,20 @@ struct profile {
 	int nseq_rec;
 	int **sta;//nthr nsit
 	char **cep;
+	int **cel;// popadanie v interval porogov
 	double **sco;	
 	int mem_in_sta(void);
 	int mem_in_cep(void);
+	int mem_in_cel(void);
 	int mem_in_sco(void);
 	int mem_in_nsit(void);
 	void mem_out_sta(void);
 	void mem_out_cep(void);
+	void mem_out_cel(void);
 	void mem_out_sco(void);		
 	void mem_out_nsit(void);	
 	int get_copy_rand(profile *a, int height);
-	int get_copy_real(profile *a);
+	int clear_real(void);
 	int fprintf_pro(char *mot_db, double thr, char *mode);//mot_db real/rand
 	void count_sites(void);
 	int test(void);
@@ -317,6 +320,21 @@ int profile::mem_in_cep(void)
 	}
 	return 1;
 }
+int profile::mem_in_cel(void)
+{
+	int i;
+	cel = new int*[nseq];
+	if (cep == NULL) return -1;
+	for (i = 0; i<nseq; i++)
+	{
+		if (nsit[i]>0)
+		{
+			cel[i] = new int[nsit[i]];
+			if (cel[i] == NULL) return -1;
+		}
+	}
+	return 1;
+}
 int profile::mem_in_sco(void)
 {
 	int i;
@@ -335,14 +353,26 @@ int profile::mem_in_sco(void)
 void profile::mem_out_sta(void)
 {
 	int i;
-	for(i=0;i<nseq;i++)if(nsit[i]>0)delete [] sta[i];		
+	for(i=0;i<nseq;i++)
+	{
+		if(nsit[i]>0)delete [] sta[i];		
+	}
 	delete [] sta;
+	sta = NULL;
 }
 void profile::mem_out_cep(void)
 {
 	int i;
 	for(i=0;i<nseq;i++)if(nsit[i]>0)delete [] cep[i];
 	delete [] cep;
+	cep = NULL;
+}
+void profile::mem_out_cel(void)
+{
+	int i;
+	for (i = 0; i<nseq; i++)if (nsit[i]>0)delete[] cel[i];
+	delete[] cel;
+	cel = NULL;
 }
 void profile::mem_out_sco(void)
 {
@@ -383,7 +413,9 @@ int profile::get_copy_rand(profile *a, int height)
 	if(ini==-1){puts("Not enough memory...\n");return -1;}
 	ini=a->mem_in_cep();
 	if(ini==-1){puts("Not enough memory...\n");return -1;}
-	z=0;
+	ini = a->mem_in_cel();
+	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	z = 0;
 	for(i=0;i<nseq;i++)
 	{		
 		for(h=0;h<height;h++)
@@ -392,46 +424,36 @@ int profile::get_copy_rand(profile *a, int height)
 			{
 				a->sta[z][j]=sta[i][j];			
 				a->cep[z][j]=cep[i][j];			
+				a->cel[z][j]=cel[i][j];				
 			}
 			z++;
 		}		
 	}
 	return 1;
 }
-int profile::get_copy_real(profile *a)
+int profile::clear_real(void)
 {
-	int i,j,z=0, ini;
-	a->mot=mot;
-	a->nam=nam;
-	a->nseq=nseq;
-	a->nsit_all=nsit_all;
-	a->nseq_rec=nseq_rec;
-	for(i=0;i<nseq;i++)
+/*	if (mem_clear!=0)
 	{
-		a->nsit[i]=nsit[i];
-	}
-	ini=a->mem_in_sta();
+		mem_out_sta();
+		mem_out_cep();
+		mem_out_cel();
+	}*/
+	int ini=mem_in_sta();
 	if(ini==-1){puts("Not enough memory...\n");return -1;}
-	ini=a->mem_in_cep();
+	ini=mem_in_cep();
 	if(ini==-1){puts("Not enough memory...\n");return -1;}
-	ini=a->mem_in_sco();
+	ini = mem_in_cel();
+	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	ini = mem_in_sco();
 	if(ini==-1){puts("Not enough memory...\n");return -1;}
-	for(i=0;i<nseq;i++)
-	{		
-		for(j=0;j<a->nsit[i];j++)
-		{
-			a->sta[i][j]=sta[i][j];			
-			a->cep[i][j]=cep[i][j];			
-			a->sco[i][j]=sco[i][j];			
-		}	
-	}
 	return 1;
 }
 int profile::fprintf_pro(char *mot_db, double thr,char *mode)
 {
-	int print_sco;
-	if(strncmp(mode,"real",4)==0)print_sco=1;
-	else print_sco=0;
+	//int print_sco=1;
+	//if(strncmp(mode,"real",4)==0)print_sco=1;
+//	else print_sco=0;
 	int i,j;
 	char fileo[80];
 	FILE *out;
@@ -457,7 +479,7 @@ int profile::fprintf_pro(char *mot_db, double thr,char *mode)
 		for(j=0;j<nsit[i];j++)
 		{
 			fprintf(out,"%d\t",sta[i][j]);			
-			if(print_sco==1)fprintf(out,"%f",sco[i][j]);			
+			fprintf(out,"%d",cel[i][j]);			
 			fprintf(out,"\t");
 			fprintf(out,"%c\n",cep[i][j]);						;			
 		}	
@@ -499,40 +521,55 @@ struct count {
 	int any;
 	int partial;
 	int full;
-	int over;
+	int overlap;
 	int spacer;
 	void ini(void);
 };
 void count::ini(void)
 {
-	two_sites=any=partial=full=over=spacer=0;
+	two_sites=any=partial=full=overlap=spacer=0;
 }
-
-//dlya vyvoda rezultata po zna4imostyam CE b asymmetrii CE
 struct result {
-	struct count observed;
-	struct count expected;
-	double fold_a;//any
-	double pvalue_a;
-	double fold_p;//partial
-	double pvalue_p;
-	double fold_f;//full
-	double pvalue_f;
-	double fold_s;//spacer
-	double pvalue_s;
-	double fold_o;//overlap
-	double pvalue_o;
+	count cell[NUM_THR][NUM_THR];
+	count anc;
+	count par;
+	count eq;
 	void ini(void);
-} ;
+} observed, expected;	
 void result::ini(void)
 {
-	fold_a=pvalue_a=1;
-	fold_f=pvalue_f=1;
-	fold_p=pvalue_p=1;
-	fold_o=pvalue_o=1;
-	fold_s=pvalue_s=1;	
-	observed.ini();
-	expected.ini();
+	int j, k;
+	for(j=0;j<NUM_THR;j++)for(k=0;k<NUM_THR;k++)cell[j][k].ini();
+	anc.ini();
+	par.ini();
+	eq.ini();
+}
+
+/*
+	int i,j;	
+*/
+double pvalue_a[NUM_THR][NUM_THR];	
+double pvalue_p[NUM_THR][NUM_THR];	
+double pvalue_f[NUM_THR][NUM_THR];	
+double pvalue_s[NUM_THR][NUM_THR];	
+double pvalue_o[NUM_THR][NUM_THR];
+
+struct pval {
+	double anchor;
+	double partner;
+	double equal;
+	double anc_par;
+	double anc_eq;
+	double par_eq;
+	double fold_anc_par;
+	double fold_anc_eq;
+	double fold_par_eq;
+	void ini(void);
+} pv_any, pv_full, pv_partial, pv_overlap, pv_spacer;
+void pval::ini(void)
+{
+	anchor=partner=equal=anc_par=anc_eq=par_eq=1;
+	fold_anc_par=fold_anc_eq=fold_par_eq=1;
 }
 
 // dlya vyvoda histogram of CE distribution as fanction of mutual orientation and location of anchor/partner motifs
@@ -596,7 +633,7 @@ char nam[MOT_NAME_LEN];
 
 int main(int argc, char *argv[])
 {
-	int i, j, k, m, n, n_motifs, mot, *bad_matrix; 
+	int i, j, k, m, n_motifs, mot, *bad_matrix; 
 	char file_fasta[80], mot_db[30], mypath_data[200], prom[200], partner_db[30], file_pfm_anchor[50];	
 	char ***seq;// peaks
 	
@@ -616,7 +653,7 @@ int main(int argc, char *argv[])
 	int height_permut = 100, size_min_permut= 200000, size_max_permut =300000; //50000 150000 25  parametry permutacii
 	double pvalue = 0.0005, pvalue_mult = 1.5; // 0.0005 1.5 parametry dlya porogov matric
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database	
-	int s_overlap_min=6, s_ncycle_small=2000, s_ncycle_large=20000;//for permutation(motif_comparison) min_length_of_alignment, no. of permutation (test & detailed)
+	int s_overlap_min=6, s_ncycle_small=1000, s_ncycle_large=10000;//for permutation(motif_comparison) min_length_of_alignment, no. of permutation (test & detailed)
 	double s_granul=0.001;//for permutation(motif_comparison) okruglenie 4astotnyh matric	
 	strcpy(file_pfm_anchor,argv[2]);		
 	strcpy(partner_db,argv[3]); //hs_core, hs_full, mm_core, mm_full, dapseq
@@ -761,30 +798,20 @@ int main(int argc, char *argv[])
 		return -1;
 	}		
 		
-	double thr[NUM_THR], thr_anchor[NUM_THR];	
-
-	profile real[2][NUM_THR], rand[2][NUM_THR], rand_hom[NUM_THR];
+	double thr[NUM_THR], thr_anchor[NUM_THR];
+	
 	profile real_one[2], rand_one[2], rand_hom_one;
 	matrices matrix, matrix0;	
-	result table[NUM_THR][NUM_THR], table_one;
-	combi hist_obs[NUM_THR][NUM_THR], hist_obs_one;		
-	combi hist_exp[NUM_THR][NUM_THR];		
+	combi hist_obs_one, hist_exp_one;		
 	
 	//for real
 	for(j=0;j<2;j++)
 	{
-		for(k=0;k<NUM_THR;k++)
-		{
-			real[j][k].nseq=nseq_real;
-			real[j][k].nam=k+1;
-			int ini=real[j][k].mem_in_nsit();
-			if(ini==-1){puts("Not enough memory...\n");return -1;}
-		}
 		real_one[j].nseq=nseq_real;
 		real_one[j].nam=1;
 		int ini=real_one[j].mem_in_nsit();
 		if(ini==-1){puts("Not enough memory...\n");return -1;}		
-	}
+	}	
 	
 	//for permutation
 	srand( (unsigned)time( NULL ) );
@@ -793,33 +820,18 @@ int main(int argc, char *argv[])
 	if(nseq_rand>size_max_permut)height_permut=size_max_permut/nseq_real;
 	nseq_rand=nseq_real*height_permut;	
 
-	for(j=0;j<2;j++)
-	{
-		for(k=0;k<NUM_THR;k++)
-		{
-			rand[j][k].nseq=nseq_rand;
-			rand[j][k].nam=k+1;
-			int ini=rand[j][k].mem_in_nsit();
-			if(ini==-1){puts("Not enough memory...\n");return -1;}
-		}		
-		rand_one[j].nseq=nseq_rand;
-		rand_one[j].nam=1;
-		int ini=rand_one[j].mem_in_nsit();
-		if(ini==-1){puts("Not enough memory...\n");return -1;}		
-	}
-	for(j=0;j<NUM_THR;j++)
-	{
-		rand_hom[j].nseq=nseq_rand;
-		rand_hom[j].nam=j+1;
-		rand_hom[j].mot=0;
-		int ini=rand_hom[j].mem_in_nsit();
-		if(ini==-1){puts("Not enough memory...\n");return -1;}
-	}		
 	rand_hom_one.nseq=nseq_rand;
 	rand_hom_one.nam=1;
 	rand_hom_one.mot=0;
 	int ini=rand_hom_one.mem_in_nsit();
 	if(ini==-1){puts("Not enough memory...\n");return -1;}	
+	for(j=0;j<2;j++)
+	{
+		rand_one[j].nseq=nseq_rand;
+		rand_one[j].nam=1;
+		int ini=rand_one[j].mem_in_nsit();
+		if(ini==-1){puts("Not enough memory...\n");return -1;}		
+	}
 
 	int *peak_len_rand;
 	peak_len_rand=new int[nseq_rand];
@@ -829,14 +841,11 @@ int main(int argc, char *argv[])
 	{
 		for(m=0;m<height_permut;m++)peak_len_rand[k++]=peak_len_real[i];
 	}
-	int *thr_err_real, *thr_err_rand, *thr_err_real_one;
+	int *thr_err_real, *thr_err_rand;
 	thr_err_real=new int[nseq_real];
 	if(thr_err_real==NULL){puts("Out of memory...");return -1;}
 	thr_err_rand=new int[nseq_rand];
 	if(thr_err_rand==NULL){puts("Out of memory...");return -1;}			
-	thr_err_real_one=new int[nseq_real];
-	if(thr_err_real_one==NULL){puts("Out of memory...");return -1;}
-	for(i=0;i<nseq_real;i++)thr_err_real_one[i]=0;
 
 	FILE *out_hist;
 	if((out_hist=fopen(file_hist,"wt"))==NULL)
@@ -852,25 +861,48 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 //	fprintf(out_pval_table,"%s\n",file_fasta);
-	fprintf(out_pval_table,"Motif Num");
-	fprintf(out_pval_table,"\tMotif Name");
+	fprintf(out_pval_table,"Partner Num");
+	fprintf(out_pval_table,"\tPartner Nam");
 	fprintf(out_pval_table,"\tAny Pv");
 	fprintf(out_pval_table,"\tFull Pv");
-	fprintf(out_pval_table,"\tPart Pv");
-	fprintf(out_pval_table,"\tOver Pv");
-	fprintf(out_pval_table,"\tSpac Pv");
-	fprintf(out_pval_table,"\t");
-	fprintf(out_pval_table,"\tAny Asy");
-	fprintf(out_pval_table,"\tFull Asy");
-	fprintf(out_pval_table,"\tPart Asy");
-	fprintf(out_pval_table,"\tOver Asy");
-	fprintf(out_pval_table,"\tSpac Asy");	
-	fprintf(out_pval_table,"\t");
-	fprintf(out_pval_table,"\tSim Pv");	
-	/*fprintf(out_pval_table,"\tSimEDpre");	
-	fprintf(out_pval_table,"\tSimPCpre");	
-	fprintf(out_pval_table,"\tSimED");	
-	fprintf(out_pval_table,"\tSimPC");	*/
+	fprintf(out_pval_table,"\tPartial Pv");
+	fprintf(out_pval_table,"\tOverlap Pv");
+	fprintf(out_pval_table,"\tSpacer Pv");
+	fprintf(out_pval_table, "\t");
+	fprintf(out_pval_table, "\tSim");
+	fprintf(out_pval_table, "\tSim SSD");
+	fprintf(out_pval_table, "\tSim PCC");	
+	fprintf(out_pval_table, "\t\t");
+	fprintf(out_pval_table, "Anchor Any\t");
+	fprintf(out_pval_table, "Partner Any\t");
+	fprintf(out_pval_table, "Equal Any\t\t");
+	fprintf(out_pval_table, "Anchor Full\t");
+	fprintf(out_pval_table, "Partner Full\t");
+	fprintf(out_pval_table, "Equal Full\t\t");
+	fprintf(out_pval_table, "Anchor Part\t");
+	fprintf(out_pval_table, "Partner Part\t");
+	fprintf(out_pval_table, "Equal Part\t\t");
+	fprintf(out_pval_table, "Anchor Over\t");
+	fprintf(out_pval_table, "Partner Over\t");
+	fprintf(out_pval_table, "Equal Over\t\t");
+	fprintf(out_pval_table, "Anchor Spac\t");
+	fprintf(out_pval_table, "Partner Spac\t");
+	fprintf(out_pval_table, "Equal Spac\t\t");
+	fprintf(out_pval_table, "AncPar Any\t");
+	fprintf(out_pval_table, "AncEq Any\t");
+	fprintf(out_pval_table, "ParEq Any\t\t");
+	fprintf(out_pval_table, "AncPar Full\t");
+	fprintf(out_pval_table, "AncEq Full\t");
+	fprintf(out_pval_table, "ParEq Full\t\t");
+	fprintf(out_pval_table, "AncPar Partial\t");
+	fprintf(out_pval_table, "AncEq Partial\t");
+	fprintf(out_pval_table, "ParEq Partial\t\t");
+	fprintf(out_pval_table, "AncPar Overlap\t");
+	fprintf(out_pval_table, "AncEq Overlap\t");
+	fprintf(out_pval_table, "ParEq Overlap\t\t");
+	fprintf(out_pval_table, "AncPar Spacer\t");
+	fprintf(out_pval_table, "AncEq Spacer\t");
+	fprintf(out_pval_table, "ParEq Spacer");	
 	fprintf(out_pval_table,"\n");
 	fclose(out_pval_table);
 
@@ -885,7 +917,7 @@ int main(int argc, char *argv[])
 	}	
 	fprintf(out_stat,"Motif Num\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
 	for(mot=0;mot<n_motifs;mot++)
-	//for(mot=0;mot<n_motifs;mot+=68)
+	//for(mot=0;mot<n_motifs;mot+=106)
 	{	
 		{
 			int bad=0;
@@ -1044,9 +1076,12 @@ int main(int argc, char *argv[])
 		if(mot==0)
 		{
 			ap=0;
-			for(j=0;j<NUM_THR;j++)thr_anchor[j]=thr[j];
+			for (j = 0; j<NUM_THR; j++)thr_anchor[j] =thr[j];
 		}
-		else ap=1;
+		else
+		{
+			ap = 1;			
+		}
 //int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, profile *real)  count all sites
 		////recognition 1st		
 		int all_pos=0;//total number of available positions
@@ -1057,12 +1092,7 @@ int main(int argc, char *argv[])
 			return -1;
 		}	
 		//memory allocation for all sites
-		int ini=real_one[ap].mem_in_sta();
-		if(ini==-1){puts("Not enough memory...\n");return -1;}
-		ini=real_one[ap].mem_in_cep();
-		if(ini==-1){puts("Not enough memory...\n");return -1;}
-		ini=real_one[ap].mem_in_sco();	
-		if(ini==-1){puts("Not enough memory...\n");return -1;}
+		real_one[ap].clear_real();
 		real_one[ap].mot=mot;
 		real_one[ap].nam=NUM_THR;
 		real_one[ap].count_sites();
@@ -1073,14 +1103,7 @@ int main(int argc, char *argv[])
 			printf("Motif %d recognition 2nd stage error\n", mot);
 			return -1;
 		}
-		int fprint_pro=real_one[ap].fprintf_pro(mot_db,thr[NUM_THR-1],xreal);
-		if(fprint_pro==-1)
-		{
-			printf("Real print profile error, motif %d\n",mot);
-			return -1;
-		}
 		//count nsites for various thresholds
-		for(j=0;j<NUM_THR;j++)real[ap][j].nsit[i]=0;
 		for(i=0;i<nseq_real;i++)
 		{
 			for(k=0;k<real_one[ap].nsit[i];k++)
@@ -1090,24 +1113,17 @@ int main(int argc, char *argv[])
 				{
 					if(sco>=thr[j])
 					{
-						real[ap][j].nsit[i]++;
+						real_one[ap].cel[i][k]=j;
 						break;
 					}
 				}
 			}
-		}
-		//memory allcation for various thresholds
-		for(j=0;j<NUM_THR;j++)
-		{				
-			int ini=real[ap][j].mem_in_sta();
-			if(ini==-1){puts("Not enough memory...\n");return -1;}
-			ini=real[ap][j].mem_in_cep();
-			if(ini==-1){puts("Not enough memory...\n");return -1;}
-			ini=real[ap][j].mem_in_sco();	
-			if(ini==-1){puts("Not enough memory...\n");return -1;}
-			real[ap][j].mot=mot;
-			real[ap][j].nam=j+1;
-			real[ap][j].count_sites();
+		}		
+		int fprint_pro=real_one[ap].fprintf_pro(mot_db,thr[NUM_THR-1],xreal);
+		if(fprint_pro==-1)
+		{
+			printf("Real print profile error, motif %d\n",mot);
+			return -1;
 		}
 		//initiation of profiles for various thresholds
 		int rec_seq[NUM_THR], rec_pos[NUM_THR];
@@ -1124,9 +1140,6 @@ int main(int argc, char *argv[])
 					if(sco>=thr[j])
 					{
 						rec_pos[j]++;						
-						real[ap][j].sta[i][inx[j]]=real_one[ap].sta[i][k];
-						real[ap][j].cep[i][inx[j]]=real_one[ap].cep[i][k];
-						real[ap][j].sco[i][inx[j]]=sco;
 						inx[j]++;
 						if(inx[j]==1)rec_seq[j]++;
 						break;
@@ -1139,16 +1152,6 @@ int main(int argc, char *argv[])
 			fprintf(out_stat,"%d\t%s\t%d\t%f\t",mot,name_partner,j+1,thr[j]);
 			fprintf(out_stat,"%f\t%d\t%d\t",100*(double)rec_seq[j]/nseq_real,rec_seq[j],nseq_real);
 			fprintf(out_stat,"%g\t%d\t%d\n",(double)rec_pos[j]/all_pos,rec_pos[j],all_pos);
-		}
-		for(j=0;j<NUM_THR;j++)
-		{
-			real[ap][j].count_sites();
-			int fprint_pro=real[ap][j].fprintf_pro(mot_db,thr[j],xreal);
-			if(fprint_pro==-1)
-			{
-				printf("Real print profile error, motif %d\n",mot);
-				return -1;
-			}
 		}
 		if(ap==0){len_anchor=len_partner=matrix.len;}
 		else len_partner=matrix.len;
@@ -1163,8 +1166,8 @@ int main(int argc, char *argv[])
 		}*/
 	
 //one thresh  rand - &rand_hom_one,&rand_one[ap]   real - real_one[0],real_one[ap]
-//many thresh rand - &rand_hom[j],&rand[ap][k]     real - real[0][j],real[ap][k]
-		//anchor		
+		//anchor
+		if(mot==0)
 		{
 			int cop=real_one[0].get_copy_rand(&rand_hom_one,height_permut);
 			if(cop==-1)
@@ -1172,15 +1175,13 @@ int main(int argc, char *argv[])
 				printf("Rand Copy error Mot %d Thr One\n",mot);
 				return -1;
 			}
-			for(j=0;j<NUM_THR;j++)
-			{				
-				cop=real[0][j].get_copy_rand(&rand_hom[j],height_permut);
-				if(cop==-1)
-				{
-					printf("Rand Copy error Mot %d Thr%d\n",mot,j);
-					return -1;
-				}
-			}
+	/*		int fprint_pro=rand_hom_one.fprintf_pro(mot_db,thr[NUM_THR-1],xrand);
+			if(fprint_pro==-1)
+			{
+				printf("Rand print profile error, motif %d\n",mot);
+				return -1;
+			}*/
+		
 			/*
 			test = rand_hom_one.test();
 			if(test==-1)
@@ -1206,15 +1207,6 @@ int main(int argc, char *argv[])
 			{
 				printf("Rand Copy error Mot %d Thr One\n",mot);
 				return -1;
-			}
-			for(j=0;j<NUM_THR;j++)
-			{				
-				cop=real[ap][j].get_copy_rand(&rand[ap][j],height_permut);
-				if(cop==-1)
-				{
-					printf("Rand Copy error Mot %d Thr%d\n",mot,j);
-					return -1;
-				}
 			}
 			/*
 			test = rand_one[ap].test();
@@ -1247,41 +1239,14 @@ int main(int argc, char *argv[])
 		{// one threshold
 			for(m=0;m<nseq_real;m++)thr_err_real[m]=0;			
 			rand_one[ap].mot=mot;			
-			int throwp=throw_predictions(peak_len_rand,&rand_hom_one,&rand_one[ap],len_anchor,len_partner,0,thr_err_real,nseq_real,nseq_rand,seq[0],height_permut);			
+			int throwp = throw_predictions(peak_len_rand, &rand_hom_one, &rand_one[ap], len_anchor, len_partner, 0, thr_err_real, nseq_real, nseq_rand, seq[0], height_permut);
 			if(throwp==-1)
 			{
 				printf("Throw Prediction error One - Anc 0 Par %d\n", mot);
 				return -1;
 			}
-		/*	int fprint_pro=rand_hom_one.fprintf_pro(mot_db,thr_anchor[NUM_THR-1],"rand_po");
-			if(fprint_pro==-1)
-			{
-				printf("Real print profile error, motif %d\n",mot);
-				return -1;
-			}
-			fprint_pro=rand_one[ap].fprintf_pro(mot_db,thr[NUM_THR-1],"rand_po");
-			if(fprint_pro==-1)
-			{
-				printf("Real print profile error, motif %d\n",mot);
-				return -1;
-			}*/
-		/*	memset(file_throw_err,'\0',sizeof(file_throw_err));
-			memset(file_throw_err0,'\0',sizeof(file_throw_err0));
-			strcpy(file_throw_err,"throw_nsit_mot0");
-			char buf[10];
-			sprintf(buf,"%d",mot);
-			strcat(file_throw_err,buf);
-			strcpy(file_throw_err0,file_throw_err);
-			strcat(file_throw_err,"_one.txt");
-			if((out_nsit_throw=fopen(file_throw_err,"wt"))==NULL)
-			{
-				printf("Input file %s can't be opened!\n", file_throw_err);
-				return -1;
-			}
-			for(m=0;m<nseq_real;m++)fprintf(out_nsit_throw,"%d\n",thr_err_real[m]);
-			fclose(out_nsit_throw);*/
-			table_one.ini();
-			real_one[ap].mot=mot;
+			observed.ini();
+			expected.ini();			
 			k=0;
 			for(i=0;i<nseq_real;i++)
 			{
@@ -1290,116 +1255,251 @@ int main(int argc, char *argv[])
 					thr_err_rand[k++]=thr_err_real[i];
 				}		
 			}					
-			int proj=projoin(xreal_one,mot_db,real_one[0],real_one[ap],shift_min,shift_max,len_anchor,len_partner,thr_err_real,nseq_real,seq,&table_one.observed,&hist_obs_one,peak_len_real);		
+			int proj=projoin(xrand,mot_db,rand_hom_one,rand_one[ap],shift_min,shift_max,len_anchor,len_partner,thr_err_rand,nseq_rand,seq,&expected, &hist_exp_one,peak_len_rand);		
+			if(proj==-1)
+			{
+				printf("Projoin Rand error Anc 0 Par %d\n", mot);
+				return -1;
+			}			
+			proj=projoin(xreal,mot_db,real_one[0],real_one[ap],shift_min,shift_max,len_anchor,len_partner,thr_err_real,nseq_real,seq,&observed, &hist_obs_one,peak_len_real);		
 			if(proj==-1)
 			{
 				printf("Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			hist_obs_one.fprintf_all(file_hist,mot,name_partner,len_anchor,len_partner,shift_max);
+			hist_obs_one.fprintf_all(file_hist,mot,name_partner,len_anchor,len_partner,shift_max);					
 		}// one threshold
 		//many thresholds
-		//strcat(file_throw_err0,"_thr");
-		for(j=0;j<NUM_THR;j++)
-		{
-			for(k=0;k<NUM_THR;k++)
-			{
-				//printf("Anchor %d thresh, Partner %d thresh\n",j+1,k+1);
-				for(m=0;m<nseq_real;m++)thr_err_real[m]=0;				
-				int throwp=throw_predictions(peak_len_rand,&rand_hom[j],&rand[ap][k],len_anchor,len_partner,0,thr_err_real,nseq_real,nseq_rand,seq[0],height_permut);
-				if(throwp==-1)
-				{
-					printf("Throw Prediction error Anc 0(%d) Par %d(%d)\n", j, mot, k);
-					return -1;
-				}
-				n=0;
-				for(i=0;i<nseq_real;i++)
-				{
-					for(m=0;m<height_permut;m++)
-					{
-						thr_err_rand[n++]=thr_err_real[i];
-					}		
-				}	
-			/*	strcpy(file_throw_err,file_throw_err0);
-				char buf[10];
-				sprintf(buf,"%d",j+1);
-				strcat(file_throw_err,buf);
-				sprintf(buf,"%d",k+1);
-				strcat(file_throw_err,buf);
-				strcat(file_throw_err,".txt");	
-				if((out_nsit_throw=fopen(file_throw_err,"wt"))==NULL)
-				{
-					printf("Input file %s can't be opened!\n", file_throw_err);
-					return -1;
-				}
-				for(m=0;m<nseq_real;m++)fprintf(out_nsit_throw,"%d\n",thr_err_real[m]);
-				fclose(out_nsit_throw);*/
-				/*	int fprint_pro=rand_hom[j].fprintf_pro(mot_db,thr_anchor[j],"rand_po");
-				if(fprint_pro==-1)
-				{
-					printf("Real print profile error, motif %d\n",mot);
-					return -1;
-				}
-				fprint_pro=rand[ap][k].fprintf_pro(mot_db,thr[k],"rand_po");
-				if(fprint_pro==-1)
-				{
-					printf("Real print profile error, motif %d\n",mot);
-					return -1;
-				}*/
-				table[j][k].ini();
-//				hist_exp[j][k].ini(len_anchor,len_partner,shift);
-				int proj=projoin(xrand,mot_db,rand_hom[j],rand[ap][k],shift_min,shift_max,len_anchor,len_partner,thr_err_rand,nseq_rand,seq,&table[j][k].expected,&hist_exp[j][k],peak_len_rand);		
-				if(proj==-1)
-				{
-					printf("Projoin Rand error Anc 0 Par %d\n", mot);
-					return -1;
-				}
-	//			hist_obs[j][k].ini(len_anchor,len_partner,shift);
-				proj=projoin(xreal,mot_db,real[0][j],real[ap][k],shift_min,shift_max,len_anchor,len_partner,thr_err_real,nseq_real,seq,&table[j][k].observed,&hist_obs[j][k],peak_len_real);		
-				if(proj==-1)
-				{
-					printf("Projoin Real error Anc 0 Par %d\n", mot);
-					return -1;
-				}
-			}
-		}
+		for(i=0;i<NUM_THR;i++)for(j=0;j<NUM_THR;j++)pvalue_a[i][j]=pvalue_f[i][j]=pvalue_p[i][j]=pvalue_o[i][j]=pvalue_s[i][j]=1;			
 		for(j=0;j<NUM_THR;j++)
 		{
 			for(k=0;k<NUM_THR;k++)
 			{			
-				//printf("Mot %d J %d K %d\n",mot,j+1,k+1);
-				int fisher;
-				fisher=fisher_exact_test(table[j][k].observed.any, table[j][k].observed.two_sites,table[j][k].expected.any,table[j][k].expected.two_sites,table[j][k].fold_a,table[j][k].pvalue_a);					
+				//printf("Mot %d J %d K %d\n",mot,j+1,k+1);								
+				int fisher=fisher_exact_test(observed.cell[j][k].any, observed.cell[j][k].two_sites,expected.cell[j][k].any,expected.cell[j][k].two_sites,pvalue_a[j][k],0);					
 				if(fisher==-1)
 				{
 					printf("Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher=fisher_exact_test(table[j][k].observed.full, table[j][k].observed.two_sites,table[j][k].expected.full,table[j][k].expected.two_sites,table[j][k].fold_f,table[j][k].pvalue_f);					
+				fisher=fisher_exact_test(observed.cell[j][k].full, observed.cell[j][k].two_sites,expected.cell[j][k].full,expected.cell[j][k].two_sites,pvalue_f[j][k],0);					
 				if(fisher==-1)
 				{
 					printf("Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher=fisher_exact_test(table[j][k].observed.partial, table[j][k].observed.two_sites,table[j][k].expected.partial,table[j][k].expected.two_sites,table[j][k].fold_p,table[j][k].pvalue_p);					
+				fisher=fisher_exact_test(observed.cell[j][k].partial, observed.cell[j][k].two_sites,expected.cell[j][k].partial,expected.cell[j][k].two_sites,pvalue_p[j][k],0);					
 				if(fisher==-1)
 				{
 					printf("Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher=fisher_exact_test(table[j][k].observed.over, table[j][k].observed.two_sites,table[j][k].expected.over,table[j][k].expected.two_sites,table[j][k].fold_o,table[j][k].pvalue_o);					
+				fisher=fisher_exact_test(observed.cell[j][k].overlap, observed.cell[j][k].two_sites,expected.cell[j][k].overlap,expected.cell[j][k].two_sites,pvalue_o[j][k],0);					
 				if(fisher==-1)
 				{
 					printf("Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher=fisher_exact_test(table[j][k].observed.spacer, table[j][k].observed.two_sites,table[j][k].expected.spacer,table[j][k].expected.two_sites,table[j][k].fold_s,table[j][k].pvalue_s);					
+				fisher=fisher_exact_test(observed.cell[j][k].spacer, observed.cell[j][k].two_sites,expected.cell[j][k].spacer,expected.cell[j][k].two_sites,pvalue_s[j][k],0);					
 				if(fisher==-1)
 				{
 					printf("Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 			}
+		}
+		{
+			pv_any.ini();
+			pv_full.ini();
+			pv_partial.ini();
+			pv_overlap.ini();
+			pv_spacer.ini();
+			//any
+			int fisher;
+			fisher = fisher_exact_test(observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.eq.any, observed.eq.two_sites, expected.eq.any, expected.eq.two_sites, pv_any.equal, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.any, observed.anc.two_sites, observed.par.any, observed.par.two_sites, pv_any.anc_par, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.any, observed.anc.two_sites, observed.eq.any, observed.eq.two_sites, pv_any.anc_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.any, observed.par.two_sites, observed.eq.any, observed.eq.two_sites, pv_any.par_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			//full
+			fisher = fisher_exact_test(observed.anc.full, observed.anc.two_sites, expected.anc.full, expected.anc.two_sites, pv_full.anchor, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.full, observed.par.two_sites, expected.par.full, expected.par.two_sites, pv_full.partner, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.eq.full, observed.eq.two_sites, expected.eq.full, expected.eq.two_sites, pv_full.equal, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.full, observed.anc.two_sites, observed.par.full, observed.par.two_sites, pv_full.anc_par, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.full, observed.anc.two_sites, observed.eq.full, observed.eq.two_sites, pv_full.anc_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.full, observed.par.two_sites, observed.eq.full, observed.eq.two_sites, pv_full.par_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			//partial
+			fisher = fisher_exact_test(observed.anc.partial, observed.anc.two_sites, expected.anc.partial, expected.anc.two_sites, pv_partial.anchor, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.partial, observed.par.two_sites, expected.par.partial, expected.par.two_sites, pv_partial.partner, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.eq.partial, observed.eq.two_sites, expected.eq.partial, expected.eq.two_sites, pv_partial.equal, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.partial, observed.anc.two_sites, observed.par.partial, observed.par.two_sites, pv_partial.anc_par, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.partial, observed.anc.two_sites, observed.eq.partial, observed.eq.two_sites, pv_partial.anc_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.partial, observed.par.two_sites, observed.eq.partial, observed.eq.two_sites, pv_partial.par_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}			
+			//overlap
+			fisher = fisher_exact_test(observed.anc.overlap, observed.anc.two_sites, expected.anc.overlap, expected.anc.two_sites, pv_overlap.anchor, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.overlap, observed.par.two_sites, expected.par.overlap, expected.par.two_sites, pv_overlap.partner, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.eq.overlap, observed.eq.two_sites, expected.eq.overlap, expected.eq.two_sites, pv_overlap.equal, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.overlap, observed.anc.two_sites, observed.par.overlap, observed.par.two_sites, pv_overlap.anc_par, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.overlap, observed.anc.two_sites, observed.eq.overlap, observed.eq.two_sites, pv_overlap.anc_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.overlap, observed.par.two_sites, observed.eq.overlap, observed.eq.two_sites, pv_overlap.par_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}			
+			//spacer
+			fisher = fisher_exact_test(observed.anc.spacer, observed.anc.two_sites, expected.anc.spacer, expected.anc.two_sites, pv_spacer.anchor, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.spacer, observed.par.two_sites, expected.par.spacer, expected.par.two_sites, pv_spacer.partner, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.eq.spacer, observed.eq.two_sites, expected.eq.spacer, expected.eq.two_sites, pv_spacer.equal, 0);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.spacer, observed.anc.two_sites, observed.par.spacer, observed.par.two_sites, pv_spacer.anc_par, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc.spacer, observed.anc.two_sites, observed.eq.spacer, observed.eq.two_sites, pv_spacer.anc_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.par.spacer, observed.par.two_sites, observed.eq.spacer, observed.eq.two_sites, pv_spacer.par_eq, 1);
+			if (fisher == -1)
+			{
+				printf("Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}			
 		}
 		for(i=0;i<5;i++)
 		{
@@ -1420,13 +1520,110 @@ int main(int argc, char *argv[])
 			for(k=0;k<NUM_THR;k++)
 			{		
 				for(i=0;i<5;i++)fprintf(out_pval[i],"A %d\tP %d\t\t",j+1,k+1);												
-				fprintf(out_pval[0],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.any, table[j][k].observed.two_sites,table[j][k].expected.any,table[j][k].expected.two_sites,table[j][k].fold_a,table[j][k].pvalue_a);
-				fprintf(out_pval[1],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.full, table[j][k].observed.two_sites,table[j][k].expected.full,table[j][k].expected.two_sites,table[j][k].fold_f,table[j][k].pvalue_f);
-				fprintf(out_pval[2],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.partial, table[j][k].observed.two_sites,table[j][k].expected.partial,table[j][k].expected.two_sites,table[j][k].fold_p,table[j][k].pvalue_p);
-				fprintf(out_pval[3],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.over, table[j][k].observed.two_sites,table[j][k].expected.over,table[j][k].expected.two_sites,table[j][k].fold_o,table[j][k].pvalue_o);
-				fprintf(out_pval[4],"%d\t%d\t%d\t%d\t%f\t%g\n",table[j][k].observed.spacer, table[j][k].observed.two_sites,table[j][k].expected.spacer,table[j][k].expected.two_sites,table[j][k].fold_s,table[j][k].pvalue_s);
+				fprintf(out_pval[0],"%d\t%d\t%d\t%d\t\t%g\n",observed.cell[j][k].any, observed.cell[j][k].two_sites,expected.cell[j][k].any,expected.cell[j][k].two_sites,pvalue_a[j][k]);
+				fprintf(out_pval[1],"%d\t%d\t%d\t%d\t\t%g\n",observed.cell[j][k].full, observed.cell[j][k].two_sites,expected.cell[j][k].full,expected.cell[j][k].two_sites,pvalue_f[j][k]);
+				fprintf(out_pval[2],"%d\t%d\t%d\t%d\t\t%g\n",observed.cell[j][k].partial, observed.cell[j][k].two_sites,expected.cell[j][k].partial,expected.cell[j][k].two_sites,pvalue_p[j][k]);
+				fprintf(out_pval[3],"%d\t%d\t%d\t%d\t\t%g\n",observed.cell[j][k].overlap, observed.cell[j][k].two_sites,expected.cell[j][k].overlap,expected.cell[j][k].two_sites,pvalue_o[j][k]);
+				fprintf(out_pval[4],"%d\t%d\t%d\t%d\t\t%g\n",observed.cell[j][k].spacer, observed.cell[j][k].two_sites,expected.cell[j][k].spacer,expected.cell[j][k].two_sites,pvalue_s[j][k]);
 			}
 		}
+		double rat_a, rat_p, rat_e;
+		for(i=0;i<5;i++)fprintf(out_pval[i],"\n");
+		//any vs rand
+		fprintf(out_pval[0],"Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.anc.any,observed.anc.two_sites,expected.anc.any,expected.anc.two_sites,pv_any.anchor);
+		fprintf(out_pval[0],"Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.par.any,observed.par.two_sites,expected.par.any,expected.par.two_sites,pv_any.partner);			
+		fprintf(out_pval[0],"Equal\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.eq.any,observed.eq.two_sites,expected.eq.any,expected.eq.two_sites,pv_any.equal);
+		//any vs real
+		rat_a=(double)observed.anc.any/observed.anc.two_sites;
+		rat_p=(double)observed.par.any/observed.par.two_sites;
+		rat_e=(double)observed.eq.any/observed.eq.two_sites;
+		if(rat_p==0)pv_any.fold_anc_par=1000;
+		else pv_any.fold_anc_par = rat_a/rat_p;
+		if(rat_e==0)pv_any.fold_anc_eq=1000;
+		else 
+		{
+			pv_any.fold_anc_eq = rat_a/rat_e;
+			pv_any.fold_par_eq = rat_p/rat_e;
+		}
+		fprintf(out_pval[0],"Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.any,observed.anc.two_sites,observed.par.any,observed.par.two_sites,pv_any.fold_anc_par,pv_any.anc_par);
+		fprintf(out_pval[0],"Anchor_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.any,observed.anc.two_sites,observed.eq.any,observed.eq.two_sites,pv_any.fold_anc_eq,pv_any.anc_eq);
+		fprintf(out_pval[0],"Partner_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.par.any,observed.par.two_sites,observed.eq.any,observed.eq.two_sites,pv_any.fold_par_eq,pv_any.par_eq);		
+		//full vs rand		
+		fprintf(out_pval[1],"Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.anc.full,observed.anc.two_sites,expected.anc.full,expected.anc.two_sites,pv_full.anchor);
+		fprintf(out_pval[1],"Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.par.full,observed.par.two_sites,expected.par.full,expected.par.two_sites,pv_full.partner);
+		fprintf(out_pval[1],"Equal\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.eq.full,observed.eq.two_sites,expected.eq.full,expected.eq.two_sites,pv_full.equal);
+		//full vs real
+		rat_a=(double)observed.anc.full/observed.anc.two_sites;
+		rat_p=(double)observed.par.full/observed.par.two_sites;
+		rat_e=(double)observed.eq.full/observed.eq.two_sites;		
+		if(rat_p==0)pv_full.fold_anc_par=1000;
+		else pv_full.fold_anc_par = rat_a/rat_p;
+		if(rat_e==0)pv_full.fold_anc_eq=1000;
+		else 
+		{
+			pv_full.fold_anc_eq = rat_a/rat_e;
+			pv_full.fold_par_eq = rat_p/rat_e;
+		}
+		fprintf(out_pval[1],"Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.full,observed.anc.two_sites,observed.par.full,observed.par.two_sites,pv_full.fold_anc_par,pv_full.anc_par);
+		fprintf(out_pval[1],"Anchor_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.full,observed.anc.two_sites,observed.eq.full,observed.eq.two_sites,pv_full.fold_anc_eq,pv_full.anc_eq);
+		fprintf(out_pval[1],"Partner_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.par.full,observed.par.two_sites,observed.eq.full,observed.eq.two_sites,pv_full.fold_par_eq,pv_full.par_eq);		
+		//partial vs rand
+		fprintf(out_pval[2],"Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.anc.partial,observed.anc.two_sites,expected.anc.partial,expected.anc.two_sites,pv_partial.anchor);			
+		fprintf(out_pval[2],"Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.par.partial,observed.par.two_sites,expected.par.partial,expected.par.two_sites,pv_partial.partner);			
+		fprintf(out_pval[2],"Equal\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.eq.partial,observed.eq.two_sites,expected.eq.partial,expected.eq.two_sites,pv_partial.equal);			
+		//partial vs real
+		rat_a=(double)observed.anc.partial/observed.anc.two_sites;
+		rat_p=(double)observed.par.partial/observed.par.two_sites;
+		rat_e=(double)observed.eq.partial/observed.eq.two_sites;		
+		if(rat_p==0)pv_partial.fold_anc_par=1000;
+		else pv_partial.fold_anc_par = rat_a/rat_p;
+		if(rat_e==0)pv_partial.fold_anc_eq=1000;
+		else 
+		{
+			pv_partial.fold_anc_eq = rat_a/rat_e;
+			pv_partial.fold_par_eq = rat_p/rat_e;
+		}
+		fprintf(out_pval[2],"Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.partial,observed.anc.two_sites,observed.par.partial,observed.par.two_sites,pv_partial.fold_anc_par,pv_partial.anc_par);
+		fprintf(out_pval[2],"Anchor_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.partial,observed.anc.two_sites,observed.eq.partial,observed.eq.two_sites,pv_partial.fold_anc_eq,pv_partial.anc_eq);
+		fprintf(out_pval[2],"Partner_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.par.partial,observed.par.two_sites,observed.eq.partial,observed.eq.two_sites,pv_partial.fold_par_eq,pv_partial.par_eq);		
+		//overlap vs rand
+		fprintf(out_pval[3],"Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.anc.overlap,observed.anc.two_sites,expected.anc.overlap,expected.anc.two_sites,pv_overlap.anchor);
+		fprintf(out_pval[3],"Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.par.overlap,observed.par.two_sites,expected.par.overlap,expected.par.two_sites,pv_overlap.partner);
+		fprintf(out_pval[3],"Equal\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.eq.overlap,observed.eq.two_sites,expected.eq.overlap,expected.eq.two_sites,pv_overlap.equal);
+		//overlap vs real
+		rat_a=(double)observed.anc.overlap/observed.anc.two_sites;
+		rat_p=(double)observed.par.overlap/observed.par.two_sites;
+		rat_e=(double)observed.eq.overlap/observed.eq.two_sites;		
+		if(rat_p==0)pv_overlap.fold_anc_par=1000;
+		else pv_overlap.fold_anc_par = rat_a/rat_p;
+		if(rat_e==0)pv_overlap.fold_anc_eq=1000;
+		else 
+		{
+			pv_overlap.fold_anc_eq = rat_a/rat_e;
+			pv_overlap.fold_par_eq = rat_p/rat_e;
+		}
+		fprintf(out_pval[3],"Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.overlap,observed.anc.two_sites,observed.par.overlap,observed.par.two_sites,pv_overlap.fold_anc_par,pv_overlap.anc_par);
+		fprintf(out_pval[3],"Anchor_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.overlap,observed.anc.two_sites,observed.eq.overlap,observed.eq.two_sites,pv_overlap.fold_anc_eq,pv_overlap.anc_eq);
+		fprintf(out_pval[3],"Partner_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.par.overlap,observed.par.two_sites,observed.eq.overlap,observed.eq.two_sites,pv_overlap.fold_par_eq,pv_overlap.par_eq);		
+		//spacer vs rand
+		fprintf(out_pval[4],"Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.anc.spacer,observed.anc.two_sites,expected.anc.spacer,expected.anc.two_sites,pv_spacer.anchor);
+		fprintf(out_pval[4],"Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.par.spacer,observed.par.two_sites,expected.par.spacer,expected.par.two_sites,pv_spacer.partner);
+		fprintf(out_pval[4],"Equal\t\t\t%d\t%d\t%d\t%d\t\t%g\n",observed.eq.spacer,observed.eq.two_sites,expected.eq.spacer,expected.eq.two_sites,pv_spacer.equal);
+		//spacer vs real
+		rat_a=(double)observed.anc.spacer/observed.anc.two_sites;
+		rat_p=(double)observed.par.spacer/observed.par.two_sites;
+		rat_e=(double)observed.eq.spacer/observed.eq.two_sites;		
+		if(rat_p==0)pv_spacer.fold_anc_par=1000;
+		else pv_spacer.fold_anc_par = rat_a/rat_p;
+		if(rat_e==0)pv_spacer.fold_anc_eq=1000;
+		else 
+		{
+			pv_spacer.fold_anc_eq = rat_a/rat_e;
+			pv_spacer.fold_par_eq = rat_p/rat_e;
+		}
+		fprintf(out_pval[4],"Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.spacer,observed.anc.two_sites,observed.par.spacer,observed.par.two_sites,pv_spacer.fold_anc_par,pv_spacer.anc_par);
+		fprintf(out_pval[4],"Anchor_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.anc.spacer,observed.anc.two_sites,observed.eq.spacer,observed.eq.two_sites,pv_spacer.fold_anc_eq,pv_spacer.anc_eq);
+		fprintf(out_pval[4],"Partner_Equal\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n",observed.par.spacer,observed.par.two_sites,observed.eq.spacer,observed.eq.two_sites,pv_spacer.fold_par_eq,pv_spacer.par_eq);		
 		for(i=0;i<5;i++)fclose(out_pval[i]);									
 		double pval_tot_min[5]={0,0,0,0,0};
 		double limit=300;
@@ -1437,31 +1634,16 @@ int main(int argc, char *argv[])
 			for(k=0;k<NUM_THR;k++)
 			{
 				for(i=0;i<5;i++)lgpv[i][k][j]=0;
-				if(table[k][j].fold_a>1)
-				{
-					if(table[k][j].pvalue_a<=pv_limit)lgpv[0][k][j]=limit;
-					else lgpv[0][k][j]=-log10(table[k][j].pvalue_a);
-				}
-				if(table[k][j].fold_f>1)
-				{
-					if(table[k][j].pvalue_f<=pv_limit)lgpv[1][k][j]=limit;
-					else lgpv[1][k][j]=-log10(table[k][j].pvalue_f);
-				}
-				if(table[k][j].fold_p>1)
-				{
-					if(table[k][j].pvalue_p<=pv_limit)lgpv[2][k][j]=limit;
-					else lgpv[2][k][j]=-log10(table[k][j].pvalue_p);
-				}
-				if(table[k][j].fold_o>1)
-				{
-					if(table[k][j].pvalue_o<=pv_limit)lgpv[3][k][j]=limit;
-					else lgpv[3][k][j]=-log10(table[k][j].pvalue_o);
-				}
-				if(table[k][j].fold_s>1)
-				{
-					if(table[k][j].pvalue_s<=pv_limit)lgpv[4][k][j]=limit;
-					else lgpv[4][k][j]=-log10(table[k][j].pvalue_s);
-				}
+				if(pvalue_a[k][j]<=pv_limit)lgpv[0][k][j]=limit;
+				else lgpv[0][k][j]=-log10(pvalue_a[k][j]);
+				if(pvalue_f[k][j]<=pv_limit)lgpv[1][k][j]=limit;
+				else lgpv[1][k][j]=-log10(pvalue_f[k][j]);
+				if(pvalue_p[k][j]<=pv_limit)lgpv[2][k][j]=limit;
+				else lgpv[2][k][j]=-log10(pvalue_p[k][j]);
+				if(pvalue_o[k][j]<=pv_limit)lgpv[3][k][j]=limit;
+				else lgpv[3][k][j]=-log10(pvalue_o[k][j]);
+				if(pvalue_s[k][j]<=pv_limit)lgpv[4][k][j]=limit;
+				else lgpv[4][k][j]=-log10(pvalue_s[k][j]);				
 			}
 		}
 		for(i=0;i<5;i++)
@@ -1498,55 +1680,105 @@ int main(int argc, char *argv[])
 				pval_tot_min[i]=pow(10,-pval_tot_min[i]);
 			}
 		}
-		//double asy[5]={0,0,0,0,0};
-/*		for(j=0;j<NUM_THR;j++)
-		{
-			for(k=j+1;k<NUM_THR;k++)
-			{
-				for(i=0;i<5;i++)asy[i]+=(lgpv[i][j][k]-lgpv[i][k][j]);
-			}
-		}
-		{
-			int mnoj=NUM_THR*(NUM_THR-1)/2;
-			for(i=0;i<5;i++)
-			{
-				asy[i]/=mnoj;					
-			}
-		}*/
 		if((out_pval_table=fopen(file_pval_table,"at"))==NULL)
 		{
 			printf("Input file %s can't be opened!\n", file_pval_table);
 			return -1;
 		}
-		fprintf(out_pval_table,"0,%d",mot);
+		fprintf(out_pval_table,"%d",mot);
 		fprintf(out_pval_table,"\t%s",name_partner);
 		for(i=0;i<5;i++)fprintf(out_pval_table,"\t%g",pval_tot_min[i]);
-		fprintf(out_pval_table,"\t");
-		//for(i=0;i<5;i++)fprintf(out_pval_table,"\t%f",asy[i]);
-		//fprintf(out_pval_table,"\t\t");
-		if(mot!=0)fprintf(out_pval_table,"%g",pvalue_similarity_tot);
-		//for(i=0;i<4;i++)fprintf(out_pval_table,"\t%g",pval_sim[i]);
+		fprintf(out_pval_table,"\t\t");		
+		if (mot != 0)
+		{
+			fprintf(out_pval_table,"%g\t%g\t%g",pvalue_similarity_tot,pval_sim[0],pval_sim[1]);
+		}
+		else fprintf(out_pval_table,"\t\t");
+		fprintf(out_pval_table, "\t\t");
+		{
+			fprintf(out_pval_table,"%g\t",pv_any.anchor);
+			fprintf(out_pval_table,"%g\t",pv_any.partner);
+			fprintf(out_pval_table,"%g\t\t",pv_any.equal);
+			fprintf(out_pval_table,"%g\t",pv_full.anchor);
+			fprintf(out_pval_table,"%g\t",pv_full.partner);
+			fprintf(out_pval_table,"%g\t\t",pv_full.equal);
+			fprintf(out_pval_table,"%g\t",pv_partial.anchor);
+			fprintf(out_pval_table,"%g\t",pv_partial.partner);
+			fprintf(out_pval_table,"%g\t\t",pv_partial.equal);
+			fprintf(out_pval_table,"%g\t",pv_overlap.anchor);
+			fprintf(out_pval_table,"%g\t",pv_overlap.partner);
+			fprintf(out_pval_table,"%g\t\t",pv_overlap.equal);
+			fprintf(out_pval_table,"%g\t",pv_spacer.anchor);
+			fprintf(out_pval_table,"%g\t",pv_spacer.partner);						
+			fprintf(out_pval_table,"%g\t\t",pv_spacer.equal);
+			//real vs real
+			//any
+			pv_any.anc_par=-log10(pv_any.anc_par);
+			if(pv_any.fold_anc_par<1)pv_any.anc_par*=-1;
+			pv_any.anc_eq=-log10(pv_any.anc_eq);
+			if(pv_any.fold_anc_eq<1)pv_any.anc_eq*=-1;
+			pv_any.par_eq=-log10(pv_any.par_eq);
+			if(pv_any.fold_par_eq<1)pv_any.par_eq*=-1;			
+			//full
+			pv_full.anc_par=-log10(pv_full.anc_par);
+			if(pv_full.fold_anc_par<1)pv_full.anc_par*=-1;
+			pv_full.anc_eq=-log10(pv_full.anc_eq);
+			if(pv_full.fold_anc_eq<1)pv_full.anc_eq*=-1;
+			pv_full.par_eq=-log10(pv_full.par_eq);
+			if(pv_full.fold_par_eq<1)pv_full.par_eq*=-1;			
+			//partial
+			pv_partial.anc_par=-log10(pv_partial.anc_par);
+			if(pv_partial.fold_anc_par<1)pv_partial.anc_par*=-1;
+			pv_partial.anc_eq=-log10(pv_partial.anc_eq);
+			if(pv_partial.fold_anc_eq<1)pv_partial.anc_eq*=-1;
+			pv_partial.par_eq=-log10(pv_partial.par_eq);
+			if(pv_partial.fold_par_eq<1)pv_partial.par_eq*=-1;	
+			//overlap
+			pv_overlap.anc_par=-log10(pv_overlap.anc_par);
+			if(pv_overlap.fold_anc_par<1)pv_overlap.anc_par*=-1;
+			pv_overlap.anc_eq=-log10(pv_overlap.anc_eq);
+			if(pv_overlap.fold_anc_eq<1)pv_overlap.anc_eq*=-1;
+			pv_overlap.par_eq=-log10(pv_overlap.par_eq);
+			if(pv_overlap.fold_par_eq<1)pv_overlap.par_eq*=-1;	
+			//spacer
+			pv_spacer.anc_par=-log10(pv_spacer.anc_par);
+			if(pv_spacer.fold_anc_par<1)pv_spacer.anc_par*=-1;
+			pv_spacer.anc_eq=-log10(pv_spacer.anc_eq);
+			if(pv_spacer.fold_anc_eq<1)pv_spacer.anc_eq*=-1;
+			pv_spacer.par_eq=-log10(pv_spacer.par_eq);
+			if(pv_spacer.fold_par_eq<1)pv_spacer.par_eq*=-1;	
+			//print
+			fprintf(out_pval_table,"%f\t",pv_any.anc_par);
+			fprintf(out_pval_table,"%f\t",pv_any.anc_eq);
+			fprintf(out_pval_table,"%f\t\t",pv_any.par_eq);
+			fprintf(out_pval_table,"%f\t",pv_full.anc_par);
+			fprintf(out_pval_table,"%f\t",pv_full.anc_eq);
+			fprintf(out_pval_table,"%f\t\t",pv_full.par_eq);
+			fprintf(out_pval_table,"%f\t",pv_partial.anc_par);
+			fprintf(out_pval_table,"%f\t",pv_partial.anc_eq);
+			fprintf(out_pval_table,"%f\t\t",pv_partial.par_eq);
+			fprintf(out_pval_table,"%f\t",pv_overlap.anc_par);
+			fprintf(out_pval_table,"%f\t",pv_overlap.anc_eq);
+			fprintf(out_pval_table,"%f\t\t",pv_overlap.par_eq);
+			fprintf(out_pval_table,"%f\t",pv_spacer.anc_par);
+			fprintf(out_pval_table,"%f\t",pv_spacer.anc_eq);
+			fprintf(out_pval_table,"%f",pv_spacer.par_eq);
+		}
 		fprintf(out_pval_table,"\n");
 		fclose(out_pval_table);
-		if(ap==1)
 		{
-			for(j=0;j<NUM_THR;j++)
-			{
-				real[ap][j].mem_out_sta();
-				real[ap][j].mem_out_cep();
-				real[ap][j].mem_out_sco();
-				for(i=0;i<nseq_real;i++)real[ap][j].nsit[i]=0;
-				rand[ap][j].mem_out_sta();
-				rand[ap][j].mem_out_cep();									
-				for(i=0;i<nseq_rand;i++)rand[ap][j].nsit[i]=0;
-			}
-			real_one[ap].mem_out_sta();
-			real_one[ap].mem_out_cep();
-			real_one[ap].mem_out_sco();
-			for(i=0;i<nseq_real;i++)real_one[ap].nsit[i]=0;
 			rand_one[ap].mem_out_sta();
 			rand_one[ap].mem_out_cep();			
+			rand_one[ap].mem_out_cel();		
 			for(i=0;i<nseq_rand;i++)rand_one[ap].nsit[i]=0;
+		}
+		if(ap==1)
+		{
+			real_one[ap].mem_out_sta();
+			real_one[ap].mem_out_cep();
+			real_one[ap].mem_out_cel();
+			real_one[ap].mem_out_sco();
+			for(i=0;i<nseq_real;i++)real_one[ap].nsit[i]=0;
 		}
 	}		
 	delete [] thr_err_real;
@@ -1564,43 +1796,12 @@ int main(int argc, char *argv[])
 	delete [] seq;
 	real_one[0].mem_out_sta();
 	real_one[0].mem_out_cep();
+	real_one[0].mem_out_cel();
 	real_one[0].mem_out_sco();
-	rand_one[0].mem_out_sta();
-	rand_one[0].mem_out_cep();
-	for(j=0;j<NUM_THR;j++)
-	{
-		real[0][j].mem_out_sta();
-		real[0][j].mem_out_cep();
-		real[0][j].mem_out_sco();
-	}
-	for(j=0;j<NUM_THR;j++)
-	{
-		rand[0][j].mem_out_sta();
-		rand[0][j].mem_out_cep();	
-	}
-	for(j=0;j<NUM_THR;j++)
-	{
-		rand_hom[j].mem_out_sta();
-		rand_hom[j].mem_out_cep();
-	}
 	rand_hom_one.mem_out_sta();
 	rand_hom_one.mem_out_cep();
-	for(j=0;j<2;j++)
-	{
-		real_one[j].mem_out_nsit();
-		for(k=0;k<NUM_THR;k++)
-		{
-			real[j][k].mem_out_nsit();
-		}
-	}
-	for(j=0;j<2;j++)
-	{
-		rand_one[j].mem_out_nsit();
-		for(k=0;k<NUM_THR;k++)
-		{
-			rand[j][k].mem_out_nsit();
-		}
-	}
+	rand_hom_one.mem_out_cel();
+	rand_hom_one.mem_out_nsit();
 	matrix0.mem_out(matrix0.len);
-	return 1;
+	return 0;
 }
