@@ -306,7 +306,7 @@ Example:
 |1             |  |1.9E-22   |1.2E-53    |1.3E-22  | |3.4E-45     |3.4E-171    |4.1E-23   |    |
 
 
-The third block of data consequently for five computation flows (Any, Full, etc.) represents three significances (-Log10[p-value]) of asymmetry in CEs: ‘Anchor vs. Partner’, ‘Anchor vs Equal’ and ‘Partner vs. Equal’.
+The third block of data consequently for five computation flows (Any, Full, etc.) represents three significances (-Log10[p-value]) of asymmetry in CEs: ‘Anchor vs. Partner’, ‘Anchor vs Equal’ and ‘Partner vs. Equal’. The positive/negative values reflect an enrichment toward the first/second participant in a comparison
 
 Example:
 
