@@ -1687,30 +1687,30 @@ int main(int argc, char *argv[])
 		}
 		fprintf(out_pval_table,"%d",mot);
 		fprintf(out_pval_table,"\t%s",name_partner);
-		for(i=0;i<5;i++)fprintf(out_pval_table,"\t%g",pval_tot_min[i]);
+		for(i=0;i<5;i++)fprintf(out_pval_table,"\t%.2g",pval_tot_min[i]);
 		fprintf(out_pval_table,"\t\t");		
 		if (mot != 0)
 		{
-			fprintf(out_pval_table,"%g\t%g\t%g",pvalue_similarity_tot,pval_sim[0],pval_sim[1]);
+			fprintf(out_pval_table,"%.2g\t%.2g\t%.2g",pvalue_similarity_tot,pval_sim[0],pval_sim[1]);
 		}
 		else fprintf(out_pval_table,"\t\t");
 		fprintf(out_pval_table, "\t\t");
 		{
-			fprintf(out_pval_table,"%g\t",pv_any.anchor);
-			fprintf(out_pval_table,"%g\t",pv_any.partner);
-			fprintf(out_pval_table,"%g\t\t",pv_any.equal);
-			fprintf(out_pval_table,"%g\t",pv_full.anchor);
-			fprintf(out_pval_table,"%g\t",pv_full.partner);
-			fprintf(out_pval_table,"%g\t\t",pv_full.equal);
-			fprintf(out_pval_table,"%g\t",pv_partial.anchor);
-			fprintf(out_pval_table,"%g\t",pv_partial.partner);
-			fprintf(out_pval_table,"%g\t\t",pv_partial.equal);
-			fprintf(out_pval_table,"%g\t",pv_overlap.anchor);
-			fprintf(out_pval_table,"%g\t",pv_overlap.partner);
-			fprintf(out_pval_table,"%g\t\t",pv_overlap.equal);
-			fprintf(out_pval_table,"%g\t",pv_spacer.anchor);
-			fprintf(out_pval_table,"%g\t",pv_spacer.partner);						
-			fprintf(out_pval_table,"%g\t\t",pv_spacer.equal);
+			fprintf(out_pval_table,"%.2g\t",pv_any.anchor);
+			fprintf(out_pval_table,"%.2g\t",pv_any.partner);
+			fprintf(out_pval_table,"%.2g\t\t",pv_any.equal);
+			fprintf(out_pval_table,"%.2g\t",pv_full.anchor);
+			fprintf(out_pval_table,"%.2g\t",pv_full.partner);
+			fprintf(out_pval_table,"%.2g\t\t",pv_full.equal);
+			fprintf(out_pval_table,"%.2g\t",pv_partial.anchor);
+			fprintf(out_pval_table,"%.2g\t",pv_partial.partner);
+			fprintf(out_pval_table,"%.2g\t\t",pv_partial.equal);
+			fprintf(out_pval_table,"%.2g\t",pv_overlap.anchor);
+			fprintf(out_pval_table,"%.2g\t",pv_overlap.partner);
+			fprintf(out_pval_table,"%.2g\t\t",pv_overlap.equal);
+			fprintf(out_pval_table,"%.2g\t",pv_spacer.anchor);
+			fprintf(out_pval_table,"%.2g\t",pv_spacer.partner);						
+			fprintf(out_pval_table,"%.2g\t\t",pv_spacer.equal);
 			//real vs real
 			//any
 			pv_any.anc_par=-log10(pv_any.anc_par);
@@ -1748,21 +1748,21 @@ int main(int argc, char *argv[])
 			pv_spacer.par_eq=-log10(pv_spacer.par_eq);
 			if(pv_spacer.fold_par_eq<1)pv_spacer.par_eq*=-1;	
 			//print
-			fprintf(out_pval_table,"%f\t",pv_any.anc_par);
-			fprintf(out_pval_table,"%f\t",pv_any.anc_eq);
-			fprintf(out_pval_table,"%f\t\t",pv_any.par_eq);
-			fprintf(out_pval_table,"%f\t",pv_full.anc_par);
-			fprintf(out_pval_table,"%f\t",pv_full.anc_eq);
-			fprintf(out_pval_table,"%f\t\t",pv_full.par_eq);
-			fprintf(out_pval_table,"%f\t",pv_partial.anc_par);
-			fprintf(out_pval_table,"%f\t",pv_partial.anc_eq);
-			fprintf(out_pval_table,"%f\t\t",pv_partial.par_eq);
-			fprintf(out_pval_table,"%f\t",pv_overlap.anc_par);
-			fprintf(out_pval_table,"%f\t",pv_overlap.anc_eq);
-			fprintf(out_pval_table,"%f\t\t",pv_overlap.par_eq);
-			fprintf(out_pval_table,"%f\t",pv_spacer.anc_par);
-			fprintf(out_pval_table,"%f\t",pv_spacer.anc_eq);
-			fprintf(out_pval_table,"%f",pv_spacer.par_eq);
+			fprintf(out_pval_table,"%.2f\t",pv_any.anc_par);
+			fprintf(out_pval_table,"%.2f\t",pv_any.anc_eq);
+			fprintf(out_pval_table,"%.2f\t\t",pv_any.par_eq);
+			fprintf(out_pval_table,"%.2f\t",pv_full.anc_par);
+			fprintf(out_pval_table,"%.2f\t",pv_full.anc_eq);
+			fprintf(out_pval_table,"%.2f\t\t",pv_full.par_eq);
+			fprintf(out_pval_table,"%.2f\t",pv_partial.anc_par);
+			fprintf(out_pval_table,"%.2f\t",pv_partial.anc_eq);
+			fprintf(out_pval_table,"%.2f\t\t",pv_partial.par_eq);
+			fprintf(out_pval_table,"%.2f\t",pv_overlap.anc_par);
+			fprintf(out_pval_table,"%.2f\t",pv_overlap.anc_eq);
+			fprintf(out_pval_table,"%.2f\t\t",pv_overlap.par_eq);
+			fprintf(out_pval_table,"%.2f\t",pv_spacer.anc_par);
+			fprintf(out_pval_table,"%.2f\t",pv_spacer.anc_eq);
+			fprintf(out_pval_table,"%.2f",pv_spacer.par_eq);
 		}
 		fprintf(out_pval_table,"\n");
 		fclose(out_pval_table);
