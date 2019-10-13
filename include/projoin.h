@@ -27,6 +27,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	//int *cepi_sit[4];
 	int *cepi_sit_one[4];
 	//if(strncmp(rera,"rand",4)!=0)
+	outbest=NULL;
 	if(strstr(rera,"real")!=NULL)
 	{
 		if((outbest=fopen(filebest,"wt"))==NULL)
