@@ -897,7 +897,7 @@ fprintf(out_pval_table,"# Partner");
 	fprintf(out_pval_table,"\tAsymmetry Full P-value");	
 	fprintf(out_pval_table,"\tAsymmetry Overlap P-value");
 	fprintf(out_pval_table,"\tAsymmetry Any P-value");
-	fprintf(out_pval_table, "\tSim");	
+	fprintf(out_pval_table, "\tSimilarity");	
 	fprintf(out_pval_table, "\tSim SSD");
 	fprintf(out_pval_table, "\tSim PCC\t");		
 	fprintf(out_pval_table, "Anchor Any\t");
