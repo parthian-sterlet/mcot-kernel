@@ -946,7 +946,9 @@ int main(int argc, char *argv[])
 		}
 		for(j=0;j<NUM_THR;j++)
 		{
-			fprintf(out_stat,"%d\t%s\t%d\t%f\t",mot,name[mot],j+1,thr[mot][j]);
+			if(mot==0)fprintf(out_stat,"Anchor");
+			else fprintf(out_stat,"Partner %d",mot);
+			fprintf(out_stat,"\t%s\t%d\t%f\t",name[mot],j+1,thr[mot][j]);
 			fprintf(out_stat,"%f\t%d\t%d\t",100*(double)rec_seq[j]/nseq_real,rec_seq[j],nseq_real);
 			fprintf(out_stat,"%g\t%d\t%d\n",(double)rec_pos[j]/all_pos,rec_pos[j],all_pos);
 		}
