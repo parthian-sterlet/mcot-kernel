@@ -887,7 +887,7 @@ int main(int argc, char *argv[])
 		printf("Input file %s can't be opened!\n", file_pval_table);
 		return -1;
 	}
-fprintf(out_pval_table,"# Motif");
+	fprintf(out_pval_table,"# Motif");
 	fprintf(out_pval_table,"\tMotif Name");	
 	fprintf(out_pval_table,"\tFull P-value");
 	fprintf(out_pval_table,"\tPartial P-value");
@@ -1176,7 +1176,9 @@ fprintf(out_pval_table,"# Motif");
 		}
 		for(j=0;j<NUM_THR;j++)
 		{
-			fprintf(out_stat,"%d\t%s\t%d\t%f\t",mot,name_partner,j+1,thr[j]);
+			if(mot==0)fprintf(out_stat,"Anchor");
+			else fprintf(out_stat,"Partner %d",mot);
+			fprintf(out_stat,"\t%s\t%d\t%f\t",name_partner,j+1,thr[j]);
 			fprintf(out_stat,"%f\t%d\t%d\t",100*(double)rec_seq[j]/nseq_real,rec_seq[j],nseq_real);
 			fprintf(out_stat,"%g\t%d\t%d\n",(double)rec_pos[j]/all_pos,rec_pos[j],all_pos);
 		}
