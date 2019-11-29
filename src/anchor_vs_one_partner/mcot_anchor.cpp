@@ -761,8 +761,8 @@ int main(int argc, char *argv[])
 		printf("Input file %s can't be opened!\n", file_pval_table);
 		return -1;
 	}
-	fprintf(out_pval_table,"# Partner");
-	fprintf(out_pval_table,"\tPartner Name");	
+	fprintf(out_pval_table,"# Motif");
+	fprintf(out_pval_table,"\tMotif Name");	
 	fprintf(out_pval_table,"\tFull P-value");
 	fprintf(out_pval_table,"\tPartial P-value");
 	fprintf(out_pval_table,"\tOverlap P-value");
