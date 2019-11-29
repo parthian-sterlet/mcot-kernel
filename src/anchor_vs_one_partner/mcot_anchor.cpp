@@ -773,10 +773,10 @@ int main(int argc, char *argv[])
 	fprintf(out_pval_table,"\tAsymmetry Any P-value");
 	fprintf(out_pval_table, "\tSim");	
 	fprintf(out_pval_table, "\tSim SSD");
-	fprintf(out_pval_table, "\tSim PCC");		
+	fprintf(out_pval_table, "\tSim PCC\t");		
 	fprintf(out_pval_table, "Anchor Any\t");
 	fprintf(out_pval_table, "Partner Any\t");
-	fprintf(out_pval_table, "Equal Any\t\t");
+	fprintf(out_pval_table, "Equal Any\t");
 	fprintf(out_pval_table, "Anchor Full\t");
 	fprintf(out_pval_table, "Partner Full\t");
 	fprintf(out_pval_table, "Equal Full\t");
