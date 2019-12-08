@@ -600,7 +600,9 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	strcpy(head[0],"Direct AP");
 	strcpy(head[1],"Direct PA");
 	strcpy(head[2],"Inverted");
-	strcpy(head[3],"Everted");	
+	strcpy(head[3],"Everted");
+	char head0[10];
+	strcpy(head0,"Direct AA");
 	int n_partial;
 	n_partial=Min(len_a,len_p);//partial overlap
 	n_partial--;
@@ -621,12 +623,25 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	for(j=n_partial;j>=1;j--)fprintf(out,"\t%d%c",j,bo);		
 	for(j=0;j<=len_sp;j++)fprintf(out,"\t%d%c",j,sp);
 	fprintf(out,"\n");
-	for(i=3;i>=0;i--)
+	if(mot>0)
 	{
-		fprintf(out,"\t\t%s",head[i]);
-		for(j=0;j<n_tot;j++)fprintf(out,"\t%f",100*freq[i][j]);
-		fprintf(out,"\n");
-	}	
+		for(i=3;i>=0;i--)
+		{
+			fprintf(out,"\t\t%s",head[i]);
+			for(j=0;j<n_tot;j++)fprintf(out,"\t%f",100*freq[i][j]);
+			fprintf(out,"\n");
+		}	
+	}
+	else
+	{
+		for(i=3;i>=1;i--)
+		{
+			if(i!=1)fprintf(out,"\t\t%s",head[i]);
+			else fprintf(out,"\t\t%s",head0);
+			for(j=0;j<n_tot;j++)fprintf(out,"\t%f",100*freq[i][j]);
+			fprintf(out,"\n");
+		}	
+	}
 	fclose(out);
 	return 1;
 }
@@ -887,52 +902,53 @@ int main(int argc, char *argv[])
 		printf("Input file %s can't be opened!\n", file_pval_table);
 		return -1;
 	}
-	fprintf(out_pval_table,"# Motif");
-	fprintf(out_pval_table,"\tMotif Name");	
-	fprintf(out_pval_table,"\tFull P-value");
-	fprintf(out_pval_table,"\tPartial P-value");
-	fprintf(out_pval_table,"\tOverlap P-value");
-	fprintf(out_pval_table,"\tSpacer P-value");
-	fprintf(out_pval_table,"\tAny P-value");
-	fprintf(out_pval_table,"\tAsymmetry Full P-value");	
-	fprintf(out_pval_table,"\tAsymmetry Overlap P-value");
-	fprintf(out_pval_table,"\tAsymmetry Any P-value");
-	fprintf(out_pval_table, "\tSimilarity");	
-	fprintf(out_pval_table, "\tSim SSD");
-	fprintf(out_pval_table, "\tSim PCC\t");		
-	fprintf(out_pval_table, "Anchor Any\t");
-	fprintf(out_pval_table, "Partner Any\t");
-	fprintf(out_pval_table, "Equal Any\t");
-	fprintf(out_pval_table, "Anchor Full\t");
-	fprintf(out_pval_table, "Partner Full\t");
-	fprintf(out_pval_table, "Equal Full\t");
-	fprintf(out_pval_table, "Anchor Part\t");
-	fprintf(out_pval_table, "Partner Part\t");
-	fprintf(out_pval_table, "Equal Part\t");
-	fprintf(out_pval_table, "Anchor Over\t");
-	fprintf(out_pval_table, "Partner Over\t");
-	fprintf(out_pval_table, "Equal Over\t");
-	fprintf(out_pval_table, "Anchor Spac\t");
-	fprintf(out_pval_table, "Partner Spac\t");
-	fprintf(out_pval_table, "Equal Spac\t");
-	fprintf(out_pval_table, "AncPar Any\t");
-	fprintf(out_pval_table, "AncEq Any\t");
-	fprintf(out_pval_table, "ParEq Any\t");
-	fprintf(out_pval_table, "AncPar Full\t");
-	fprintf(out_pval_table, "AncEq Full\t");
-	fprintf(out_pval_table, "ParEq Full\t");
-	fprintf(out_pval_table, "AncPar Partial\t");
-	fprintf(out_pval_table, "AncEq Partial\t");
-	fprintf(out_pval_table, "ParEq Partial\t");
-	fprintf(out_pval_table, "AncPar Overlap\t");
-	fprintf(out_pval_table, "AncEq Overlap\t");
-	fprintf(out_pval_table, "ParEq Overlap\t");
-	fprintf(out_pval_table, "AncPar Spacer\t");
-	fprintf(out_pval_table, "AncEq Spacer\t");
-	fprintf(out_pval_table, "ParEq Spacer");	
-	fprintf(out_pval_table,"\n");
-	fclose(out_pval_table);
-
+	{	
+		fprintf(out_pval_table,"# Motif");
+		fprintf(out_pval_table,"\tMotif Name");	
+		fprintf(out_pval_table,"\tFull overlap, -Log10[P-value]");
+		fprintf(out_pval_table,"\tPartial overlap,-Log10[P-value]");
+		fprintf(out_pval_table,"\tOverlap, -Log10[P-value]");
+		fprintf(out_pval_table,"\tSpacer, -Log10[P-value]");
+		fprintf(out_pval_table,"\tAny, -Log10[P-value]");
+		fprintf(out_pval_table,"\tFull overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]");	
+		fprintf(out_pval_table,"\tOverlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]");
+		fprintf(out_pval_table,"\tAny, Asymmetry to Anchor+/Partner-, -Log10[P-value]");
+		fprintf(out_pval_table, "\tSimilarity to Anchor, -Log10[P-value]");	
+		fprintf(out_pval_table, "\tSimilarity to Anchor, SSD");
+		fprintf(out_pval_table, "\tSimilarity to Anchor, PCC\t");		
+		fprintf(out_pval_table, "Full overlap, Conservative Anchor, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Full overlap, Conservative Partner, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Full overlap, Equal conservation, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Partial overlap, Conservative Anchor, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Partial overlap, Conservative Partner, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Partial overlap, Equal conservation, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Conservative Anchor, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Conservative Partner, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Equal conservation, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Conservative Anchor, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Conservative Partner, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Equal conservation, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Any, Conservative Anchor, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Any, Conservative Partner, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Any, Equal Consevation, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Full overlap, Asymmetry to Partner+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Partial overlap, Asymmetry to Partner+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Asymmetry to Anchor+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Asymmetry to Partner+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Asymmetry to Anchor+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Asymmetry to Partner+/Equal-, -Log10[P-value]\t");	
+		fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Any, Asymmetry to Partner+/Equal-, -Log10[P-value]\t");
+		fprintf(out_pval_table,"\n");
+		fclose(out_pval_table);
+	}
 	FILE *out_pval[5];
 	double pval_sim[4];
 
@@ -1761,9 +1777,6 @@ int main(int argc, char *argv[])
 		{			
 			fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
 			fprintf(out_pval_table,"\t%.2f\t%.2f\t%.2f",-log10(pvalue_similarity_tot),-log10(pval_sim[0]),-log10(pval_sim[1]));	
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.anchor));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.partner));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.equal));
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.anchor));
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.partner));
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.equal));
@@ -1776,9 +1789,9 @@ int main(int argc, char *argv[])
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_spacer.anchor));
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_spacer.partner));						
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_spacer.equal));
-			fprintf(out_pval_table,"\t%+.2f",pv_any.anc_par);
-			fprintf(out_pval_table,"\t%+.2f",pv_any.anc_eq);
-			fprintf(out_pval_table,"\t%+.2f",pv_any.par_eq);
+			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.anchor));
+			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.partner));
+			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.equal));
 			fprintf(out_pval_table,"\t%+.2f",pv_full.anc_par);
 			fprintf(out_pval_table,"\t%+.2f",pv_full.anc_eq);
 			fprintf(out_pval_table,"\t%+.2f",pv_full.par_eq);
@@ -1791,6 +1804,9 @@ int main(int argc, char *argv[])
 			fprintf(out_pval_table,"\t%+.2f",pv_spacer.anc_par);
 			fprintf(out_pval_table,"\t%+.2f",pv_spacer.anc_eq);
 			fprintf(out_pval_table,"\t%+.2f",pv_spacer.par_eq);
+			fprintf(out_pval_table,"\t%+.2f",pv_any.anc_par);
+			fprintf(out_pval_table,"\t%+.2f",pv_any.anc_eq);
+			fprintf(out_pval_table,"\t%+.2f",pv_any.par_eq);
 		}
 		else 
 		{
