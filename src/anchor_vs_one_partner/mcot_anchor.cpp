@@ -783,9 +783,9 @@ int main(int argc, char *argv[])
 		fprintf(out_pval_table,"\tOverlap, -Log10[P-value]");
 		fprintf(out_pval_table,"\tSpacer, -Log10[P-value]");
 		fprintf(out_pval_table,"\tAny, -Log10[P-value]");
-		fprintf(out_pval_table,"\tFull overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]");	
-		fprintf(out_pval_table,"\tOverlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]");
-		fprintf(out_pval_table,"\tAny, Asymmetry to Anchor+/Partner-, -Log10[P-value]");
+		//fprintf(out_pval_table,"\tFull overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]");	
+		//fprintf(out_pval_table,"\tOverlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]");
+		//fprintf(out_pval_table,"\tAny, Asymmetry to Anchor+/Partner-, -Log10[P-value]");
 		fprintf(out_pval_table, "\tSimilarity to Anchor, -Log10[P-value]");	
 		fprintf(out_pval_table, "\tSimilarity to Anchor, SSD");
 		fprintf(out_pval_table, "\tSimilarity to Anchor, PCC\t");		
@@ -1536,7 +1536,7 @@ int main(int argc, char *argv[])
 		if(mot_a!=mot_p)
 		{
 			pvalue_similarity_tot=pfm_similarity(&matrix[mot_a],&matrix[mot_p],s_granul,s_overlap_min,s_ncycle_small,s_ncycle_large,pval_sim);
-			fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
+			//fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
 			fprintf(out_pval_table,"\t%.2f\t%.2f\t%.2f",-log10(pvalue_similarity_tot),-log10(pval_sim[0]),-log10(pval_sim[1]));			
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.anchor));
 			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.partner));
@@ -1572,7 +1572,7 @@ int main(int argc, char *argv[])
 		else 
 		{
 			char slash='/';
-			for(i=0;i<36;i++)fprintf(out_pval_table,"\tn%ca",slash);
+			for(i=0;i<33;i++)fprintf(out_pval_table,"\tn%ca",slash);
 		}		
 		fprintf(out_pval_table,"\n");
 		fclose(out_pval_table);
