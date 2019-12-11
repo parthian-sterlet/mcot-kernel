@@ -626,7 +626,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"maps\\mm")!=NULL) 
+		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"MM")!=NULL) 
 		{
 			strcat(prom,"ups2kb.plain");
 			len_genome=2000;
