@@ -528,9 +528,9 @@ struct combi {
 	double freq[4][MATLEN+SPACLEN];	
 //	void ini(int len_a, int len_p, int len_sp);
 //	void mem_out(void);
-	int fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp);
+	int fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode);
 };
-int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp)
+int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode)
 {
 	char head[4][10];
 	strcpy(head[0],"Direct AP");
@@ -548,14 +548,14 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	char bo='P';//partial
 	char in='F';//full
 	FILE *out;
-	if((out=fopen(file,"at"))==NULL)
+	if((out=fopen(file,mode))==NULL)
 	{
 		printf("Input file %s can't be opened!\n", file);
 		return -1;
 	}
 	fprintf(out,"%d\t%s\t",mot,motif);
 	int i,j;	
-	for(j=n_full;j>=1;j--)fprintf(out,"\t%d%c",j,in);		
+	for(j=n_full;j>=1;j--)fprintf(out,"\t%d%c",j-1,in);		
 	for(j=n_partial;j>=1;j--)fprintf(out,"\t%d%c",j,bo);		
 	for(j=0;j<=len_sp;j++)fprintf(out,"\t%d%c",j,sp);
 	fprintf(out,"\n");
@@ -594,6 +594,9 @@ int main(int argc, char *argv[])
 	char file_hist[80], file_pval[5][80], file_pval_table[80];
 	char name[2][MOT_NAME_LEN];
 	char xreal[]="real", xrand[]="rand", xreal_one[]="real_one";
+	char file_fpr[2][80];
+	strcpy(file_fpr[0],"fpr_anchor.txt");
+	strcpy(file_fpr[1],"fpr_partner.txt");
 
 	if(argc!=7)
 	{
@@ -618,7 +621,7 @@ int main(int argc, char *argv[])
 	
 	strcpy(prom,mypath_data);	
 
-	if ((strstr(mypath_data, "hs") != NULL || strstr(mypath_data, "hg") != NULL) || (strstr(mypath_data, "HS") != NULL || strstr(mypath_data, "HG") != NULL))
+	if(strstr(mypath_data,"hs") !=NULL || strstr(mypath_data,"maps\\hg")!=NULL) 
 	{
 		strcat(prom,"ups2kb.plain");
 		len_genome=2000;
@@ -626,7 +629,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"MM")!=NULL) 
+		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"maps\\mm")!=NULL) 
 		{
 			strcat(prom,"ups2kb.plain");
 			len_genome=2000;
@@ -860,6 +863,14 @@ int main(int argc, char *argv[])
 			printf("FP rate table error\n");
 			return -1;
 		}
+		FILE *out_fpr;
+		if ((out_fpr = fopen(file_fpr[mot], "wt")) == NULL)
+		{
+			printf("Output file %s can't be opened!\n",file_fpr[mot]);
+			return -1;
+		}
+		for (i = 0; i < n_thr_touzet; i++)fprintf(out_fpr, "%.8f\t%g\n", thr_touzet[mot][i], fp_rate[i]);
+		fclose(out_fpr);
 		double fpr_select[NUM_THR];				
 		if(length>5)
 		{
@@ -1068,7 +1079,15 @@ int main(int argc, char *argv[])
 				printf("Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			hist_obs_one.fprintf_all(file_hist,mot_p,name[mot_p],len_anchor,len_partner,shift_max);					
+			char modew[]="wt", modea[]="at";
+			char file_hist_one[80];
+			strcpy(file_hist_one,file_hist);
+			char buf[4];
+			memset(buf,'\0',sizeof(buf));
+			sprintf(buf,"%d",mot_p);
+			strcat(file_hist_one,buf);			
+			hist_obs_one.fprintf_all(file_hist,mot_p,name[mot_p],len_anchor,len_partner,shift_max,modea);					
+			hist_obs_one.fprintf_all(file_hist_one,mot_p,name[mot_p],len_anchor,len_partner,shift_max,modew);
 		}// one threshold
 		//many thresholds
 		for(i=0;i<NUM_THR;i++)for(j=0;j<NUM_THR;j++)pvalue_a[i][j]=pvalue_f[i][j]=pvalue_p[i][j]=pvalue_o[i][j]=pvalue_s[i][j]=1;				
