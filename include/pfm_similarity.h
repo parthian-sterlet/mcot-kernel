@@ -3,7 +3,7 @@ void measure(int pfm1[][OLIGNUM], int pfm2[][OLIGNUM],  int len1, int len2,int a
 	int i,j,k;
 	switch(measure_type) 
 	{
-		case 0://euñlid
+		case 0://SSD
 		{
 			for(i=0;i<len1;i++)
 			{
@@ -15,12 +15,13 @@ void measure(int pfm1[][OLIGNUM], int pfm2[][OLIGNUM],  int len1, int len2,int a
 						double dif=(double)(pfm1[i][k]-pfm2[j][k])/size;
 						ret+=dif*dif;
 					}
+					ret = 2-sqrt(ret);
 					over_scores[i][j]=ret;
 				}
 			}
 			break;
 		}
-		default://pearson
+		default://PCC
 		{
 			double av=1/(double)alphabet;
 			double x2[MATLEN], y2[MATLEN];
@@ -51,7 +52,7 @@ void measure(int pfm1[][OLIGNUM], int pfm2[][OLIGNUM],  int len1, int len2,int a
 					{
 						xy+=((double)pfm1[i][k]/size-av)*((double)pfm2[j][k]/size-av);				
 					}
-					over_scores[i][j]=1-xy/(x2[i]*y2[j]);
+					over_scores[i][j]=xy/(x2[i]*y2[j]);
 				}
 			}	
 			break;
@@ -60,7 +61,7 @@ void measure(int pfm1[][OLIGNUM], int pfm2[][OLIGNUM],  int len1, int len2,int a
 }
 double Min_trackReal(double mat[][MATLEN],int size_short,int size_long, int track_len, int sta_sh, int sta_lo)//size1 <=size2
 {
-	double ret=100000;
+	double ret=-1000;
 	int i_short, i_long, j;
 	for(i_long=0;i_long<=size_long-track_len;i_long++)
 	{
@@ -70,9 +71,8 @@ double Min_trackReal(double mat[][MATLEN],int size_short,int size_long, int trac
 			for(j=0;j<track_len;j++)
 			{
 				sum+=mat[i_short+j][i_long+j];				
-			}
-			//sum=sqrt(sum);
-			if(sum<ret)
+			}			
+			if(sum>ret)
 			{
 				ret=sum;
 				sta_sh=i_short;
@@ -84,7 +84,7 @@ double Min_trackReal(double mat[][MATLEN],int size_short,int size_long, int trac
 }
 double Min_trackRand(double mat[][MATLEN],int size_short,int size_long, int track_len)//size1 <=size2
 {
-	double ret=100000;
+	double ret=-1000;
 	int i_short, i_long, j;
 	for(i_long=0;i_long<=size_long-track_len;i_long++)
 	{
@@ -97,7 +97,7 @@ double Min_trackRand(double mat[][MATLEN],int size_short,int size_long, int trac
 				sum+=val;				
 			}
 			//sum=sqrt(sum);
-			if(sum<ret)ret=sum;
+			if(sum>ret)ret=sum;
 		}
 	}
 	return ret;
@@ -167,24 +167,27 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 		//printf("Po- First col %d,%d Second col %d,%d\n",pfm[i1][j1],pfm[i1][j2],pfm[i2][j1],pfm[i2][j2]);
 	}
 }
-double Laplace(double x_end)
+double Laplace(double z)
 {
-    const double pi=3.141592653589;
+    const double pi=3.141592653589793; 
     const double step=0.0001;
-    double x, ym, y, dy;
-    if(x_end<0)x_end*=-1;
-    x=y=0;    
-	while(x<=x_end)
+	const double step2=step/2;
+    double x, y=0, dy;    
+    double prec = 1E-20;	
+	x=z;	    
+	double mnoj=sqrt(2*pi);
+	prec/=mnoj;
+	do
     {
-		x+=step/2;
+		x+=step2;
 		dy=step*exp(-x*x/2);
+		//dy/=mnoj;
 		y+=dy;
-		x+=step/2;
-    }	
-	ym=sqrt(2*pi)/2;
-	y/=ym;
-	y=1-y;
-	//printf("%f\t%f\n",dy,y);
+		x+=step2;
+    }		
+	while(dy>prec);
+	y/=mnoj;
+	y*=2;
     return(y);
 }
 void PFM_compl(int pfm[][OLIGNUM], int pfmc[][OLIGNUM], int olen)
@@ -200,7 +203,7 @@ void PFM_compl(int pfm[][OLIGNUM], int pfmc[][OLIGNUM], int olen)
 		}
 	}	
 }
-double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap_min, int n_cycle_small, int n_cycle_large, double pval[4])//int measure_type
+double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap_min, int n_cycle_small, int n_cycle_large, double pval[2])//int measure_type
 {	
 	//int ***pfm, ***pfmr, ***pfmc;	
 	int pfm[2][MATLEN][OLIGNUM];
@@ -306,7 +309,7 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 				}				
 			}
 		}
-	}
+	}	
 	/*
 	for(k=0;k<2;k++)
 	{
@@ -454,7 +457,7 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 	*/
 	for(i=0;i<n_track;i++)sim_real[i]=10000;
 	
-	double av[MATLEN], sd[MATLEN], zs[MATLEN], pv[MATLEN];
+	double av[MATLEN], sd[MATLEN];
 	/*
 	double *av, *sd, *zs, *pv;
 	av=new double[n_track];
@@ -480,9 +483,9 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 	if(best_not_ali==NULL){puts("Out of memory...");return -1;}	
 	for(i=0;i<n_track;i++)sta_sh[i]=sta_lo[i]=ori_select[i]=best_not_ali[i]=0;
 	*/
-	int test, measure_type;
-	double ret=1;
-	double pv_min_thr[4]={0.075, 0.075, 0.05, 0.05};
+	int test, measure_type;	
+	double pv_min_thr[4]={0.05, 0.05, 0.05, 0.05};
+	double pv_best=1;
 	for(test=0;test<4;test++)
 	{
 		measure_type=test%2;
@@ -492,14 +495,14 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 		//real two orientations
 		measure(pfm[k0],pfm[k1],olen_min,olen_max,OLIGNUM,granul_back,over_scores_real[0],measure_type);
 		measure(pfmc[k0],pfm[k1],olen_min,olen_max,OLIGNUM,granul_back,over_scores_real[1],measure_type);
-		for(i=0;i<n_track;i++)sim_real[i]=10000;	
+		for(i=0;i<n_track;i++)sim_real[i]=-10000;	
 		for(j=0;j<n_track;j++)
 		{
 			for(ori=0;ori<2;ori++)
 			{
 				int sta_sh_cur=0, sta_lo_cur=0;
 				double sim_score=Min_trackReal(over_scores_real[ori],olen_min,olen_max,j+overlap_min,sta_sh_cur,sta_lo_cur);
-				if(sim_score<sim_real[j])
+				if(sim_score>sim_real[j])
 				{
 					sim_real[j]=sim_score;
 					sta_sh[j]=sta_sh_cur;
@@ -539,13 +542,13 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 			}		
 			for(ori=0;ori<2;ori++)
 			{
-				for(j=0;j<n_track;j++)sim_rand[j]=10000;		
+				for(j=0;j<n_track;j++)sim_rand[j]=-10000;		
 				for(j=0;j<n_track;j++)
 				{
 					double sim_score=Min_trackRand(over_scores_rand_one[ori],olen_min,olen_max,j+overlap_min);
-					if(sim_score<sim_rand[j])sim_rand[j]=sim_score;
+					if(sim_score>sim_rand[j])sim_rand[j]=sim_score;
 					sim_score=Min_trackRand(over_scores_rand_two[ori],olen_min,olen_max,j+overlap_min);
-					if(sim_score<sim_rand[j])sim_rand[j]=sim_score;
+					if(sim_score>sim_rand[j])sim_rand[j]=sim_score;
 				}
 				CellCount(over_scores_rand_one[ori],olen_min,olen_max,av_cell[ori],sd_cell[ori]);
 				CellCount(over_scores_rand_two[ori],olen_min,olen_max,av_cell[ori],sd_cell[ori]);
@@ -586,28 +589,31 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 				sta_lo_cur++;
 				best_not_ali[j]++;
 			}
-		}	
+		}
+		double zmax=0;
 		for(j=0;j<n_track;j++)
 		{
 			sd[j]=sqrt(sd[j]);
-			zs[j]=(sim_real[j]-av[j])/sd[j];
-			if(zs[j]<0)pv[j]=Laplace(zs[j]);
-			else pv[j]=1;
+			double zs=(sim_real[j]-av[j])/sd[j];
+			if(zs>zmax)zmax=zs;			
 		}
-		double pv_min=pv[0];
-		//int best_ali=overlap_min, best_not_ali_select=0;
-		for(j=1;j<n_track;j++)
+		double pv, z_thr=1.644805;//pv=0.1;
+		if(zmax<z_thr)pv=1;
+		else pv=Laplace(zmax);
+		if(test<=1)pval[test]=pv;
+		if(test>=2)pval[test-2]=pv;
+		if(test==1)
 		{
-			if(pv[j]<pv_min)
+			pv_best=Max(pval[0],pval[1]);
+			if(pval[0]>pv_min_thr[0] && pval[1]>pv_min_thr[1])
 			{
-				pv_min=pv[j];
-			//	best_ali=overlap_min+j;
-				//best_not_ali_select=best_not_ali[j];
+				break;		
 			}
 		}
-		pval[test]=pv_min;
-		if(pv_min>pv_min_thr[test])return 1;
-		if(test>1)ret*=pv_min;
+		if(test==3)
+		{
+			pv_best=Max(pval[0],pval[1]);							
+		}		
 	}
 /*
 	fprintf(out,"RealAv");
@@ -696,7 +702,6 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 	delete [] sim_real;
 	delete[] pv;
 	delete[] zs;
-	delete [] sim_rand;*/
-	ret=sqrt(ret);
-	return ret;
+	delete [] sim_rand;*/	
+	return pv_best;
 }
