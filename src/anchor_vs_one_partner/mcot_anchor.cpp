@@ -427,7 +427,7 @@ int profile::fprintf_pro(char *mot_db, double thr,char *mode)
 		for(j=0;j<nsit[i];j++)
 		{
 			fprintf(out,"%d\t",sta[i][j]);			
-			fprintf(out,"%d",cel[i][j]);			
+			fprintf(out,"%d",1+cel[i][j]);			
 			fprintf(out,"\t");
 			fprintf(out,"%c\n",cep[i][j]);						;			
 		}	
@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 	
 	strcpy(prom,mypath_data);	
 
-	if(strstr(mypath_data,"hs") !=NULL || strstr(mypath_data,"maps\\hg")!=NULL) 
+	if((strstr(mypath_data,"hs") !=NULL || strstr(mypath_data,"hg")!=NULL) || (strstr(mypath_data,"HS") !=NULL || strstr(mypath_data,"HG")!=NULL) )
 	{
 		strcat(prom,"ups2kb.plain");
 		len_genome=2000;
@@ -629,7 +629,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"maps\\mm")!=NULL) 
+		if(strstr(mypath_data,"mm") !=NULL || strstr(mypath_data,"MM")!=NULL) 
 		{
 			strcat(prom,"ups2kb.plain");
 			len_genome=2000;
@@ -637,7 +637,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			if(strstr(mypath_data,"at") !=NULL || strstr(mypath_data,"maps\\at")!=NULL) 
+			if(strstr(mypath_data,"at") !=NULL || strstr(mypath_data,"AT")!=NULL) 
 			{
 				strcat(prom,"ups1500.plain");
 				len_genome=1500;
