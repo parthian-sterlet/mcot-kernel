@@ -602,7 +602,7 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	strcpy(head[2],"Inverted");
 	strcpy(head[3],"Everted");
 	char head0[10];
-	strcpy(head0,"Direct AA");
+	strcpy(head0,"DirectAA");
 	int n_partial;
 	n_partial=Min(len_a,len_p);//partial overlap
 	n_partial--;
