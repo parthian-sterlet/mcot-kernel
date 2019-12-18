@@ -597,8 +597,8 @@ struct combi {
 int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode)
 {
 	char head[4][10];
-	strcpy(head[0],"Direct AP");
-	strcpy(head[1],"Direct PA");
+	strcpy(head[0],"DirectAP");
+	strcpy(head[1],"DirectPA");
 	strcpy(head[2],"Inverted");
 	strcpy(head[3],"Everted");
 	char head0[10];
