@@ -15,16 +15,6 @@ int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double 
 	{		
 		for (i = 0; i < NUM_THR; i++)index[i] = i;
 	}
-	/*if(n_thr_touzet<=NUM_THR+3)
-	{
-		int dif=Max(0,NUM_THR+2-n_thr_touzet);
-		j=n_thr_touzet-1-dif;
-		for(i=NUM_THR-1;i>=0;i--)
-		{
-			index[i]=j;
-			if(j>0)j--;
-		}
-	}*/
 	else
 	{
 		int jsta=n_thr_touzet-1;
