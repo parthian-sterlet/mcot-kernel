@@ -427,7 +427,7 @@ int profile::fprintf_pro(char *mot_db, double thr,char *mode)
 		for(j=0;j<nsit[i];j++)
 		{
 			fprintf(out,"%d\t",sta[i][j]);			
-			fprintf(out,"%d",1+cel[i][j]);			
+			fprintf(out,"%d",cel[i][j]);			
 			fprintf(out,"\t");
 			fprintf(out,"%c\n",cep[i][j]);						;			
 		}	
@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 	
 	strcpy(prom,mypath_data);	
 
-	if((strstr(mypath_data,"hs") !=NULL || strstr(mypath_data,"hg")!=NULL) || (strstr(mypath_data,"HS") !=NULL || strstr(mypath_data,"HG")!=NULL) )
+	if ((strstr(mypath_data, "hs") != NULL || strstr(mypath_data, "hg") != NULL) || (strstr(mypath_data, "HS") != NULL || strstr(mypath_data, "HG") != NULL))
 	{
 		strcat(prom,"ups2kb.plain");
 		len_genome=2000;
@@ -871,34 +871,12 @@ int main(int argc, char *argv[])
 		}
 		for (i = 0; i < n_thr_touzet; i++)fprintf(out_fpr, "%.8f\t%g\n", thr_touzet[mot][i], fp_rate[i]);
 		fclose(out_fpr);
-		double fpr_select[NUM_THR];				
-		if(length>5)
+		double fpr_select[NUM_THR];
 		{
-			int stfp=select_thresholds_from_pvalues(n_thr_touzet,thr_touzet[mot],fp_rate,pvalue,pvalue_mult,fpr_select,thr[mot]);
-		}
-		else
-		{
-			if(n_thr_touzet>=NUM_THR)
+			int stfp = select_thresholds_from_pvalues(n_thr_touzet, thr_touzet[mot], fp_rate, pvalue, pvalue_mult, fpr_select, thr[mot]);
+			if (stfp==-1)
 			{
-				for(i=0;i<NUM_THR;i++)
-				{
-					thr[mot][i]=thr_touzet[mot][i];
-					fpr_select[i]=fp_rate[i];
-				}
-				for(i=0;i<NUM_THR;i++)
-				{		
-					printf("\t%g",fpr_select[i]);
-				}
-				printf("\n");
-				for(i=0;i<NUM_THR;i++)
-				{		
-					printf("\t%g",thr[mot][i]);
-				}
-				printf("\n");	
-			}
-			else
-			{
-				printf("Too bad input matrix of %d motif\n",mot);
+				printf("Too bad input matrix of %d motif\n", mot);
 				return -1;
 			}
 		}
