@@ -10,7 +10,12 @@ int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double 
 		fpr_select[i]=fpr_select[i+1]/ratio_cur;
 		ratio_cur=1+ratio_cur/2;
 	}
-	if(n_thr_touzet<=NUM_THR+3)
+	if (n_thr_touzet <= NUM_THR) return -1;
+	if (fp_rate[0] > fpr_select[0])
+	{		
+		for (i = 0; i < NUM_THR; i++)index[i] = i;
+	}
+	/*if(n_thr_touzet<=NUM_THR+3)
 	{
 		int dif=Max(0,NUM_THR+2-n_thr_touzet);
 		j=n_thr_touzet-1-dif;
@@ -19,7 +24,7 @@ int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double 
 			index[i]=j;
 			if(j>0)j--;
 		}
-	}
+	}*/
 	else
 	{
 		int jsta=n_thr_touzet-1;
