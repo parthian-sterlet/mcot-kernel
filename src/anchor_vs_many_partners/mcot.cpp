@@ -491,7 +491,7 @@ int profile::fprintf_pro(char *mot_db, double thr,char *mode)
 		for(j=0;j<nsit[i];j++)
 		{
 			fprintf(out,"%d\t",sta[i][j]);			
-			fprintf(out,"%d",1+cel[i][j]);			
+			fprintf(out,"%d",cel[i][j]);			
 			fprintf(out,"\t");
 			fprintf(out,"%c\n",cep[i][j]);						;			
 		}	
@@ -1016,6 +1016,11 @@ int main(int argc, char *argv[])
 			fclose(out_fpr);
 			double fpr_select[NUM_THR];
 			int stfp=select_thresholds_from_pvalues(n_thr_touzet,thr_touzet,fp_rate,pvalue,pvalue_mult,fpr_select,thr);
+			if (stfp == -1)
+			{
+				printf("Too bad input matrix of %d motif\n", mot);
+				return -1;
+			}
 			delete [] fp_rate;							
 			memset(name_partner,'\0',sizeof(name_partner));
 			strcpy(name_partner,name_anchor);
