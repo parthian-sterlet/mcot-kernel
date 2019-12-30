@@ -27,7 +27,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	//int *cepi_sit[4];
 	int *cepi_sit_one[4];
 	//if(strncmp(rera,"rand",4)!=0)
-	if(strstr(rera,"real")!=NULL)
+	outbest=NULL;
+	//if(strstr(rera,"real")!=NULL)
 	{
 		if((outbest=fopen(filebest,"wt"))==NULL)
 		{
@@ -66,8 +67,9 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	for(n=0;n<nseq;n++)
 	{						
 		if(prf_a.nsit[n]==0 || prf_p.nsit[n]==0)continue;
+	//	printf("%8d",n+1);
 		int lenp=peak_len[n];
-		int join_sites[NUM_THR][NUM_THR], join_sites_eq=0, join_sites_anc=0, join_sites_par=0;
+		int join_sites[NUM_THR][NUM_THR], join_sites_anc=0, join_sites_par=0;
 		int ce_full[NUM_THR][NUM_THR], ce_part[NUM_THR][NUM_THR], ce_spac[NUM_THR][NUM_THR];// no. of CE 
 		for(j=0;j<NUM_THR;j++)for(k=0;k<NUM_THR;k++)join_sites[j][k]=ce_full[j][k]=ce_part[j][k]=ce_spac[j][k]=0;		
 		int ce_full_anc = 0, ce_part_anc = 0, ce_spac_anc = 0;// no. of CE , anc
@@ -92,6 +94,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 				int y0;			
 				y0=prf_a.nsit[n]-1;												
 				int ori_ce;
+				double pv_par=prf_p.pv[n][x];
 				int r_par=prf_p.cel[n][x];
 				for(y=0;y<prf_a.nsit[n];y++)
 				{
@@ -99,15 +102,12 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					{
 						if(x<=y)continue;//homodimer
 					}					
+					double pv_anc=prf_a.pv[n][y];					
 					int r_anc=prf_a.cel[n][y];
 					join_sites[r_anc][r_par]=1;
-					int r_dif=r_anc-r_par;
-					if(r_dif==0)join_sites_eq=1;
-					else
-					{
-						if(r_dif<0)join_sites_anc=1;
-						else join_sites_par=1;
-					}
+					double r_dif=pv_anc-pv_par;
+					if (r_dif > 0)join_sites_anc = 1;
+					else join_sites_par=1;					
 					int ysta,yend;// start & end position of motif
 					ysta=prf_a.sta[n][y];												
 					yend=ysta+len_a-1;												
@@ -129,6 +129,18 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					{
 						take_distance=1;//full overlap
 						full_len=Min(ysta-xsta,xend-yend);
+						sam->sit.full++;
+						sam->sit.overlap++;
+						if (r_dif > 0)
+						{
+							sam->anc_sit.full++;
+							sam->anc_sit.overlap++;
+						}
+						else
+						{
+							sam->par_sit.full++;
+							sam->par_sit.overlap++;
+						}
 					}
 					else
 					{
@@ -136,6 +148,18 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						{
 							take_distance=1;//full overlap
 							full_len=Min(xsta-ysta,yend-xend);
+							sam->sit.full++;
+							sam->sit.overlap++;
+							if (r_dif > 0)
+							{
+								sam->anc_sit.full++;
+								sam->anc_sit.overlap++;
+							}
+							else
+							{
+								sam->par_sit.full++;
+								sam->par_sit.overlap++;
+							}
 						}
 					}
 					if(take_distance==0)
@@ -144,6 +168,18 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						{
 							take_distance=1;//partial overlap
 							partlial_len=xend-ysta+1;
+							sam->sit.overlap++;
+							sam->sit.partial++;
+							if (r_dif > 0)
+							{
+								sam->anc_sit.partial++;
+								sam->anc_sit.overlap++;
+							}
+							else
+							{
+								sam->par_sit.partial++;
+								sam->par_sit.overlap++;
+							}
 						}
 						else 
 						{
@@ -151,6 +187,18 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							{
 								take_distance=1;//partial overlap
 								partlial_len=yend-xsta+1;
+								sam->sit.overlap++;
+								sam->sit.partial++;
+								if (r_dif > 0)
+								{
+									sam->anc_sit.partial++;
+									sam->anc_sit.overlap++;
+								}
+								else
+								{
+									sam->par_sit.partial++;
+									sam->par_sit.overlap++;
+								}
 							}
 						}
 					}
@@ -158,11 +206,20 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					{
 						if(xend<ysta)spacer_len=ysta-xend-1;
 						if(yend<xsta)spacer_len=xsta-yend-1;
-						if(spacer_len>=shift_min && spacer_len<=shift_max)take_distance=1;//spacer
+						if (spacer_len >= shift_min && spacer_len <= shift_max)
+						{
+							take_distance = 1;//spacer
+							sam->sit.spacer++;
+							if (r_dif > 0)sam->anc_sit.spacer++;
+							else sam->par_sit.spacer++;
+						}
 					}					
 					if(take_distance==1)
-					{															
-//							printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
+					{		
+						sam->sit.any++;
+						if (r_dif > 0)sam->anc_sit.any++;
+						else sam->par_sit.any++;
+//						printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
 //						printf("2y=%d\t%d\t%d\t\n",y,ysta,yend);
 						int xsta0=ysta-dlen;
 						int xend0=yend+dlen;
@@ -249,7 +306,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						int dir;
 						if(prf_p.cep[n][x]=='+')dir=1;
 						else dir=-1;																									
-						if(strstr(rera,"real")!=NULL)
+//						if(strstr(rera,"real")!=NULL)
 						{
 							fprintf(outbest,"Seq %d\t",n+1);							
 							fprintf(outbest,"%d\t%d\t",prf_a.sta[n][y],prf_a.sta[n][y]+len_a-1);
@@ -261,7 +318,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								else fprintf(outbest,"%d%c\t%s",spacer_len,locs[2][0],locs[2]);	
 							}
 							fprintf(outbest,"\t%c%c\t%s\t",prf_a.cep[n][y],prf_p.cep[n][x],oris[ori_ce]);																								
-							fprintf(outbest,"%f\t%f\t",prf_a.sco[n][y],prf_p.sco[n][x]);							
+							fprintf(outbest,"%f\t%f\t",prf_a.pv[n][y],prf_p.pv[n][x]);							
+							if (strstr(rera, "real") != NULL)
 							{
 								char dseq[2][MATLEN], compl1;											
 								int pos;
@@ -289,8 +347,9 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								}
 								strncpy(dseq[1],&seq[compl1][n][pos],len_p);	
 								dseq[1][len_p]='\0';
-								fprintf(outbest,"%s\t%s\n",dseq[0],dseq[1]);							
-							}																																			
+								fprintf(outbest,"%s\t%s",dseq[0],dseq[1]);							
+							}	
+							fprintf(outbest, "\n");
 							//printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b%8d %8d",n_site,tot);													
 						}
 					}									
@@ -303,33 +362,39 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					if(join_sites[j][k]==1)sam->cell[j][k].two_sites++;
 				}
 			}
-			if(join_sites_anc==1)sam->anc.two_sites++;
-			if(join_sites_par==1)sam->par.two_sites++;
-			if(join_sites_eq==1)sam->eq.two_sites++;
-			if(ce_full_anc+ce_part_anc+ce_spac_anc>0)
+			if(join_sites_anc==1)
 			{
-				sam->anc.any++;
-				if(ce_full_anc+ce_part_anc>0)sam->anc.overlap++;
-				if(ce_spac_anc>0)sam->anc.spacer++;
-				if(ce_part_anc>0)sam->anc.partial++;
-				if(ce_full_anc>0)sam->anc.full++;
+				sam->anc.two_sites++;
+				if(ce_full_anc+ce_part_anc+ce_spac_anc>0)
+				{
+					sam->anc.any++;
+					if(ce_full_anc+ce_part_anc>0)sam->anc.overlap++;
+					if(ce_spac_anc>0)sam->anc.spacer++;
+					if(ce_part_anc>0)sam->anc.partial++;
+					if(ce_full_anc>0)sam->anc.full++;
+				}
 			}
-			if(ce_full_par+ce_part_par+ce_spac_par>0)
+			if(join_sites_par==1)
 			{
-				sam->par.any++;
-				if(ce_full_par+ce_part_par>0)sam->par.overlap++;
-				if(ce_spac_par>0)sam->par.spacer++;
-				if(ce_part_par>0)sam->par.partial++;
-				if(ce_full_par>0)sam->par.full++;
+				sam->par.two_sites++;
+			//if(join_sites_eq==1)sam->eq.two_sites++;			
+				if(ce_full_par+ce_part_par+ce_spac_par>0)
+				{
+					sam->par.any++;
+					if(ce_full_par+ce_part_par>0)sam->par.overlap++;
+					if(ce_spac_par>0)sam->par.spacer++;
+					if(ce_part_par>0)sam->par.partial++;
+					if(ce_full_par>0)sam->par.full++;
+				}
 			}
-			if(ce_full_eq+ce_part_eq+ce_spac_eq>0)
+			/*if(ce_full_eq+ce_part_eq+ce_spac_eq>0)
 			{
 				sam->eq.any++;
 				if(ce_full_eq+ce_part_eq>0)sam->eq.overlap++;
 				if(ce_spac_eq>0)sam->eq.spacer++;
 				if(ce_part_eq>0)sam->eq.partial++;
 				if(ce_full_eq>0)sam->eq.full++;
-			}
+			}*/
 			for(j=0;j<NUM_THR;j++)
 			{
 				for(k=0;k<NUM_THR;k++)
@@ -365,7 +430,10 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	}	
 	//strcpy(filerec,"projoin.txt");
 //	printf("Debug - Start print!\n");
-	if(strstr(rera,"real")!=NULL)fclose(outbest);
+//	if (strstr(rera, "real") != NULL)
+	{
+		fclose(outbest);
+	}
 	if(prf_a.mot==prf_p.mot)
 	{
 		for(j=0;j<cepi_len;j++)
