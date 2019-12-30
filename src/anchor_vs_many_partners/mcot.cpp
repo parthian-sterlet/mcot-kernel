@@ -13,11 +13,6 @@
 #define MATLEN 50 //max matrix length
 #define SPACLEN 100 //max upper bound of spacer length
 #define OLIGNUM 4// di 16 mono 4
-#define NMAT_HS_CORE 403 // total count of matrices in hocomoco human core collection +1(anchor)
-#define NMAT_MM_CORE 359 // total count of matrices in hocomoco mouse core collection +1(anchor)
-#define NMAT_HS_FULL 772 // total count of matrices in hocomoco human full collection +1(anchor)
-#define NMAT_MM_FULL 532 // total count of matrices in hocomoco mouse full collection +1(anchor)
-#define NMAT_DAPSEQ 529 // total count of matrices in hocomoco mouse full collection +1(anchor)
 #define NUM_THR 5 //4islo porogov
 #define NUM_PVAL 30000 // max 4islo porogov v tablice Touzet
 
