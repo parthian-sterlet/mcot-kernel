@@ -1,7 +1,7 @@
 int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double *fp_rate, double pvalue_large, double ratio, 
-								   double *fpr_select, double *thr_select)
+								   double *fpr_select, double *thr_select, int index[NUM_THR])
 {
-    int i, j, index[NUM_THR];
+    int i, j;
 
 	double ratio_cur=ratio;
 	fpr_select[NUM_THR-1]=pvalue_large;
