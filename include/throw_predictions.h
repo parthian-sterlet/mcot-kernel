@@ -175,37 +175,68 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 				//nsit_cur+=nsit_clust[i][j];
 			}
 		}
-		int ***clust_cel;
-		clust_cel = new int**[2];				
-		if(clust_cel==NULL){puts("Out of memory...");return -1;}
+		int ***cel_pv;
+		cel_pv = new int**[2];				
+		if(cel_pv==NULL){puts("Out of memory...");return -1;}
 		for(i=0;i<2;i++)
 		{
-			clust_cel[i] = new int*[n_clust[i]];
-			if(clust_cel[i]==NULL ){puts("Out of memory...");return -1;}
+			cel_pv[i] = new int*[n_clust[i]];
+			if(cel_pv[i]==NULL ){puts("Out of memory...");return -1;}
 			int nsit_cur=0;
 			for(j=0;j<n_clust[i];j++)
 			{
-				clust_cel[i][j] = new int[nsit_clust[i][j]+1];
-				if(clust_cel[i][j]==NULL ){puts("Out of memory...");return -1;}
+				cel_pv[i][j] = new int[nsit_clust[i][j]+1];
+				if(cel_pv[i][j]==NULL ){puts("Out of memory...");return -1;}
 				if(i==0)
 				{
 					for(k=0;k<nsit_clust[i][j];k++)
 					{
-						clust_cel[i][j][k]=anc->cel[n][nsit_cur++];
-						//printf("I %d J %d K %d Cel %d\n",i,j,k,clust_cel[i][j][k]);
+						cel_pv[i][j][k]=anc->cel[n][nsit_cur++];
+						//printf("I %d J %d K %d Cel %d\n",i,j,k,pv[i][j][k]);
 					}
 				}
 				else
 				{
 					for(k=0;k<nsit_clust[i][j];k++)
 					{
-						clust_cel[i][j][k]=par->cel[n][nsit_cur++];
-						//printf("I %d J %d K %d Cel %d\n",i,j,k,clust_cel[i][j][k]);
+						cel_pv[i][j][k]=par->cel[n][nsit_cur++];
+						//printf("I %d J %d K %d Cel %d\n",i,j,k,pv[i][j][k]);
 					}
 				}
 				//nsit_cur+=nsit_clust[i][j];
 			}
 		}
+		double ***pv;
+		pv = new double**[2];				
+		if(pv==NULL){puts("Out of memory...");return -1;}
+		for(i=0;i<2;i++)
+		{
+			pv[i] = new double*[n_clust[i]];
+			if(pv[i]==NULL ){puts("Out of memory...");return -1;}
+			int nsit_cur=0;
+			for(j=0;j<n_clust[i];j++)
+			{
+				pv[i][j] = new double[nsit_clust[i][j]+1];
+				if(pv[i][j]==NULL ){puts("Out of memory...");return -1;}
+				if(i==0)
+				{
+					for(k=0;k<nsit_clust[i][j];k++)
+					{
+						pv[i][j][k]=anc->pv[n][nsit_cur++];
+						//printf("I %d J %d K %d Cel %d\n",i,j,k,pv[i][j][k]);
+					}
+				}
+				else
+				{
+					for(k=0;k<nsit_clust[i][j];k++)
+					{
+						pv[i][j][k]=par->pv[n][nsit_cur++];
+						//printf("I %d J %d K %d Cel %d\n",i,j,k,pv[i][j][k]);
+					}
+				}
+				//nsit_cur+=nsit_clust[i][j];
+			}
+		}		
 		int ***shift;
 		shift = new int**[2];				
 		if(shift==NULL){puts("Out of memory...");return -1;}
@@ -244,16 +275,19 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 			{
 				for(j=0;j<n_clust[i];j++)delete[] clust_seq[i][j]; 
 				for(j=0;j<n_clust[i];j++)delete[] clust_cep[i][j]; 
-				for(j=0;j<n_clust[i];j++)delete[] clust_cel[i][j]; 
+				for(j=0;j<n_clust[i];j++)delete[] cel_pv[i][j]; 
+				for(j=0;j<n_clust[i];j++)delete[] pv[i][j]; 
 				for(j=0;j<n_clust[i];j++)delete[] shift[i][j]; 
 				delete[] clust_seq[i];
 				delete[] clust_cep[i];
-				delete[] clust_cel[i];
+				delete[] cel_pv[i];
+				delete[] pv[i];
 				delete[] shift[i];
 			}
 			delete [] clust_seq;
 			delete [] clust_cep;
-			delete [] clust_cel;
+			delete [] cel_pv;
+			delete [] pv;
 			delete [] shift;
 			for(i=0;i<2;i++)delete [] nsit_clust[i];
 			for(i=0;i<2;i++)delete [] clust_len[i];			
@@ -418,16 +452,18 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 					{
 						anc->sta[n][nsit_cur]=m+shift[permut][j1][k];//prf[implant]->sta[n][nsit_cur]
 						anc->cep[n][nsit_cur]=clust_cep[permut][j1][k];
-						anc->cel[n][nsit_cur]=clust_cel[permut][j1][k];
-						//printf("I %d J %d K %d Cel %d\n",permut,j1,k,clust_cel[permut][j1][k]);
+						anc->cel[n][nsit_cur]=cel_pv[permut][j1][k];
+						anc->pv[n][nsit_cur]=pv[permut][j1][k];
+						//printf("I %d J %d K %d Cel %d\n",permut,j1,k,pv[permut][j1][k]);
 					//	printf("%d%c ",anc->sta[n][nsit_cur],anc->cep[n][nsit_cur]);
 					}
 					else
 					{
 						par->sta[n][nsit_cur]=m+shift[permut][j1][k];//prf[implant]->sta[n][nsit_cur]
 						par->cep[n][nsit_cur]=clust_cep[permut][j1][k];
-						par->cel[n][nsit_cur]=clust_cel[permut][j1][k];
-					//	printf("I %d J %d K %d Cel %d\n",permut,j1,k,clust_cel[permut][j1][k]);
+						par->cel[n][nsit_cur]=cel_pv[permut][j1][k];
+						par->pv[n][nsit_cur]=pv[permut][j1][k];
+					//	printf("I %d J %d K %d Cel %d\n",permut,j1,k,pv[permut][j1][k]);
 						//printf("%d%c ",par->sta[n][nsit_cur],par->cep[n][nsit_cur]);
 					}
 			//		pra.sco=1;
@@ -474,17 +510,20 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 		{
 			for(j=0;j<n_clust[i];j++)delete[] clust_seq[i][j]; 
 			for(j=0;j<n_clust[i];j++)delete[] clust_cep[i][j]; 
-			for(j=0;j<n_clust[i];j++)delete[] clust_cel[i][j]; 
+			for(j=0;j<n_clust[i];j++)delete[] cel_pv[i][j]; 
+			for(j=0;j<n_clust[i];j++)delete[] pv[i][j]; 
 			for(j=0;j<n_clust[i];j++)delete[] shift[i][j]; 
 			delete[] clust_seq[i];
 			delete[] clust_cep[i];
-			delete[] clust_cel[i];
+			delete[] cel_pv[i];
+			delete[] pv[i];
 			delete[] shift[i];
 			//delete [] order[i];//printf("Order\n");
 		}
 		delete [] clust_seq;
 		delete [] clust_cep;
-		delete [] clust_cel;
+		delete [] cel_pv;
+		delete [] pv;
 		delete [] shift;
 		//delete [] spacer_lenr;
 		//delete [] order;
