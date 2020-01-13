@@ -454,12 +454,14 @@ void profile::mem_out_sco(void)
 	int i;
 	for(i=0;i<nseq;i++)if(nsit[i]>0)delete [] sco[i];
 	delete [] sco;
+	sco=NULL;
 }
 void profile::mem_out_pv(void)
 {
 	int i;
 	for(i=0;i<nseq;i++)if(nsit[i]>0)delete [] pv[i];
 	delete [] pv;
+	pv=NULL;
 }
 int profile::mem_in_nsit(void)
 {	
@@ -517,12 +519,6 @@ int profile::get_copy_rand(profile *a, int height)
 }
 int profile::clear_real(void)
 {
-/*	if (mem_clear!=0)
-	{
-		mem_out_sta();
-		mem_out_cep();
-		mem_out_cel();
-	}*/
 	int ini=mem_in_sta();
 	if(ini==-1){puts("Not enough memory...\n");return -1;}
 	ini=mem_in_cep();
@@ -2004,6 +2000,7 @@ int main(int argc, char *argv[])
 			rand_one[ap].mem_out_sta();
 			rand_one[ap].mem_out_cep();			
 			rand_one[ap].mem_out_cel();		
+			rand_one[ap].mem_out_pv();		
 			for(i=0;i<nseq_rand;i++)rand_one[ap].nsit[i]=0;
 		}
 		if(ap==1)
