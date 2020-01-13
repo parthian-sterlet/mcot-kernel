@@ -1,5 +1,5 @@
 int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min, int shift_max, int len_a, int len_p, int *thr_pre_err,
-			int nseq, char ***seq, result *sam, combi *hist, int *peak_len)
+			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot)
 {	
 	int n, k,j, x,y;
 	char filebest[120]; 
@@ -28,7 +28,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	int *cepi_sit_one[4];
 	//if(strncmp(rera,"rand",4)!=0)
 	outbest=NULL;
-	//if(strstr(rera,"real")!=NULL)
+	if(strstr(rera,"real")!=NULL)
 	{
 		if((outbest=fopen(filebest,"wt"))==NULL)
 		{
@@ -96,15 +96,29 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 				int ori_ce;
 				double pv_par=prf_p.pv[n][x];
 				int r_par=prf_p.cel[n][x];
+				int p_karman;
+				if(pv_par<plot->min)p_karman=0;
+				else
+				{
+					if(pv_par>=plot->max)p_karman=plot->n_karman;
+					else p_karman=1+(int)((pv_par-plot->min)/plot->inter);
+				}
 				for(y=0;y<prf_a.nsit[n];y++)
 				{
 					if(prf_a.mot==prf_p.mot)
 					{
 						if(x<=y)continue;//homodimer
-					}					
+					}																		
 					double pv_anc=prf_a.pv[n][y];					
 					int r_anc=prf_a.cel[n][y];
 					join_sites[r_anc][r_par]=1;
+					int a_karman;
+					if(pv_anc<plot->min)a_karman=0;
+					else
+					{
+						if(pv_anc>=plot->max)a_karman=plot->n_karman;
+						else a_karman=1+(int)((pv_anc-plot->min)/plot->inter);
+					}
 					double r_dif=pv_anc-pv_par;
 					if (r_dif > 0)join_sites_anc = 1;
 					else join_sites_par=1;					
@@ -131,6 +145,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						full_len=Min(ysta-xsta,xend-yend);
 						sam->sit.full++;
 						sam->sit.overlap++;
+						plot->full[a_karman][p_karman]++;
+						plot->overlap[a_karman][p_karman]++;
 						if (r_dif > 0)
 						{
 							sam->anc_sit.full++;
@@ -150,6 +166,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							full_len=Min(xsta-ysta,yend-xend);
 							sam->sit.full++;
 							sam->sit.overlap++;
+							plot->full[a_karman][p_karman]++;
+							plot->overlap[a_karman][p_karman]++;
 							if (r_dif > 0)
 							{
 								sam->anc_sit.full++;
@@ -170,6 +188,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							partlial_len=xend-ysta+1;
 							sam->sit.overlap++;
 							sam->sit.partial++;
+							plot->partial[a_karman][p_karman]++;
+							plot->overlap[a_karman][p_karman]++;
 							if (r_dif > 0)
 							{
 								sam->anc_sit.partial++;
@@ -189,6 +209,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								partlial_len=yend-xsta+1;
 								sam->sit.overlap++;
 								sam->sit.partial++;
+								plot->partial[a_karman][p_karman]++;
+								plot->overlap[a_karman][p_karman]++;
 								if (r_dif > 0)
 								{
 									sam->anc_sit.partial++;
@@ -212,6 +234,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							sam->sit.spacer++;
 							if (r_dif > 0)sam->anc_sit.spacer++;
 							else sam->par_sit.spacer++;
+							plot->spacer[a_karman][p_karman]++;
 						}
 					}					
 					if(take_distance==1)
@@ -219,6 +242,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						sam->sit.any++;
 						if (r_dif > 0)sam->anc_sit.any++;
 						else sam->par_sit.any++;
+						plot->any[a_karman][p_karman]++;
 //						printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
 //						printf("2y=%d\t%d\t%d\t\n",y,ysta,yend);
 						int xsta0=ysta-dlen;
@@ -306,7 +330,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						int dir;
 						if(prf_p.cep[n][x]=='+')dir=1;
 						else dir=-1;																									
-//						if(strstr(rera,"real")!=NULL)
+						if(strstr(rera,"real")!=NULL)
 						{
 							fprintf(outbest,"Seq %d\t",n+1);							
 							fprintf(outbest,"%d\t%d\t",prf_a.sta[n][y],prf_a.sta[n][y]+len_a-1);
@@ -319,7 +343,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							}
 							fprintf(outbest,"\t%c%c\t%s\t",prf_a.cep[n][y],prf_p.cep[n][x],oris[ori_ce]);																								
 							fprintf(outbest,"%f\t%f\t",prf_a.pv[n][y],prf_p.pv[n][x]);							
-							if (strstr(rera, "real") != NULL)
+						//	if (strstr(rera, "real") != NULL)
 							{
 								char dseq[2][MATLEN], compl1;											
 								int pos;
@@ -430,7 +454,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	}	
 	//strcpy(filerec,"projoin.txt");
 //	printf("Debug - Start print!\n");
-//	if (strstr(rera, "real") != NULL)
+	if (strstr(rera, "real") != NULL)
 	{
 		fclose(outbest);
 	}
