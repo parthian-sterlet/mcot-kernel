@@ -344,12 +344,14 @@ void profile::mem_out_sco(void)
 	int i;
 	for(i=0;i<nseq;i++)if(nsit[i]>0)delete [] sco[i];
 	delete [] sco;
+	sco=NULL;
 }
 void profile::mem_out_pv(void)
 {
 	int i;
 	for(i=0;i<nseq;i++)if(nsit[i]>0)delete [] pv[i];
 	delete [] pv;
+	pv=NULL;
 }
 int profile::mem_in_nsit(void)
 {	
