@@ -20,7 +20,6 @@
 //#define NMAT_DAPSEQ 529 // total count of matrices in hocomoco mouse full collection +1(anchor)
 #define NUM_THR 5 //4islo porogov
 #define NUM_PVAL 30000 // max 4islo porogov v tablice Touzet
-#define MOT_NAME_LEN 80 //max length of motif name
 
 //return n-th occurrence of a certain symbol c in a string str
 int StrNStr(char *str,char c, int n)
@@ -2028,6 +2027,8 @@ int main(int argc, char *argv[])
 		delete [] seq[k];
 	}
 	delete [] seq;
+	for(i=0;i<2;i++)real_one[i].mem_out_nsit();
+	for(i=0;i<2;i++)rand_one[i].mem_out_nsit();
 	real_one[0].mem_out_sta();
 	real_one[0].mem_out_cep();
 	real_one[0].mem_out_cel();
