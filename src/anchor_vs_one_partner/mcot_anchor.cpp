@@ -1742,16 +1742,18 @@ int main(int argc, char *argv[])
 	rand_plot.mem_out();
 	rand_hom_one.mem_out_sta();
 	rand_hom_one.mem_out_cep();		
-	rand_hom_one.mem_out_cel();		
-	rand_hom_one.mem_out_nsit();
+	rand_hom_one.mem_out_cel();	
+	rand_hom_one.mem_out_pv();
+	rand_hom_one.mem_out_nsit();	
 	for (i = 0; i < 2; ++i) 
 	{
 		real_one[i].mem_out_sta();
 		real_one[i].mem_out_cep();
 		real_one[i].mem_out_cel();
 		real_one[i].mem_out_sco();
-		real_one[i].mem_out_pv();
+		real_one[i].mem_out_pv();		
 		real_one[i].mem_out_nsit();
+		rand_one[i].mem_out_nsit();
 	}
 	delete [] thr_err_real;
 	delete [] thr_err_rand;
