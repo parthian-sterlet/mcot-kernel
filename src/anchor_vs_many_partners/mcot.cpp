@@ -1079,6 +1079,16 @@ int main(int argc, char *argv[])
 		return -1;
 	}	
 	fprintf(out_stat,"# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
+	char file_err[] = "throw_prediction.txt";		
+	{
+		FILE *out_err;		
+		if ((out_err = fopen(file_err, "wt")) == NULL)
+		{
+			printf("Input file %s can't be opened!\n", file_err);
+			return -1;
+		}							
+			
+	}
 	for(mot=0;mot<n_motifs;mot++)
 	//for(mot=0;mot<n_motifs;mot+=144)
 	{	
@@ -1429,7 +1439,7 @@ int main(int argc, char *argv[])
 		{// one threshold
 			for(m=0;m<nseq_real;m++)thr_err_real[m]=0;			
 			rand_one[ap].mot=mot;			
-			int throwp = throw_predictions(peak_len_rand, &rand_hom_one, &rand_one[ap], len_anchor, len_partner, 0, thr_err_real, nseq_real, nseq_rand, seq[0], height_permut);
+			int throwp = throw_predictions(peak_len_rand, &rand_hom_one, &rand_one[ap], len_anchor, len_partner, 0, thr_err_real, nseq_real, nseq_rand, seq[0], height_permut,file_err);
 			if(throwp==-1)
 			{
 				printf("Throw Prediction error One - Anc 0 Par %d\n", mot);
@@ -1475,198 +1485,203 @@ int main(int argc, char *argv[])
 			//printf("Mot %d Enter plot\n",mot);
 			if(mot!=0)
 			{
-				char file_plot[80];
-				strcpy(file_plot,"plot_");
-				strcat(file_plot,name_anchor);
-				strcat(file_plot,"_partner");
-				strcat(file_plot,buf);
-				FILE *out_plot;
-				if((out_plot=fopen(file_plot,"wt"))==NULL)
+				char *flow[5]={"Full","Partial","Overlap","Spacer","Any"};
+				FILE *out_plot[5];
+				char file_plot[5][80];
+				for(i=0;i<5;i++)
 				{
-					printf("Input file %s can't be opened!\n", file_plot);
-					return -1;
-				}
-				fprintf(out_plot,"Full\tAnchor\\Partner\n");
-				double val=real_plot.min;						
-				fprintf(out_plot,"\t<%.1f",val);
+					strcpy(file_plot[i],"plot_");
+					strcat(file_plot[i],flow[i]);
+					strcat(file_plot[i],"_Anchor");
+					strcat(file_plot[i],"_Partner");
+					strcat(file_plot[i],buf);					
+					if((out_plot[i]=fopen(file_plot[i],"wt"))==NULL)
+					{
+						printf("Input file %s can't be opened!\n", file_plot[i]);
+						return -1;
+					}
+				}				
+				char rzd=',';
+				double val=real_plot.min;
+				fprintf(out_plot[0],"%c<%.1f",rzd,val);
 				for(i=1;i<real_plot.n_karman;i++)
 				{				
-					fprintf(out_plot,"\t%.1f",val);
+					fprintf(out_plot[0],"%c%.1f",rzd,val);
 					val+=real_plot.inter;
-					fprintf(out_plot,"..%.1f",val);
+					fprintf(out_plot[0],"..%.1f",val);
 				}
-				fprintf(out_plot,"\t>%.1f",val);
-				fprintf(out_plot,"\n");
+				fprintf(out_plot[0],"%c>%.1f",rzd,val);
+				fprintf(out_plot[0],"\n");
 				val=real_plot.min;
 				for(i=0;i<=real_plot.n_karman;i++)
 				{
-					if(i==0)fprintf(out_plot,"<%.1f",val);
+					if(i==0)fprintf(out_plot[0],"<%.1f",val);
 					else
 					{
-						if(i==real_plot.n_karman)fprintf(out_plot,">%.1f",val);
+						if(i==real_plot.n_karman)fprintf(out_plot[0],">%.1f",val);
 						else
 						{
-							fprintf(out_plot,"%.1f",val);
+							fprintf(out_plot[0],"%.1f",val);
 							val+=real_plot.inter;
-							fprintf(out_plot,"..%.1f",val);
+							fprintf(out_plot[0],"..%.1f",val);
 						}
 					}
 					for(j=0;j<=real_plot.n_karman;j++)
 					{
-						fprintf(out_plot,"\t");					
+						fprintf(out_plot[0],"%c",rzd);					
 						if(real_plot.total_full!=0 && rand_plot.total_full!=0)
 						{
 							double mill=1000*((double)real_plot.full[i][j]/real_plot.total_full-(double)rand_plot.full[i][j]/rand_plot.total_full);
-							fprintf(out_plot,"%f",mill);
+							if(fabs(mill)>0.5)fprintf(out_plot[0],"%.f",mill);
 						}
 					}
-					fprintf(out_plot,"\n");
+					fprintf(out_plot[0],"\n");
 				}
-				fprintf(out_plot,"Partial\tAnchor\\Partner\n");
+				fclose(out_plot[0]);
 				val=real_plot.min;
-				fprintf(out_plot,"\t<%.1f",val);
+				fprintf(out_plot[1],"%c<%.1f",rzd,val);
 				for(i=1;i<real_plot.n_karman;i++)
 				{				
-					fprintf(out_plot,"\t%.1f",val);
+					fprintf(out_plot[1],"%c%.1f",rzd,val);
 					val+=real_plot.inter;
-					fprintf(out_plot,"..%.1f",val);
+					fprintf(out_plot[1],"..%.1f",val);
 				}
-				fprintf(out_plot,"\t>%.1f",val);
-				fprintf(out_plot,"\n");
+				fprintf(out_plot[1],"%c>%.1f",rzd,val);
+				fprintf(out_plot[1],"\n");
 				val=real_plot.min;
 				for(i=0;i<=real_plot.n_karman;i++)
 				{
-					if(i==0)fprintf(out_plot,"<%.1f",val);
+					if(i==0)fprintf(out_plot[1],"<%.1f",val);
 					else
 					{
-						if(i==real_plot.n_karman)fprintf(out_plot,">%.1f",val);
+						if(i==real_plot.n_karman)fprintf(out_plot[1],">%.1f",val);
 						else
 						{
-							fprintf(out_plot,"%.1f",val);
+							fprintf(out_plot[1],"%.1f",val);
 							val+=real_plot.inter;
-							fprintf(out_plot,"..%.1f",val);
+							fprintf(out_plot[1],"..%.1f",val);
 						}
 					}
 					for(j=0;j<=real_plot.n_karman;j++)
 					{
-						fprintf(out_plot,"\t");					
+						fprintf(out_plot[1],"%c",rzd);					
 						if(real_plot.total_partial!=0 && rand_plot.total_partial!=0)
 						{
 							double mill=1000*((double)real_plot.partial[i][j]/real_plot.total_partial-(double)rand_plot.partial[i][j]/rand_plot.total_partial);
-							fprintf(out_plot,"%f",mill);
+							if(fabs(mill)>0.5)fprintf(out_plot[1],"%.f",mill);
 						}
 					}
-					fprintf(out_plot,"\n");
+					fprintf(out_plot[1],"\n");
 				}			
-				fprintf(out_plot,"Overlap\tAnchor\\Partner\n");
+				fclose(out_plot[1]);
 				val=real_plot.min;
-				fprintf(out_plot,"\t<%.1f",val);
+				fprintf(out_plot[2],"%c<%.1f",rzd,val);
 				for(i=1;i<real_plot.n_karman;i++)
 				{				
-					fprintf(out_plot,"\t%.1f",val);
+					fprintf(out_plot[2],"%c%.1f",rzd,val);
 					val+=real_plot.inter;
-					fprintf(out_plot,"..%.1f",val);
+					fprintf(out_plot[2],"..%.1f",val);
 				}
-				fprintf(out_plot,"\t>%.1f",val);
-				fprintf(out_plot,"\n");
+				fprintf(out_plot[2],"%c>%.1f",rzd,val);
+				fprintf(out_plot[2],"\n");
 				val=real_plot.min;
 				for(i=0;i<=real_plot.n_karman;i++)
 				{
-					if(i==0)fprintf(out_plot,"<%.1f",val);
+					if(i==0)fprintf(out_plot[2],"<%.1f",val);
 					else
 					{
-						if(i==real_plot.n_karman)fprintf(out_plot,">%.1f",val);
+						if(i==real_plot.n_karman)fprintf(out_plot[2],">%.1f",val);
 						else
 						{
-							fprintf(out_plot,"%.1f",val);
+							fprintf(out_plot[2],"%.1f",val);
 							val+=real_plot.inter;
-							fprintf(out_plot,"..%.1f",val);
+							fprintf(out_plot[2],"..%.1f",val);
 						}
 					}
 					for(j=0;j<=real_plot.n_karman;j++)
 					{
-						fprintf(out_plot,"\t");					
+						fprintf(out_plot[2],"%c",rzd);					
 						if(real_plot.total_overlap!=0 && rand_plot.total_overlap!=0)
 						{
 							double mill=1000*((double)real_plot.overlap[i][j]/real_plot.total_overlap-(double)rand_plot.overlap[i][j]/rand_plot.total_overlap);
-							fprintf(out_plot,"%f",mill);
+							if(fabs(mill)>0.5)fprintf(out_plot[2],"%.f",mill);
 						}
 					}
-					fprintf(out_plot,"\n");
+					fprintf(out_plot[2],"\n");
 				}
-				fprintf(out_plot,"Spacer\tAnchor\\Partner\n");
+				fclose(out_plot[2]);
 				val=real_plot.min;
-				fprintf(out_plot,"\t<%.1f",val);
+				fprintf(out_plot[3],"%c<%.1f",rzd,val);
 				for(i=1;i<real_plot.n_karman;i++)
 				{				
-					fprintf(out_plot,"\t%.1f",val);
+					fprintf(out_plot[3],"%c%.1f",rzd,val);
 					val+=real_plot.inter;
-					fprintf(out_plot,"..%.1f",val);
+					fprintf(out_plot[3],"..%.1f",val);
 				}
-				fprintf(out_plot,"\t>%.1f",val);
-				fprintf(out_plot,"\n");
+				fprintf(out_plot[3],"%c>%.1f",rzd,val);
+				fprintf(out_plot[3],"\n");
 				val=real_plot.min;
 				for(i=0;i<=real_plot.n_karman;i++)
 				{
-					if(i==0)fprintf(out_plot,"<%.1f",val);
+					if(i==0)fprintf(out_plot[3],"<%.1f",val);
 					else
 					{
-						if(i==real_plot.n_karman)fprintf(out_plot,">%.1f",val);
+						if(i==real_plot.n_karman)fprintf(out_plot[3],">%.1f",val);
 						else
 						{
-							fprintf(out_plot,"%.1f",val);
+							fprintf(out_plot[3],"%.1f",val);
 							val+=real_plot.inter;
-							fprintf(out_plot,"..%.1f",val);
+							fprintf(out_plot[3],"..%.1f",val);
 						}
 					}
 					for(j=0;j<=real_plot.n_karman;j++)
 					{
-						fprintf(out_plot,"\t");					
+						fprintf(out_plot[3],"%c",rzd);					
 						if(real_plot.total_spacer!=0 && rand_plot.total_spacer!=0)
 						{
 							double mill=1000*((double)real_plot.spacer[i][j]/real_plot.total_spacer-(double)rand_plot.spacer[i][j]/rand_plot.total_spacer);
-							fprintf(out_plot,"%f",mill);
+							if(fabs(mill)>0.5)fprintf(out_plot[3],"%.f",mill);
 						}
 					}
-					fprintf(out_plot,"\n");
+					fprintf(out_plot[3],"\n");
 				}
-				fprintf(out_plot,"Any\tAnchor\\Partner\n");
+				fclose(out_plot[3]);
 				val=real_plot.min;
-				fprintf(out_plot,"\t<%.1f",val);
+				fprintf(out_plot[4],"%c<%.1f",rzd,val);
 				for(i=1;i<real_plot.n_karman;i++)
 				{				
-					fprintf(out_plot,"\t%.1f",val);
+					fprintf(out_plot[4],"%c%.1f",rzd,val);
 					val+=real_plot.inter;
-					fprintf(out_plot,"..%.1f",val);
+					fprintf(out_plot[4],"..%.1f",val);
 				}
-				fprintf(out_plot,"\t>%.1f",val);
-				fprintf(out_plot,"\n");
+				fprintf(out_plot[4],"%c>%.1f",rzd,val);
+				fprintf(out_plot[4],"\n");
 				val=real_plot.min;
 				for(i=0;i<=real_plot.n_karman;i++)
 				{
-					if(i==0)fprintf(out_plot,"<%.1f",val);
+					if(i==0)fprintf(out_plot[4],"<%.1f",val);
 					else
 					{
-						if(i==real_plot.n_karman)fprintf(out_plot,">%.1f",val);
+						if(i==real_plot.n_karman)fprintf(out_plot[4],">%.1f",val);
 						else
 						{
-							fprintf(out_plot,"%.1f",val);
+							fprintf(out_plot[4],"%.1f",val);
 							val+=real_plot.inter;
-							fprintf(out_plot,"..%.1f",val);
+							fprintf(out_plot[4],"..%.1f",val);
 						}
 					}
 					for(j=0;j<=real_plot.n_karman;j++)
 					{
-						fprintf(out_plot,"\t");					
+						fprintf(out_plot[4],"%c",rzd);					
 						if(real_plot.total_any!=0 && rand_plot.total_any!=0)
 						{
 							double mill=1000*((double)real_plot.any[i][j]/real_plot.total_any-(double)rand_plot.any[i][j]/rand_plot.total_any);
-							fprintf(out_plot,"%f",mill);
+							if(fabs(mill)>0.5)fprintf(out_plot[4],"%.f",mill);
 						}
 					}
-					fprintf(out_plot,"\n");
+					fprintf(out_plot[4],"\n");
 				}
-				fclose(out_plot);
+				fclose(out_plot[4]);
 			}
 		}// one threshold
 		//many thresholds
