@@ -6,7 +6,7 @@ int compare_qq( const void *X1, const void *X2 )
 	return 0;
 }
 int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int len_p, int rand_prof, int *throw_err_real, 
-					  int nseq_real, int nseq_rand, char **seq, int height)
+					  int nseq_real, int nseq_rand, char **seq, int height, char *file_err)
 {	
 	char peak[SEQLEN], spacer[SEQLEN];// dna sequence of peak
 	char peak_anc[SEQLEN], peak_par[SEQLEN];
@@ -16,8 +16,7 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 //	puts("Syntax: 1fasta_length 2ipre1 3ipre2 4insit1 5insit2 6int mat1 7int mat2 8opre1 9opre2 10int height ");
 //	puts("11int size_min 12int size_max 13int rand_profile(0 0.5/0.5 1 = 1st 2 = 2nd 14file error_list_real 15file error_list_rand");
 			
-	FILE *out_err;
-	char file_err[] = "throw_prediction.txt";		
+	FILE *out_err;		
 
 	int test=0;
 	for(n=0;n<nseq_rand;n++)
@@ -417,8 +416,8 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 						printf("Input file %s can't be opened!\n", file_err);
 						return -1;
 					}							
-					if(permut==0)fprintf(out_err,"Unable to throw permute Mot(Thr) %d(%d) motif Seq(Nsites permute,implant) %d (%d,%d)\n", anc->mot, anc->nam,n+1,anc->nsit[n], par->nsit[n]);
-					else fprintf(out_err,"Unable to throw permute Mot(Thr) %d(%d) motif Seq(Nsites permute,implant) %d (%d,%d)\n", par->mot, par->nam,n+1,par->nsit[n], anc->nsit[n]);
+					if(permut==0)fprintf(out_err,"Unable to throw permute Mot(Thr) %d(%d) motif Seq(Nsites permute,implant) %d (%d,%d)\n", anc->mot, anc->nam,n/height+1,anc->nsit[n], par->nsit[n]);
+					else fprintf(out_err,"Unable to throw permute Mot(Thr) %d(%d) motif Seq(Nsites permute,implant) %d (%d,%d)\n", par->mot, par->nam,n/height+1,par->nsit[n], anc->nsit[n]);
 					throw_err_real[n_real]=1;
 				//	exit_h=1;
 					ret_value++;							
