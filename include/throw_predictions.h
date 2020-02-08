@@ -385,19 +385,18 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 					if(implant==1)
 					{
 						pos=par->sta[n][nsit_cur]+k;
-						y = peak_anc[pos];					
+						y = peak_par[pos];					
 					}
 					else 
 					{
 						pos=anc->sta[n][nsit_cur]+k;
-						y = peak_par[pos];					
+						y = peak_anc[pos];					
 					}
 					if(y == 'n')continue;
 					char x = peak[pos];
 					if(x == 'n')continue;						
 					if (x != y)
 					{
-					//	if(j>8) printf("%d out of %d -- %c vs %c\n",j+1, nsit[permut], sym,pra[permut][j].seqc[k-pra[permut][j].sta]);
 						gom=1;
 						break;
 					}
