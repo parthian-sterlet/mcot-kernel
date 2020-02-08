@@ -13,11 +13,6 @@
 #define MATLEN 50 //max matrix length
 #define SPACLEN 100 //max upper bound of spacer length
 #define OLIGNUM 4// di 16 mono 4
-//#define NMAT_HS_CORE 403 // total count of matrices in hocomoco human core collection +1(anchor)
-//#define NMAT_MM_CORE 359 // total count of matrices in hocomoco mouse core collection +1(anchor)
-//#define NMAT_HS_FULL 772 // total count of matrices in hocomoco human full collection +1(anchor)
-//#define NMAT_MM_FULL 532 // total count of matrices in hocomoco mouse full collection +1(anchor)
-//#define NMAT_DAPSEQ 529 // total count of matrices in hocomoco mouse full collection +1(anchor)
 #define NUM_THR 5 //4islo porogov
 #define NUM_PVAL 30000 // max 4islo porogov v tablice Touzet
 
@@ -825,7 +820,7 @@ int main(int argc, char *argv[])
 	char file_fasta[80], mot_db[30], mypath_data[200], prom[200], partner_db[30], file_pfm_anchor[50];	
 	char ***seq;// peaks
 	
-	char file_hist[80], file_pval[5][80], file_pval_table[80];
+	char file_hist[80], file_hist_rand[80], file_pval[5][80], file_pval_table[80];
 	char name_anchor[80], name_partner[80];
 	char xreal[]="real", xrand[]="rand", xreal_one[]="real_one";
 	char file_fpr[80];
@@ -855,6 +850,7 @@ int main(int argc, char *argv[])
 	int nseq_genome, len_genome;
 	
 	strcpy(file_hist,"out_hist");
+	strcpy(file_hist_rand, "out_hist_rand");
 	strcpy(file_pval[0],"fisher_any_mot");
 	strcpy(file_pval[1],"fisher_full_mot");
 	strcpy(file_pval[2],"fisher_part_mot");
@@ -939,7 +935,10 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
-	}	
+	}
+	int bad_motifs=0;
+	for(i=0;bad_matrix[i]!=-1;i++)bad_motifs++;
+
 	int nlen=strlen(name_anchor);//name_anchor[nlen]='\0';
 	double pvalue_equal = 0.01;	
 	double pvalue_similarity_tot;
@@ -995,7 +994,21 @@ int main(int argc, char *argv[])
 	if(nseq_rand<size_min_permut)height_permut=size_min_permut/nseq_real;
 	if(nseq_rand>size_max_permut)height_permut=size_max_permut/nseq_real;
 	nseq_rand=nseq_real*height_permut;	
-
+	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
+	{
+		double pv_standard=-log10(0.05);
+		bonferroni_corr=(double)nseq_real*nseq_rand;
+		bonferroni_corr*=5;//potoki
+		bonferroni_corr*=(n_motifs-bad_motifs-1);
+		bonferroni_corr_ap=bonferroni_corr;
+		bonferroni_corr_asy=bonferroni_corr;
+		bonferroni_corr*=NUM_THR;
+		bonferroni_corr*=NUM_THR;			
+		bonferroni_corr_ap*=2;				
+		bonferroni_corr=pv_standard+log10(bonferroni_corr);
+		bonferroni_corr_ap=pv_standard+log10(bonferroni_corr_ap);
+		bonferroni_corr_asy=pv_standard+log10(bonferroni_corr_asy);
+	}
 	rand_hom_one.nseq=nseq_rand;
 	rand_hom_one.nam=1;
 	rand_hom_one.mot=0;
@@ -1023,13 +1036,19 @@ int main(int argc, char *argv[])
 	thr_err_rand=new int[nseq_rand];
 	if(thr_err_rand==NULL){puts("Out of memory...");return -1;}			
 
-	FILE *out_hist;
-	if((out_hist=fopen(file_hist,"wt"))==NULL)
+	FILE *out_hist, *out_hist_rand;
+	if ((out_hist = fopen(file_hist, "wt")) == NULL)
 	{
 		printf("Input file %s can't be opened!\n", file_hist);
 		return -1;
 	}
 	fclose(out_hist);
+	if ((out_hist_rand = fopen(file_hist_rand, "wt")) == NULL)
+	{
+		printf("Input file %s can't be opened!\n", file_hist_rand);
+		return -1;
+	}
+	fclose(out_hist_rand);
 	FILE *out_pval_table;
 	if((out_pval_table=fopen(file_pval_table,"wt"))==NULL)
 	{
@@ -1061,7 +1080,7 @@ int main(int argc, char *argv[])
 	fprintf(out_pval_table, "Overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Spacer, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-	fprintf(out_pval_table,"\n");
+	fprintf(out_pval_table, "Bonferroni_CE\tBonferroni_CE(AncPar)\tBonferroni_Asym\n");
 	fclose(out_pval_table);
 	
 	FILE *out_pval[5];
@@ -1086,8 +1105,7 @@ int main(int argc, char *argv[])
 		{
 			printf("Input file %s can't be opened!\n", file_err);
 			return -1;
-		}							
-			
+		}								
 	}
 	for(mot=0;mot<n_motifs;mot++)
 	//for(mot=0;mot<n_motifs;mot+=144)
@@ -1480,6 +1498,7 @@ int main(int argc, char *argv[])
 			strcat(file_hist_one,buf);
 			hist_obs_one.fprintf_all(file_hist,mot,name_partner,len_anchor,len_partner,shift_max,modea);					
 			hist_obs_one.fprintf_all(file_hist_one,mot,name_partner,len_anchor,len_partner,shift_max,modew);					
+			hist_exp_one.fprintf_all(file_hist_rand, mot, name_partner, len_anchor, len_partner, shift_max, modea);
 			real_plot.sum();
 			rand_plot.sum();
 			//printf("Mot %d Enter plot\n",mot);
@@ -1940,7 +1959,7 @@ int main(int argc, char *argv[])
 			}
 			if(limit_found==1)
 			{
-				pval_tot_min[i]=pv_limit;
+				pval_tot_min[i]=limit;
 			}
 			else
 			{
@@ -1981,32 +2000,36 @@ int main(int argc, char *argv[])
 		if(mot==0)fprintf(out_pval_table,"Anchor");
 		else fprintf(out_pval_table,"Partner %d",mot);						
 		fprintf(out_pval_table,"\t%s",name_partner);
-		for(i=1;i<5;i++)fprintf(out_pval_table,"\t%.2f",pval_tot_min[i]);
-		fprintf(out_pval_table,"\t%.2f",pval_tot_min[0]);			
+		for (i = 1; i<5; i++)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
+		fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
 		if (mot != 0)
 		{
 			//fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
 			fprintf(out_pval_table,"\t%.2f\t%.2f\t%.2f",-log10(pvalue_similarity_tot),-log10(pval_sim[0]),-log10(pval_sim[1]));			
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.anchor));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_full.partner));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_partial.anchor));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_partial.partner));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_overlap.anchor));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_overlap.partner));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_spacer.anchor));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_spacer.partner));						
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.anchor));
-			fprintf(out_pval_table,"\t%.2f",-log10(pv_any.partner));
-			fprintf(out_pval_table,"\t%+.2f",pv_full.anc_par);
-			fprintf(out_pval_table,"\t%+.2f",pv_partial.anc_par);
-			fprintf(out_pval_table,"\t%+.2f",pv_overlap.anc_par);
-			fprintf(out_pval_table,"\t%+.2f",pv_spacer.anc_par);
-			fprintf(out_pval_table,"\t%+.2f",pv_any.anc_par);
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_full.anchor));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_full.partner));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_partial.anchor));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_partial.partner));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_overlap.anchor));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_overlap.partner));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_spacer.anchor));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_spacer.partner));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_any.anchor));
+			fprintf(out_pval_table, "\t%.2f", -log10(pv_any.partner));
+			fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
+			fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);			
+			fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);			
+			fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);			
+			fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_asy);
 		}
 		else 
 		{
 			char slash='/';
 			for(i=0;i<18;i++)fprintf(out_pval_table,"\tn%ca",slash);
+			fprintf(out_pval_table, "\t%.2f\t\t", bonferroni_corr);
 		}		
 		fprintf(out_pval_table,"\n");
 		fclose(out_pval_table);
