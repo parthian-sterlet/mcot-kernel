@@ -995,20 +995,6 @@ int main(int argc, char *argv[])
 	if(nseq_rand>size_max_permut)height_permut=size_max_permut/nseq_real;
 	nseq_rand=nseq_real*height_permut;	
 	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
-	{
-		double pv_standard=-log10(0.05);
-		bonferroni_corr=(double)nseq_real*nseq_rand;
-		bonferroni_corr*=5;//potoki
-		bonferroni_corr*=(n_motifs-bad_motifs-1);
-		bonferroni_corr_ap=bonferroni_corr;
-		bonferroni_corr_asy=bonferroni_corr;
-		bonferroni_corr*=NUM_THR;
-		bonferroni_corr*=NUM_THR;			
-		bonferroni_corr_ap*=2;				
-		bonferroni_corr=pv_standard+log10(bonferroni_corr);
-		bonferroni_corr_ap=pv_standard+log10(bonferroni_corr_ap);
-		bonferroni_corr_asy=pv_standard+log10(bonferroni_corr_asy);
-	}
 	rand_hom_one.nseq=nseq_rand;
 	rand_hom_one.nam=1;
 	rand_hom_one.mot=0;
@@ -1476,18 +1462,34 @@ int main(int argc, char *argv[])
 				}		
 			}					
 			//printf("Mot %d Enter projoin\n",mot);
-			int proj=projoin(xrand,mot_db,rand_hom_one,rand_one[ap],shift_min,shift_max,len_anchor,len_partner,thr_err_rand,nseq_rand,seq,&expected, &hist_exp_one,peak_len_rand,&rand_plot);		
+			int nseq_two_sites_real = 0, nseq_two_sites_rand = 0;
+			int proj = projoin(xrand, mot_db, rand_hom_one, rand_one[ap], shift_min, shift_max, len_anchor, len_partner, thr_err_rand, nseq_rand, seq, &expected, &hist_exp_one, peak_len_rand, &rand_plot, nseq_two_sites_rand);
 			if(proj==-1)
 			{
 				printf("Projoin Rand error Anc 0 Par %d\n", mot);
 				return -1;
 			}			
-			proj=projoin(xreal,mot_db,real_one[0],real_one[ap],shift_min,shift_max,len_anchor,len_partner,thr_err_real,nseq_real,seq,&observed, &hist_obs_one,peak_len_real,&real_plot);		
+			proj = projoin(xreal, mot_db, real_one[0], real_one[ap], shift_min, shift_max, len_anchor, len_partner, thr_err_real, nseq_real, seq, &observed, &hist_obs_one, peak_len_real, &real_plot, nseq_two_sites_real);
 			if(proj==-1)
 			{
 				printf("Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
+			{								
+				bonferroni_corr = (double)nseq_two_sites_real*nseq_two_sites_rand;
+				bonferroni_corr *= 5;//potoki
+				bonferroni_corr *= (n_motifs - bad_motifs - 1);
+				bonferroni_corr_ap = bonferroni_corr;
+				bonferroni_corr_asy = bonferroni_corr;
+				bonferroni_corr *= NUM_THR;
+				bonferroni_corr *= NUM_THR;
+				bonferroni_corr_ap *= 2;
+				double pv_standard = -log10(0.05);
+				bonferroni_corr = pv_standard + log10(bonferroni_corr);
+				bonferroni_corr_ap = pv_standard + log10(bonferroni_corr_ap);
+				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
+			}
+
 			//printf("Mot %d Enter hist\n",mot);
 			char modew[]="wt", modea[]="at";
 			char file_hist_one[80];
