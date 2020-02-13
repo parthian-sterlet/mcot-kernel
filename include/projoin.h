@@ -1,12 +1,11 @@
 int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min, int shift_max, int len_a, int len_p, int *thr_pre_err,
-			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot)
+			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot, int &nseq_two_sites)
 {	
 	int n, k,j, x,y;
-	char filebest[120], file_nce_anc[120], file_nce_par[120]; 
+	char filebest[120]; 
 
 	FILE *outbest;// *outhead,*out,  
 //	FILE *out_cepi_seq;//*out_cepi_sit, *out_over_spac;//*outnsite_any,*out_hist,
-	FILE *out_nce_anc, *out_nce_par;
 
 	memset(filebest,'\0',sizeof(filebest));
 	strcpy(filebest,rera);//real or random
@@ -22,24 +21,14 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	strcat(filebest,buf);
 	sprintf(buf,"%d",prf_p.nam);
 	strcat(filebest,buf);
-	strcpy(file_nce_anc,filebest);
-	strcpy(file_nce_par,filebest);
 	strcat(filebest,".best");
-	strcat(file_nce_anc,".anchor");
-	strcat(file_nce_par,".partner");
+	nseq_two_sites = 0;
 		
-	int *nce_anc, *nce_par;
-	nce_anc=new int[nseq];
-	if(nce_anc==NULL){printf("Not  enough memory!");return -1;}	
-	nce_par=new int[nseq];
-	if(nce_par==NULL){printf("Not  enough memory!");return -1;}	
-	for(k=0;k<nseq;k++)nce_anc[k]=nce_par[k]=0;
 	int *cepi_seq[4], *cepi_seq_dir;
 	//int *cepi_sit[4];
 	int *cepi_sit_one[4];
 	//if(strncmp(rera,"rand",4)!=0)
 	outbest=NULL;
-	out_nce_anc=out_nce_par=NULL;
 	if(strstr(rera,"real")!=NULL)
 	{
 		if((outbest=fopen(filebest,"wt"))==NULL)
@@ -48,16 +37,6 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 			return -1;
 		}
 		fprintf(outbest,"#Seq\tA Start\tA End\tP Start\tP End\tMutual Loc\tLoc Type\tStrands\tMutual Ori\tA Score\tP Score\tA Seq\tP Seq\n");
-		if((out_nce_anc=fopen(file_nce_anc,"wt"))==NULL)
-		{
- 			printf("Input file %s can't be opened!\n",file_nce_anc);
-			return -1;
-		}
-		if((out_nce_par=fopen(file_nce_par,"wt"))==NULL)
-		{
- 			printf("Input file %s can't be opened!\n",file_nce_par);
-			return -1;
-		}
 	}
 	int noverp=Min(len_p,len_a);//partial overlap
 	noverp--;
@@ -418,7 +397,6 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					if(ce_spac_anc>0)sam->anc.spacer++;
 					if(ce_part_anc>0)sam->anc.partial++;
 					if(ce_full_anc>0)sam->anc.full++;
-					nce_anc[n]=1;
 				}
 			}
 			if(join_sites_par==1)
@@ -432,9 +410,9 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					if(ce_spac_par>0)sam->par.spacer++;
 					if(ce_part_par>0)sam->par.partial++;
 					if(ce_full_par>0)sam->par.full++;
-					nce_par[n]=1;
 				}
 			}
+			if (join_sites_anc == 1 || join_sites_par == 1)nseq_two_sites++;
 			/*if(ce_full_eq+ce_part_eq+ce_spac_eq>0)
 			{
 				sam->eq.any++;
@@ -476,6 +454,12 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 			if(prf_a.nsit[n]>0)nseq_rec_err[1]++;				
 		}
 	}	
+	//strcpy(filerec,"projoin.txt");
+//	printf("Debug - Start print!\n");
+	if (strstr(rera, "real") != NULL)
+	{
+		fclose(outbest);
+	}
 	if(prf_a.mot==prf_p.mot)
 	{
 		for(j=0;j<cepi_len;j++)
@@ -497,21 +481,12 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 			}
 		}		
 	}
-	if(strstr(rera,"real")!=NULL)
-	{
-		fclose(outbest);
-		for(n=0;n<nseq;n++)
-		{
-			fprintf(out_nce_anc,"%d\n",nce_anc[n]);
-			fprintf(out_nce_par,"%d\n",nce_par[n]);
-		}
-		fclose(out_nce_anc);
-		fclose(out_nce_par);
-	}	
+				
+	//	printf("Debug - At the end! delete\n");
 	for(j=0;j<4;j++)delete [] cepi_seq[j];
+//	for(j=0;j<4;j++)delete [] cepi_sit[j];
 	for(j=0;j<4;j++)delete [] cepi_sit_one[j];
 	delete [] cepi_seq_dir;
-	delete [] nce_anc;
-	delete [] nce_par;
+	//printf("Debug - At the end! return\n");
 	return 1;	
 }
