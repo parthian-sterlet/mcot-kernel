@@ -736,7 +736,7 @@ int main(int argc, char *argv[])
 	strcpy(file_pfm_anchor[0], argv[2]);
 	strcpy(file_pfm_anchor[1], argv[3]);
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
-//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
+	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
 	double pvalue = 0.0005, pvalue_mult = 1.5; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
@@ -787,11 +787,11 @@ int main(int argc, char *argv[])
 		}
 	}
 	strcpy(file_hist, "out_hist");
-	strcpy(file_pval[0], "fisher_any_motAP_");
-	strcpy(file_pval[1], "fisher_full_motAP_");
-	strcpy(file_pval[2], "fisher_part_motAP_");
-	strcpy(file_pval[3], "fisher_over_motAP_");
-	strcpy(file_pval[4], "fisher_spac_motAP_");
+	strcpy(file_pval[0], "fisher_any_mot0");
+	strcpy(file_pval[1], "fisher_full_mot0");
+	strcpy(file_pval[2], "fisher_part_mot0");
+	strcpy(file_pval[3], "fisher_over_mot0");
+	strcpy(file_pval[4], "fisher_spac_mot0");
 	strcpy(file_pval_table, "out_pval");
 	strcpy(file_hist_rand, "out_hist_rand");
 	for (i = 0; i<2; i++)
@@ -863,20 +863,7 @@ int main(int argc, char *argv[])
 	if (nseq_rand<size_min_permut)height_permut = size_min_permut / nseq_real;
 	if (nseq_rand>size_max_permut)height_permut = size_max_permut / nseq_real;
 	nseq_rand = nseq_real*height_permut;
-	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
-	{
-		double pv_standard=-log10(0.05);
-		bonferroni_corr=(double)nseq_real*nseq_rand;
-		bonferroni_corr*=5;//potoki		
-		bonferroni_corr_ap=bonferroni_corr;
-		bonferroni_corr_asy=bonferroni_corr;
-		bonferroni_corr*=NUM_THR;
-		bonferroni_corr*=NUM_THR;			
-		bonferroni_corr_ap*=2;				
-		bonferroni_corr=pv_standard+log10(bonferroni_corr);
-		bonferroni_corr_ap=pv_standard+log10(bonferroni_corr_ap);
-		bonferroni_corr_asy=pv_standard+log10(bonferroni_corr_asy);
-	}
+	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;	
 	for (j = 0; j<2; j++)
 	{
 		rand_one[j].nseq = nseq_rand;
@@ -1170,20 +1157,20 @@ int main(int argc, char *argv[])
 				printf("Throw Prediction error One - Anc 0 Par %d\n", mot);
 				return -1;
 			}
-		/*	if(mot_p==1)
+			/*	if(mot_p==1)
 			{
-				int fprint_pro=rand_hom_one.fprintf_pro(name[mot_a],thr[mot_a][NUM_THR-1],"rand_po");
-				if(fprint_pro==-1)
-				{
-				printf("Real print profile error, motif %d\n",mot);
-				return -1;
-				}
-				fprint_pro=rand_one[mot_p].fprintf_pro(name[mot_p],thr[mot_p][NUM_THR-1],"rand_po");
-				if(fprint_pro==-1)
-				{
-				printf("Real print profile error, motif %d\n",mot);
-				return -1;
-				}
+			int fprint_pro=rand_hom_one.fprintf_pro(name[mot_a],thr[mot_a][NUM_THR-1],"rand_po");
+			if(fprint_pro==-1)
+			{
+			printf("Real print profile error, motif %d\n",mot);
+			return -1;
+			}
+			fprint_pro=rand_one[mot_p].fprintf_pro(name[mot_p],thr[mot_p][NUM_THR-1],"rand_po");
+			if(fprint_pro==-1)
+			{
+			printf("Real print profile error, motif %d\n",mot);
+			return -1;
+			}
 			}*/
 			/*	memset(file_throw_err,'\0',sizeof(file_throw_err));
 			memset(file_throw_err0,'\0',sizeof(file_throw_err0));
@@ -1213,17 +1200,31 @@ int main(int argc, char *argv[])
 					thr_err_rand[k++] = thr_err_real[i];
 				}
 			}
-			int proj = projoin(xrand, name[mot_p], rand_hom_one, rand_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_rand, nseq_rand, seq, &expected, &hist_exp_one, peak_len_rand, &rand_plot);
+			int nseq_two_sites_real = 0, nseq_two_sites_rand = 0;
+			int proj = projoin(xrand, name[mot_p], rand_hom_one, rand_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_rand, nseq_rand, seq, &expected, &hist_exp_one, peak_len_rand, &rand_plot, nseq_two_sites_rand);
 			if (proj == -1)
 			{
 				printf("Projoin Rand error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			proj = projoin(xreal, name[mot_p], real_one[0], real_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_real, nseq_real, seq, &observed, &hist_obs_one, peak_len_real, &real_plot);
+			proj = projoin(xreal, name[mot_p], real_one[0], real_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_real, nseq_real, seq, &observed, &hist_obs_one, peak_len_real, &real_plot, nseq_two_sites_real);
 			if (proj == -1)
 			{
 				printf("Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
+			}
+			{
+				double pv_standard = -log10(0.05);
+				bonferroni_corr = (double)nseq_two_sites_real*nseq_two_sites_rand;
+				bonferroni_corr *= 5;//potoki		
+				bonferroni_corr_ap = bonferroni_corr;
+				bonferroni_corr_asy = bonferroni_corr;
+				bonferroni_corr *= NUM_THR;
+				bonferroni_corr *= NUM_THR;
+				bonferroni_corr_ap *= 2;
+				bonferroni_corr = pv_standard + log10(bonferroni_corr);
+				bonferroni_corr_ap = pv_standard + log10(bonferroni_corr_ap);
+				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
 			}
 			char modew[] = "wt", modea[] = "at";
 			char file_hist_one[80];
@@ -1585,7 +1586,7 @@ int main(int argc, char *argv[])
 			char file_pval0[80];
 			strcpy(file_pval0, file_pval[i]);
 			char buf[10];
-			sprintf(buf, "%d", mot);
+			sprintf(buf, "%d", mot_p);
 			strcat(file_pval0, buf);
 			if ((out_pval[i] = fopen(file_pval0, "wt")) == NULL)
 			{
@@ -1757,9 +1758,9 @@ int main(int argc, char *argv[])
 			fprintf(out_pval_table, "\t%.2f", -log10(pv_any.anchor));
 			fprintf(out_pval_table, "\t%.2f", -log10(pv_any.partner));
 			fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
-			fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);			
-			fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);			
-			fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);			
+			fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);
+			fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);
+			fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);
 			fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
