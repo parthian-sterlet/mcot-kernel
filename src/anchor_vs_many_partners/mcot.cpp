@@ -1052,14 +1052,14 @@ int main(int argc, char *argv[])
 	fprintf(out_pval_table, "\tSimilarity to Anchor, SSD");
 	fprintf(out_pval_table, "\tSimilarity to Anchor, PCC\t");		
 	fprintf(out_pval_table, "Full overlap, Conservative Anchor, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Full overlap, Conservative Partner, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Partial overlap, Conservative Anchor, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Partial overlap, Conservative Partner, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Overlap, Conservative Anchor, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Overlap, Conservative Partner, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Spacer, Conservative Anchor, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Spacer, Conservative Partner, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Any, Conservative Anchor, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Full overlap, Conservative Partner, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Partial overlap, Conservative Partner, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Overlap, Conservative Partner, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Spacer, Conservative Partner, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Any, Conservative Partner, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
@@ -1976,23 +1976,37 @@ int main(int argc, char *argv[])
 				//pval_tot_min[i]=pow(10,-pval_tot_min[i]);
 			}
 		}
-		{
-	//real vs real
-			//any
+		{	
 			pv_any.anc_par=-log10(pv_any.anc_par);
-			if(pv_any.fold_anc_par<1)pv_any.anc_par*=-1;
-			//full
 			pv_full.anc_par=-log10(pv_full.anc_par);
-			if(pv_full.fold_anc_par<1)pv_full.anc_par*=-1;
-			//partial
 			pv_partial.anc_par=-log10(pv_partial.anc_par);
-			if(pv_partial.fold_anc_par<1)pv_partial.anc_par*=-1;
-			//overlap
 			pv_overlap.anc_par=-log10(pv_overlap.anc_par);
-			if(pv_overlap.fold_anc_par<1)pv_overlap.anc_par*=-1;
-			//spacer
 			pv_spacer.anc_par=-log10(pv_spacer.anc_par);
-			if(pv_spacer.fold_anc_par<1)pv_spacer.anc_par*=-1;
+			if(pv_any.anc_par>bonferroni_corr_asy)
+			{
+				if(pv_any.fold_anc_par<1)pv_any.anc_par*=-1;
+			}
+			else pv_any.anc_par=0;			
+			if(pv_full.anc_par>bonferroni_corr_asy)
+			{
+				if(pv_full.fold_anc_par<1)pv_full.anc_par*=-1;	
+			}
+			else pv_full.anc_par=0;
+			if(pv_partial.anc_par>bonferroni_corr_asy)
+			{
+				if(pv_partial.fold_anc_par<1)pv_partial.anc_par*=-1;
+			}
+			else pv_partial.anc_par=0;
+			if(pv_overlap.anc_par>bonferroni_corr_asy)
+			{
+				if(pv_overlap.fold_anc_par<1)pv_overlap.anc_par*=-1;
+			}
+			else pv_overlap.anc_par=0;					
+			if(pv_spacer.anc_par>bonferroni_corr_asy)
+			{
+				if(pv_spacer.fold_anc_par<1)pv_spacer.anc_par*=-1;
+			}
+			else pv_spacer.anc_par=0;					
 		}
 		if((out_pval_table=fopen(file_pval_table,"at"))==NULL)
 		{
@@ -2002,29 +2016,58 @@ int main(int argc, char *argv[])
 		if(mot==0)fprintf(out_pval_table,"Anchor");
 		else fprintf(out_pval_table,"Partner %d",mot);						
 		fprintf(out_pval_table,"\t%s",name_partner);
-		for (i = 1; i<5; i++)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
-		fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
+		for (i = 1; i<5; i++)
+		{			
+			if(pval_tot_min[i]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
+			else fprintf(out_pval_table,"\t0");
+		}
+		if(pval_tot_min[0]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
+		else fprintf(out_pval_table,"\t0");
 		if (mot != 0)
 		{
-			//fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
+			pv_full.anchor= -log10(pv_full.anchor);
+			pv_full.partner= -log10(pv_full.partner);
+			pv_partial.anchor= -log10(pv_partial.anchor);
+			pv_partial.partner= -log10(pv_partial.partner);
+			pv_overlap.anchor= -log10(pv_overlap.anchor);
+			pv_overlap.partner= -log10(pv_overlap.partner);
+			pv_spacer.anchor= -log10(pv_spacer.anchor);
+			pv_spacer.partner= -log10(pv_spacer.partner);
+			pv_any.anchor= -log10(pv_any.anchor);
+			pv_any.partner= -log10(pv_any.partner);
 			fprintf(out_pval_table,"\t%.2f\t%.2f\t%.2f",-log10(pvalue_similarity_tot),-log10(pval_sim[0]),-log10(pval_sim[1]));			
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_full.anchor));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_full.partner));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_partial.anchor));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_partial.partner));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_overlap.anchor));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_overlap.partner));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_spacer.anchor));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_spacer.partner));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_any.anchor));
-			fprintf(out_pval_table, "\t%.2f", -log10(pv_any.partner));
-			fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
-			fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);			
-			fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);			
-			fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);			
-			fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
-			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
-			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
+			if(pv_full.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.anchor);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_partial.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.anchor);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_overlap.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_spacer.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_any.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.anchor);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_full.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.partner);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_partial.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.partner);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_overlap.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_spacer.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_any.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.partner);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_full.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
+			else fprintf(out_pval_table,"\t0");
+			if(pv_partial.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);			
+			else fprintf(out_pval_table,"\t0");
+			if(pv_overlap.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);						
+			else fprintf(out_pval_table,"\t0");
+			if(pv_spacer.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);			
+			else fprintf(out_pval_table,"\t0");
+			if(pv_any.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
+			else fprintf(out_pval_table,"\t0");
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);			
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);			
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_asy);
 		}
 		else 
