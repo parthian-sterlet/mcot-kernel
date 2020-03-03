@@ -14,7 +14,6 @@
 #define SPACLEN 100 //max spacer length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
-#define NUM_PVAL 30000 // max 4islo porogov v tablice Touzet
 
 int StrNStr(char *str, char c, int n)
 {
@@ -863,7 +862,7 @@ int main(int argc, char *argv[])
 	if (nseq_rand<size_min_permut)height_permut = size_min_permut / nseq_real;
 	if (nseq_rand>size_max_permut)height_permut = size_max_permut / nseq_real;
 	nseq_rand = nseq_real*height_permut;
-	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;	
+	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
 	for (j = 0; j<2; j++)
 	{
 		rand_one[j].nseq = nseq_rand;
@@ -940,7 +939,7 @@ int main(int argc, char *argv[])
 		fclose(out_pval_table);
 	}
 	FILE *out_pval[5];
-	double thr_touzet[2][NUM_PVAL];
+	double *thr_all, *fp_rate;
 	double pwm_anchor[2][MATLEN][OLIGNUM];
 	int len_motif[2];
 	double thr_asy_min = 3.5, thr_asy_max = 5.5, dthr_asy = 0.2;
@@ -956,6 +955,11 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	fprintf(out_stat, "# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
+	int all_pos_rec = int(2 * nseq_genome*len_genome*pvalue);
+	thr_all = new double[all_pos_rec];
+	if (thr_all == NULL) { puts("Out of memory..."); return -1; }
+	fp_rate = new double[all_pos_rec];
+	if (fp_rate == NULL){ puts("Out of memory..."); return -1; }
 	for (mot = 0; mot<2; mot++)
 	{
 		printf("Mot %d\n", mot);
@@ -966,17 +970,9 @@ int main(int argc, char *argv[])
 			printf("PFM to PWM conversion error, file %s\n", file_pfm_anchor);
 			return -1;
 		}
-		int n_thr_touzet = 0;
-		int touzet = pwm_score_distr_granul(pvalue_equal, length, pwm_anchor[mot], n_thr_touzet, NUM_PVAL, thr_touzet[mot]);
-		if (touzet == -1)
-		{
-			printf("Threshold Pvalue table Touzet error\n");
-			return -1;
-		}
-		double *fp_rate;
-		fp_rate = new double[n_thr_touzet];
-		if (fp_rate == NULL){ puts("Out of memory..."); return -1; }
-		int piptd = pwm_iz_pwm_thr_dist(pwm_anchor[mot], length, prom, n_thr_touzet, thr_touzet[mot], fp_rate, mypath_data, nseq_genome, len_genome);
+		int nthr_dist = 0;
+		int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor[mot], length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome,pvalue);
+	//	int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor, length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
 		if (piptd == -1)
 		{
 			printf("FP rate table error\n");
@@ -988,12 +984,12 @@ int main(int argc, char *argv[])
 			printf("Output file %s can't be opened!\n", file_fpr[mot]);
 			return -1;
 		}
-		for (i = 0; i < n_thr_touzet; i++)fprintf(out_fpr, "%.8f\t%g\n", thr_touzet[mot][i], fp_rate[i]);
+		for (i = 0; i < nthr_dist; i++)fprintf(out_fpr, "%.8f\t%g\n", thr_all[i], fp_rate[i]);
 		fclose(out_fpr);
 		double fpr_select[NUM_THR];
 		int index[NUM_THR];
 		{
-			int stfp = select_thresholds_from_pvalues(n_thr_touzet, thr_touzet[mot], fp_rate, pvalue, pvalue_mult, fpr_select, thr[mot], index);
+			int stfp = select_thresholds_from_pvalues(nthr_dist, thr_all, fp_rate, pvalue, pvalue_mult, fpr_select, thr[mot], index);
 			if (stfp == -1)
 			{
 				printf("Too bad input matrix of %d motif\n", mot);
@@ -1052,7 +1048,7 @@ int main(int argc, char *argv[])
 				double pv_sc = 0;
 				for (j = inx1; j >= inx2; j--)
 				{
-					if (thr_touzet[mot][j + 1] <= sco && thr_touzet[mot][j] >= sco)
+					if (thr_all[j + 1] <= sco && thr_all[j] >= sco)
 					{
 						pv_sc = -log10(fp_rate[j]);
 						break;
@@ -1061,7 +1057,6 @@ int main(int argc, char *argv[])
 				real_one[mot].pv[i][k] = pv_sc;
 			}
 		}
-		delete[] fp_rate;
 		int fprint_pro = real_one[mot].fprintf_pro(name[mot], thr[mot][NUM_THR - 1], xreal);
 		if (fprint_pro == -1)
 		{
@@ -1099,6 +1094,9 @@ int main(int argc, char *argv[])
 		}
 	}
 	fclose(out_stat);
+	delete[] fp_rate;
+	delete[] thr_all;
+
 	for (mot = 0; mot<2; mot++)len_motif[mot] = matrix[mot].len;
 
 	int len_anchor, len_partner;
@@ -1712,36 +1710,36 @@ int main(int argc, char *argv[])
 			}
 		}
 		{
-			pv_any.anc_par=-log10(pv_any.anc_par);
-			pv_full.anc_par=-log10(pv_full.anc_par);
-			pv_partial.anc_par=-log10(pv_partial.anc_par);
-			pv_overlap.anc_par=-log10(pv_overlap.anc_par);
-			pv_spacer.anc_par=-log10(pv_spacer.anc_par);
-			if(pv_any.anc_par>bonferroni_corr_asy)
+			pv_any.anc_par = -log10(pv_any.anc_par);
+			pv_full.anc_par = -log10(pv_full.anc_par);
+			pv_partial.anc_par = -log10(pv_partial.anc_par);
+			pv_overlap.anc_par = -log10(pv_overlap.anc_par);
+			pv_spacer.anc_par = -log10(pv_spacer.anc_par);
+			if (pv_any.anc_par>bonferroni_corr_asy)
 			{
-				if(pv_any.fold_anc_par<1)pv_any.anc_par*=-1;
+				if (pv_any.fold_anc_par<1)pv_any.anc_par *= -1;
 			}
-			else pv_any.anc_par=0;			
-			if(pv_full.anc_par>bonferroni_corr_asy)
+			else pv_any.anc_par = 0;
+			if (pv_full.anc_par>bonferroni_corr_asy)
 			{
-				if(pv_full.fold_anc_par<1)pv_full.anc_par*=-1;	
+				if (pv_full.fold_anc_par<1)pv_full.anc_par *= -1;
 			}
-			else pv_full.anc_par=0;
-			if(pv_partial.anc_par>bonferroni_corr_asy)
+			else pv_full.anc_par = 0;
+			if (pv_partial.anc_par>bonferroni_corr_asy)
 			{
-				if(pv_partial.fold_anc_par<1)pv_partial.anc_par*=-1;
+				if (pv_partial.fold_anc_par<1)pv_partial.anc_par *= -1;
 			}
-			else pv_partial.anc_par=0;
-			if(pv_overlap.anc_par>bonferroni_corr_asy)
+			else pv_partial.anc_par = 0;
+			if (pv_overlap.anc_par>bonferroni_corr_asy)
 			{
-				if(pv_overlap.fold_anc_par<1)pv_overlap.anc_par*=-1;
+				if (pv_overlap.fold_anc_par<1)pv_overlap.anc_par *= -1;
 			}
-			else pv_overlap.anc_par=0;					
-			if(pv_spacer.anc_par>bonferroni_corr_asy)
+			else pv_overlap.anc_par = 0;
+			if (pv_spacer.anc_par>bonferroni_corr_asy)
 			{
-				if(pv_spacer.fold_anc_par<1)pv_spacer.anc_par*=-1;
+				if (pv_spacer.fold_anc_par<1)pv_spacer.anc_par *= -1;
 			}
-			else pv_spacer.anc_par=0;
+			else pv_spacer.anc_par = 0;
 		}
 		if ((out_pval_table = fopen(file_pval_table, "at")) == NULL)
 		{
@@ -1753,61 +1751,61 @@ int main(int argc, char *argv[])
 		else fprintf(out_pval_table, "Partner %d", mot_p);
 		fprintf(out_pval_table, "\t%s", name[mot_p]);
 		for (i = 1; i<5; i++)
-		{			
-			if(pval_tot_min[i]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
-			else fprintf(out_pval_table,"\t0");
+		{
+			if (pval_tot_min[i]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
+			else fprintf(out_pval_table, "\t0");
 		}
-		if(pval_tot_min[0]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
-		else fprintf(out_pval_table,"\t0");
+		if (pval_tot_min[0]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
+		else fprintf(out_pval_table, "\t0");
 		double pvalue_similarity_tot;
 		double pval_sim[2] = { 1, 1 };
 		if (mot_a != mot_p)
 		{
-			pv_full.anchor= -log10(pv_full.anchor);
-			pv_full.partner= -log10(pv_full.partner);
-			pv_partial.anchor= -log10(pv_partial.anchor);
-			pv_partial.partner= -log10(pv_partial.partner);
-			pv_overlap.anchor= -log10(pv_overlap.anchor);
-			pv_overlap.partner= -log10(pv_overlap.partner);
-			pv_spacer.anchor= -log10(pv_spacer.anchor);
-			pv_spacer.partner= -log10(pv_spacer.partner);
-			pv_any.anchor= -log10(pv_any.anchor);
-			pv_any.partner= -log10(pv_any.partner);			
+			pv_full.anchor = -log10(pv_full.anchor);
+			pv_full.partner = -log10(pv_full.partner);
+			pv_partial.anchor = -log10(pv_partial.anchor);
+			pv_partial.partner = -log10(pv_partial.partner);
+			pv_overlap.anchor = -log10(pv_overlap.anchor);
+			pv_overlap.partner = -log10(pv_overlap.partner);
+			pv_spacer.anchor = -log10(pv_spacer.anchor);
+			pv_spacer.partner = -log10(pv_spacer.partner);
+			pv_any.anchor = -log10(pv_any.anchor);
+			pv_any.partner = -log10(pv_any.partner);
 			pvalue_similarity_tot = pfm_similarity(&matrix[mot_a], &matrix[mot_p], s_granul, s_overlap_min, s_ncycle_small, s_ncycle_large, pval_sim);
 			//fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
 			fprintf(out_pval_table, "\t%.2f\t%.2f\t%.2f", -log10(pvalue_similarity_tot), -log10(pval_sim[0]), -log10(pval_sim[1]));
-			if(pv_full.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.anchor);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_partial.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.anchor);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_overlap.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_spacer.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_any.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.anchor);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_full.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.partner);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_partial.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.partner);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_overlap.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_spacer.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_any.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.partner);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_full.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
-			else fprintf(out_pval_table,"\t0");
-			if(pv_partial.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);			
-			else fprintf(out_pval_table,"\t0");
-			if(pv_overlap.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);						
-			else fprintf(out_pval_table,"\t0");
-			if(pv_spacer.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);			
-			else fprintf(out_pval_table,"\t0");
-			if(pv_any.anc_par!=0)fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
-			else fprintf(out_pval_table,"\t0");
-			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);			
-			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);			
+			if (pv_full.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.anchor);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_partial.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.anchor);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_overlap.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_spacer.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_any.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.anchor);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_full.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.partner);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_partial.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.partner);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_overlap.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_spacer.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_any.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.partner);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_full.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_partial.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_overlap.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_spacer.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);
+			else fprintf(out_pval_table, "\t0");
+			if (pv_any.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
+			else fprintf(out_pval_table, "\t0");
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
+			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_asy);
 		}
 		else
