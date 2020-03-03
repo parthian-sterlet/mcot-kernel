@@ -15,74 +15,146 @@ void PWMScore(double &min,double &raz, int len1, double (*pwm)[OLIGNUM])
 	 }	
 	raz-=min;
 }
-int pwm_iz_pwm_thr_dist(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int n_thr_touzet, double *thr_touzet, double *fp_rate, char *species, int nseq_pro, int len_pro) 
+void Mix(double *a, double *b)
 {
-	int i, j, n; 
-	char dp[SEQLEN];	
+	double buf = *a;
+	*a = *b;
+	*b = buf;
+}
+int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int nthr, int &nthr_dist, double *thr, double *fpr, char *species, int nseq_pro, int len_pro, double pvalue)
+{
+	int i, j, k, n;
+	char dp[SEQLEN];
 	double p;
 	FILE *in;
 
-   int compl2[2]={0,1};
-   int compl1;
-   //if(compl_==0)compl2[1]=-1;
-   //if(compl_==1)compl2[0]=-1;	
-
-	int nseq=0;
-	int len1=0;	
-	int word=1;               
-	len1=lenp+word-1;//dlina vyborki obu4eniya
-	int ten[6]={1,4,16,64,256,1024};	
-	double min=0, raz=0;
-	PWMScore(min,raz,lenp,pwm_source);
-	double min0=min, raz0=raz;
-    int cod[SEQLEN];	
-	for(i=0;i<n_thr_touzet;i++)fp_rate[i]=0;
-	double thr0=thr_touzet[n_thr_touzet-1];//min				
-	if((in=fopen(file_pro,"rt"))==NULL)
+	int nseq = 0;
+	int len1 = 0;
+	int word = 1;
+	len1 = lenp + word - 1;//dlina vyborki obu4eniya
+	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
+	double min = 0, raz = 0;
+	PWMScore(min, raz, lenp, pwm_source);
+	double min0 = min, raz0 = raz;
+	int cod[SEQLEN];		
+	if ((in = fopen(file_pro, "rt")) == NULL)
 	{
-		   printf("Input file %s can't be opened!",file_pro);
-		   return -1;
+		printf("Input file %s can't be opened!", file_pro);
+		return -1;
 	}
-	double all_pos=0;
-	int n_thr_touzet1=n_thr_touzet-1;
-	for(n=0;n<nseq_pro;n++)
-	{	    		
-	   	fgets(dp,len_pro+2,in);	   	
-	    DelChar(dp,'\n');					
-		int len_pro1=strlen(dp);		
-		int len21=len_pro1-len1;				
-		for(compl1=0;compl1<2;compl1++)
-		{		
-			if(compl2[compl1]==-1)continue;
-			if(compl2[compl1]==1) if(ComplStr(dp)!=1)  {puts("Out of memory...");return -1;}		
-			char d2[SEQLEN];							
-			p=-1000;
-			for(i=0;i<=len21;i++)
-			{	
-				strncpy(d2,&dp[i],len1);
-				d2[len1]='\0';
-				GetSostPro(d2,word,cod);
-				if(strstr(d2,"n")!=NULL){continue;}
+	double all_pos = 0;	
+	int count_val = 0;
+	int nthr_max = nthr - 1;
+	double score_min = 0.75;
+	double pvalue2 = pvalue * 2;
+	for (n = 0; n<nseq_pro; n++)
+	{
+//		if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max],count_val);
+		fgets(dp, len_pro + 2, in);
+		DelChar(dp, '\n');
+		int len_pro1 = strlen(dp);
+		int len21 = len_pro1 - len1;
+		double thresh_min;
+		if(n==0)thresh_min = score_min;//double thresh_min = Max(thr[nthr_max], score_min);
+		else
+		{
+			if (count_val >= nthr)thresh_min = thr[nthr_max];
+			else
+			{
+				int n_check = (int)(all_pos*pvalue2)-1;
+				n_check = (int)((n*n_check + count_val) / (n+1));
+				thresh_min = thr[n_check];
+			}
+		}
+		int compl1;
+		for (compl1 = 0; compl1<2; compl1++)
+		{
+			if (compl1 == 1) if (ComplStr(dp) != 1)  { puts("Out of memory..."); return -1; }
+			char d2[SEQLEN];
+			p = -1000;
+			for (i = 0; i <= len21; i++)
+			{
+				strncpy(d2, &dp[i], len1);
+				d2[len1] = '\0';
+				GetSostPro(d2, word, cod);
+				if (strstr(d2, "n") != NULL){ continue; }
 				all_pos++;
-				  double score=0;
-    			  for(j=0;j<lenp;j++)
-				  {
-					 score+=pwm_source[j][cod[j]];
-				  }
-				  score-=min0;
-				  score/=raz0;			
-				  if(score>=thr0)			  
-				  {
-						for(j=n_thr_touzet1;j>=0;j--)
+				double score = 0;
+				for (j = 0; j<lenp; j++)
+				{
+					score += pwm_source[j][cod[j]];
+				}
+				score -= min0;
+				score /= raz0;				
+				if (score >= thresh_min)
+				{
+					int gom = 0;
+					for (j = 0; j < nthr; j++)
+					{
+						if (score >= thr[j])
 						{
-							if(score>=thr_touzet[j])fp_rate[j]++;
-							else break;
+							//if (thr[j] != 0)
+							{
+								int ksta = Min(nthr_max, count_val);
+								for (k = ksta; k > j; k--)
+								{
+									Mix(&thr[k - 1], &thr[k]);
+								}
+							}
+							thr[j] = score;
+							gom = 1;
+							break;
 						}
-				  }			 
-			}						
-		}							
+						if (gom == 1)break;
+					}
+					count_val++;
+				}
+			}
+		}
 	}
-	fclose(in);	
-	for(j=0;j<n_thr_touzet;j++)fp_rate[j]/=all_pos;	
+	fclose(in);
+	double thr0 = thr[0];
+	nthr_dist = 0;
+	int nthr_final = nthr;
+	for (j = 1; j < nthr; j++)
+	{
+		if (thr[j] != thr0 || j == nthr_max)
+		{
+			nthr_dist++;
+			thr0 = thr[j];
+			double fpr = (double)(j + 1) / all_pos;
+			if (fpr >= pvalue)
+			{
+				nthr_final = j;
+				break;
+			}
+		}
+	}
+	double *thr_dist, *fpr_dist;
+	thr_dist = new double[nthr_dist];
+	if (thr_dist == NULL) { puts("Out of memory..."); return -1; }
+	fpr_dist = new double[nthr_dist];
+	if (fpr_dist == NULL) { puts("Out of memory..."); return -1; }
+	int count = 0;
+	thr0 = thr[0];
+	nthr_max = nthr_final;
+	for (j = 1; j <= nthr_final; j++)
+	{
+		if (thr[j] != thr0 || j == nthr_max)
+		{
+			double fpr = (double)(j + 1) / all_pos;			
+			thr_dist[count] = thr0;
+			fpr_dist[count] = fpr;
+			thr0 = thr[j];
+			count++;
+		}
+	}
+	for (j = 0; j < nthr_dist; j++)
+	{
+		thr[j] = thr_dist[j];
+		fpr[j] = fpr_dist[j];
+	}
+	delete[] thr_dist;
+	delete[] fpr_dist;
 	return 1;
 }
