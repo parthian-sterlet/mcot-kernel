@@ -21,7 +21,7 @@ void Mix(double *a, double *b)
 	*a = *b;
 	*b = buf;
 }
-int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int nthr, int &nthr_dist, double *thr, double *fpr, char *species, int nseq_pro, int len_pro, double pvalue)
+int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int nthr, int &nthr_dist, double *thr, double *fpr, char *species, int nseq_pro, int len_pro, double pvalue, double dpvalue)
 {
 	int i, j, k, n;
 	char dp[SEQLEN];
@@ -49,7 +49,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	double pvalue2 = pvalue * 2;
 	for (n = 0; n<nseq_pro; n++)
 	{
-//		if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max],count_val);
+		//if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max],count_val);
 		fgets(dp, len_pro + 2, in);
 		DelChar(dp, '\n');
 		int len_pro1 = strlen(dp);
@@ -76,8 +76,8 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 			{
 				strncpy(d2, &dp[i], len1);
 				d2[len1] = '\0';
-				GetSostPro(d2, word, cod);
-				if (strstr(d2, "n") != NULL){ continue; }
+				if (strstr(d2, "n") != NULL) { continue; }
+				GetSostPro(d2, word, cod);				
 				all_pos++;
 				double score = 0;
 				for (j = 0; j<lenp; j++)
@@ -113,21 +113,23 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 		}
 	}
 	fclose(in);
+	double fpr_pred=1/(double)all_pos;
 	double thr0 = thr[0];
 	nthr_dist = 0;
 	int nthr_final = nthr;
 	for (j = 1; j < nthr; j++)
 	{
-		if (thr[j] != thr0 || j == nthr_max)
+		double fprx = (double)(j + 1) / all_pos;
+		if ((thr[j] != thr0 || j == nthr_max) && fprx - fpr_pred > dpvalue)
 		{
 			nthr_dist++;
-			thr0 = thr[j];
-			double fpr = (double)(j + 1) / all_pos;
-			if (fpr >= pvalue)
+			thr0 = thr[j];			
+			if (fprx >= pvalue)
 			{
 				nthr_final = j;
 				break;
 			}
+			fpr_pred = fprx;
 		}
 	}
 	double *thr_dist, *fpr_dist;
@@ -138,14 +140,16 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	int count = 0;
 	thr0 = thr[0];
 	nthr_max = nthr_final;
+	fpr_pred = 1 / (double)all_pos;
 	for (j = 1; j <= nthr_final; j++)
 	{
-		if (thr[j] != thr0 || j == nthr_max)
-		{
-			double fpr = (double)(j + 1) / all_pos;			
+		double fprx = (double)(j + 1) / all_pos;
+		if ((thr[j] != thr0 || j == nthr_max) && fprx - fpr_pred > dpvalue)
+		{			
 			thr_dist[count] = thr0;
-			fpr_dist[count] = fpr;
-			thr0 = thr[j];
+			fpr_dist[count] = fprx;
+			thr0 = thr[j];			
+			fpr_pred = fprx;
 			count++;
 		}
 	}
