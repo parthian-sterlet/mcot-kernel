@@ -145,7 +145,7 @@ void BigMix1(int *d1, int len) // pereme6ivanie stroki
 	}
 }
 #include "fasta_to_plain.h"
-#include "pwm_score_distr_granul.h"
+//#include "pwm_score_distr_granul.h"
 #include "pwm_iz_pwm_thr_dist.h"
 #include "select_thresholds_from_pvalues.h"
 
