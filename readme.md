@@ -92,7 +92,8 @@ The command line for many-partner option:
 
 
 
-`<upper limit of spacer length>` = integer value from 0 to 100 (the default value 29)
+`<maximal spacer length>` = integer value from 0 to 100 (the default value 29)
+
 
 
 `<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of H.sapiens, M.musculus and A.thaliana promoter datasets for setting of thresholds for input motifs.
@@ -102,7 +103,7 @@ The command line for many-partner option:
 
 ## Input data
 
-MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional de novo motif search tool, e.g. HOMER (Heinz et al., 2010) or ChIPMunk (Kulakovskiy et al., 2010) to define the anchor motif. 
+MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional de novo motif search tool, e.g. HOMER (Heinz et al., 2010) to define the anchor motif. 
 
 MCOT have two options for definition of the partner motif:
 
@@ -115,7 +116,7 @@ MCOT allows the variation of the upper limit of spacer length from zero to 100 b
 
 ## Motifs recognition
 
-MCOT applies the recognition model of Position Weight Matrix (PWM) for mapping motifs  in peaks. For each matrix, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of five expected false positive rates for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Each profile respects to certain level of a motif conservation.
+MCOT applies the recognition model of Position Weight Matrix (PWM) for mapping motifs  in peaks. For each matrix, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of five expected false positive rates (FPR) for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
 
 
 
@@ -125,7 +126,7 @@ MCOT applies the recognition model of Position Weight Matrix (PWM) for mapping m
 MCOT classifies CEs structure according to the following criteria:
 * _Orientation_. Four types of distinct mutual orientations are considered: in the same DNA strand (Direct Anchor/Partner and Direct Partner/Anchor), in opposite strands (Everted and Inverted);
 * _Overlap or Spacer_. There are three distinct cases of mutual locations: Full overlap (one motif located entirely within another one); Partial overlap; and Spacer. To describe each case MCOT uses the following characteristics: the distance between nearest borders of two motifs (Full); the length of overlapped region (Partial); and the length of spacer;
-* _Asymmetry of сonservation_.  25 variants of CEs with a certain ratio of similarities of the anchor and partner motifs to their recognition models follow from 5x5 combinations of conservations of two motifs.
+* _Asymmetry of сonservation_.  All predicted CEs are subdivided into two classes: those with more conservative anchor and partner motifs. The conservation of motif hit is estimated as  -Log10(FPR), where FPR is computed by the respective score of recognition model
 
 For each of 25 combinations of motifs conservation and each computation flow MCOT compiles the 2x2 contingency table (Table 1) and compute the significance of Fisher’s exact test p-value(CE) that compares the content of CEs in ChIP-seq peaks with that for background model.
 
@@ -136,125 +137,52 @@ For each of 25 combinations of motifs conservation and each computation flow MCO
 |Observed (peaks)             |$`Obs_{CE-} = Obs_{Tot} - Obs_{CE+}`$|$`Obs_{CE+}`$        | $`Obs_{Tot}`$                    |
 |Expected (permuted sequences)|$`Exp_{CE-} = Exp_{Tot} - Exp_{CE+}`$|$`Exp_{CE+}`$        | $`Exp_{Tot}`$                    |
 
-The background model implies the preservation of content for each motif in 
-each peak. MCOT generates background profiles of hits of anchor and partner 
-motifs iteratively for each peak with a special permutation procedure.
+The background model implies the preservation of content for each motif in each peak. MCOT generates background profiles of hits of anchor and partner motifs iteratively for each peak with a special permutation procedure.
 
-MCOT computes CE significance separately for five computation flows:  
-Any (Spacer or Overlap), Full (overlap), Partial (overlap), 
-Overlap (full and partial), Spacer.
+MCOT computes CE significance separately for five computation flows:  Any (Spacer or Overlap), Full (overlap), Partial (overlap), Overlap (full and partial), Spacer.
 
+Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of conservation of motifs. Since MCOT checks five conservation ranges for each motifs, the Bonferroni-corrected
 
-Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of 
-stringencies of recognition models. Since MCOT checks five thresholds 
-for each motifs, the Bonferroni-corrected
-
-p-value < 0.05/(5*5) = 0.002 is used to mark the adjusted threshold of CE 
-significance in each computation flows. I.e. the fall of the minimal p-value of 
-25 estimates below 0.002 implied the significance. If simultaneously 
-396 matrices of human TFs were applied (option ‘many partners’) then p-value 
-threshold fell below to 0.002/396 ≈ 5E-6.
+p-value < 0.05/(5*5) = 0.002 is used to mark the adjusted threshold of CE significance in each computation flows. I.e. the fall of the minimal p-value among 25 estimates below 0.002 implied the significance. If simultaneously 396/353 matrices of human/mouse TFs were applied (option ‘many partners’) then p-value threshold fell below to 0.002/396 ≈ 5E-6.
 
 
-Finally, MCOT estimates the similarity of anchor and partner motifs with the 
-motifs similarity p-value. MCOT used matrix column similarities measures PCC 
-(Pearson Correlation Coefficient, Pietrokovski, 1996) and SSD 
-(Sum of Squared Distances, Wasserman and Sandelin, 2004) to compute two p-values. 
-If maximum among them was less than 0.05, then pair of motifs had the significant 
-similarity. Hence, a respective CE may be a possible false positive prediction.
+Finally, MCOT estimates the similarity of anchor and partner motifs with the motifs similarity p-value. MCOT used matrix column similarities measures PCC (Pearson Correlation Coefficient, Pietrokovski, 1996) and SSD (Sum of Squared Distances, Wasserman and Sandelin, 2004) to compute two p-values. If maximum among them was less than 0.05, then pair of motifs had the significant similarity. Hence, a respective CE may be a possible false positive prediction.
 
-Additionally, MCOT computed significance of CEs with more conserved anchor 
-motif, more conserved partner motif and nearly equal conservation of two motif.
-These calculation performed according to scheme represented above in Table 1, 
-but respective counts MCOT computed for three parts 
-(‘Anchor’, ‘Partner’ and ‘Equal’) of 5x5 table of stringencies (Table 2). 
-These parts respect to integrated count for 10, 10 and 5 cells of 5x5 table, 
-respectively (Table 2).
+Additionally, MCOT computed significance of CEs with more conserved anchor motif and more conserved partner motif. These calculations are performed according to scheme represented above in Table 1, but MCOT counts either CEs with more conserved Anchor or Partner motifs, i.e. either -Log10[FPR(Anchor)] > -Log10[FPR(Partner)] or -Log10[FPR(Anchor)] ≤ -Log10[FPR(Partner)].
 
-**Table 2.** Partitioning of 5x5 table of combinations of conservations of 
-anchor and partner motifs into three parts that correspond to more conserved 
-anchor motif (‘Anchor’), more conserved partner motif (‘Partner’) and 
-almost equal conservation of anchor and partner motifs (‘Equal’).
+Finally, to estimate the asymmetry of CE, MCOT partitions all CEs on those with more conserved Anchor or Partner motifs and compute the significance of asymmetry with Fisher’s exact test (Table 2). The asymmetry significance -Log10[P-value] is printed as positive (with sign ‘+’) in the case of enrichment toward the Anchor motif, otherwise, MCOT sign ‘-’ (negative value) denotes the enrichment toward the Partner motif.  These calculation yielded for each computation flow one p-value(CE, Asymmetry).
 
-<table align="center">
-        <thead>
-            <tr>
-                <th rowspan=2 colspan=2>Motifs and thresholds</th>
-                <th colspan="5">Anchor</th>
-            </tr>
-            <tr>
-                <th>1</th>
-                <th>2</th>
-                <th>3</th>
-                <th>4</th>
-                <th>5</th>
-            </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th rowspan=5 colspan=1>Partner</th>
-            <th scope="row">1</th>
-            <td>Equal</td>
-            <td>Partner</td>
-            <td>Partner</td>
-            <td>Partner</td>
-            <td>Partner</td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Anchor</td>
-            <td>Equal</td>
-            <td>Partner</td>
-            <td>Partner</td>
-            <td>Partner</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td>Anchor</td>
-            <td>Anchor</td>
-            <td>Equal</td>
-            <td>Partner</td>
-            <td>Partner</td>
-        </tr>
-        <tr>
-            <th scope="row">4</th>
-            <td>Anchor</td>
-            <td>Anchor</td>
-            <td>Anchor</td>
-            <td>Equal</td>
-            <td>Partner</td>
-        </tr>
-        <tr>
-            <th scope="row">5</th>
-            <td>Anchor</td>
-            <td>Anchor</td>
-            <td>Anchor</td>
-            <td>Anchor</td>
-            <td>Equal</td>
-        </tr>
-        </tbody>
-</table>
+**Table 2.** 2x2 contingency table for calculation of CE asymmetry.
 
-These calculation yielded for each computation flow three significances 
-p-value(CE, Anchor), p-value(CE, Partner) and p-value(CE, Equal).
+|                                    | CEs with more conserved anchor motif| CEs with more conserved partner motif  | CEs, total                              |
+|------------------------------------|-------------------------------------|----------------------------------------|-----------------------------------------|
+|Observed (CEs in peaks)             |$`Obs_{CE, Anchor}`$                 |$`Obs_{CE, Partner}`$                   | $`Obs_{CE, Anchor} + Obs_{CE, Partner}`$|
+|Expected (CEs in permuted sequences)|$`Obs_{CE, Anchor}`$                 |$`Obs_{CE, Partner}`$                   | $`Obs_{CE, Anchor} + Obs_{CE, Partner}`$|
 
-To decide whether in real pool of predicted CEs specifically enriched CEs with 
-more conserved anchor motif, those with more conserved partner motifs or those 
-with similar conservation of anchor and partner motifs, we performed for each 
-computation flow three Fisher exact tests ‘Anchor vs. Partner’, 
-‘Anchor vs. Equal’ and ‘Partner vs. Equal’. These tests estimated the 
-significance of asymmetry in CEs, see example in Table 3.
 
-**Table 3.** Calculation of significance of asymmetry ‘Anchor vs. Partner’ in CEs
-
-|       |Sequences without composite elements       |Sequences with composite elements|Total count of sequences with both motifs|
-|-------|-------------------------------------------|---------------------------------|-----------------------------------------|
-|Anchor |$`Obs_{CE-,A} = Obs_{Tot,A} - Obs_{CE+,A}`$|$`Obs_{CE+,A}`$                  |$`Obs_{Tot,A}`$                          |
-|Partner|$`Exp_{CE-,P} = Exp_{Tot,P} - Exp_{CE+,P}`$|$`Exp_{CE+,P}`$                  |$`Exp_{Tot,P}`$                          |
+Detailed enrichment or depletion of CEs with specific combinations of motifs conservation are represented in the scatterplot text file plot_*, see below.
 
 ## Output data
 
 MCOT gives the following output data:
+
+
+
+* __Files <*_thr5>, recognition profiles of motifs__ Each file respects to one motif. A file has fasta-like format, i.e. for each peak the header line starts with ‘>’ symbol. Next, each subsequent line represents one hit in a peak, particularly it position, respective conservation value -Log10(FPR) and DNA strand.
+
+```
+Example
+>Seq 1  Thr 0.864497    Nsites 1
+205 3.304404    -
+>Seq 2    Thr 0.864497    Nsites 0
+>Seq 3    Thr 0.864497    Nsites 2
+88    3.607778    -
+160    3.338550    -
+```
+
+Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β (Wederell et al., 2008) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search (Homer, Heinz et al., 2009) and the partner HNF1β motif we took from the mouse Hocomoco core collection (Kulakovskiy et al., 2018).
+
+
 
 * __File <rec_pos.txt>, the detailed recognition statistics__. For each motif and each recognition threshold MCOT provides (1) the number* and the name of the motif, (2) the number and the value of the threshold; (3) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
 
@@ -385,21 +313,40 @@ Example
 |Seq 513  |156         |167       |148          |160        |5P        |Partial |--     |DirectAP  |0.949       |0.959        |agaggaaatgac|atgacagattggg|
 
 
+* __Files <plot_*>, scatterplots that show the CE asymmetry, i.e. the abundance of CEs with various ratios of conservation of Anchor and Partner motifs__ For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one scatterplot is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(FPR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(FPR) of Anchor and Partner motifs. This conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
+{1000\*OBSi,j/N(OBS)} and {1000\*EXPi,j/N(EXP)}, where N(OBS) and N(EXP) are total counts of predicted CEs in observed and expected lists. The output scatterplot shows the difference between relative frequencies of observed and expected CEs. Example below shows the asymmetry toward the Partner (HNF1B) motif in Overlap computation flow.
+
+Example
+
+
+```
+,<3.5,3.5..3.7,3.7..3.9,3.9..4.1,4.1..4.3,4.3..4.5,4.5..4.7,4.7..4.9,4.9..5.1,5.1..5.3,5.3..5.5,>5.5
+<3.5,14,14,-8,-14,-26,-12,1,,,,,
+3.5..3.7,7,,-15,,-7,-7,,,,,,-2
+3.7..3.9,37,-4,-2,-6,4,-11,-3,,,,,-3
+3.9..4.1,17,-1,14,1,-4,-9,,,,,,
+4.1..4.3,39,,-2,8,5,-8,-2,,,,,
+4.3..4.5,,3,-6,4,5,5,,,,,,
+4.5..4.7,,-10,22,,,-5,,,,,,
+4.7..4.9,13,-4,,,-3,,,,,,,
+4.9..5.1,-23,,-3,,5,-4,1,,,,,
+5.1..5.3,1,,,,-2,,,,,,,
+5.3..5.5,-4,-3,-2,,-3,,,,,,,
+>5.5,4,2,-1,-2,-3,,,,,,,
+```
+
 ## References
-
-Heinz,S., Benner,C., Spann,N., Bertolino,E., Lin,Y.C., Laslo,P., Cheng,J.X., Murre,C., Singh,H. and Glass,C.K. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.
-
-Kulakovskiy,I.V., Boeva,V.A., Favorov,A.V., Makeev,V.J. (2010) Deep and wide digging for binding motifs in ChIP-Seq data. Bioinformatics, 26, 2622-2623.
-
-Kulakovskiy,I.V., Vorontsov,I.E., Yevshin,I.S., Sharipov,R.N., Fedorova,A.D., Rumynskiy,E.I., Medvedeva,Y.A., Magana-Mora,A., Bajic,V.B., Papatsenko,D.A., et al. (2018) HOCOMOCO: expansion and enhancement of the collection of transcription factor binding sites models. Nucleic Acids Res., 46, D252-D259.
 
 [Levitsky V.G., Zemlyanskaya E.V., Oshchepkov D.Yu., Podkolodnaya O.A., Ignatieva E.V., Grosse I., Mironova V.V., Merkulova T.I. A single ChIP-seq dataset is sufficient for comprehensive analysis of motifs co-occurrence with MCOT package. Nucleic Acids Research, 2019](https://doi.org/10.1093/nar/gkz800)
 
-O'Malley,R.C., Huang,S.C., Song,L., Lewsey,M.G., Bartlett,A., Nery,J.R., Galli,M., Gallavotti,A., Ecker,R. (2016) Cistrome and epicistrome features shape the regulatory DNA landscape. Cell, 165, 1280-1292.
+[Heinz,S., Benner,C., Spann,N., Bertolino,E., Lin,Y.C., Laslo,P., Cheng,J.X., Murre,C., Singh,H. and Glass,C.K. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.](https://doi.org/10.1016/j.molcel.2010.05.004)
 
-Pietrokovski,S. (1996) Searching databases of conserved sequence regions by aligning protein multiple-alignments. Nucleic Acids Res., 24, 3836-3845.
+[Kulakovskiy,I.V., Vorontsov,I.E., Yevshin,I.S., Sharipov,R.N., Fedorova,A.D., Rumynskiy,E.I., Medvedeva,Y.A., Magana-Mora,A., Bajic,V.B., Papatsenko,D.A., et al. (2018) HOCOMOCO: expansion and enhancement of the collection of transcription factor binding sites models. Nucleic Acids Res., 46, D252-D259.](https://academic.oup.com/nar/article/46/D1/D252/4616875)
 
-Sandelin,A., Wasserman,W.W. (2004) Constrained binding site diversity within families of transcription factors enhances pattern discovery bioinformatics. J Mol Biol., 338, 207-215.
+[O'Malley,R.C., Huang,S.C., Song,L., Lewsey,M.G., Bartlett,A., Nery,J.R., Galli,M., Gallavotti,A., Ecker,R. (2016) Cistrome and epicistrome features shape the regulatory DNA landscape. Cell,165, 1280-1292.](https://doi.org/10.1016/j.cell.2016.08.063)
 
+[Pietrokovski,S. (1996) Searching databases of conserved sequence regions by aligning protein multiple-alignments. Nucleic Acids Res., 24, 3836-3845.](https://academic.oup.com/nar/article/24/19/3836/2384639)
 
+[Sandelin,A., Wasserman,W.W. (2004) Constrained binding site diversity within families of transcription factors enhances pattern discovery bioinformatics. J Mol Biol., 338, 207-215.](https://doi.org/10.1016/j.jmb.2004.02.048)
 
+[Wederell,E.D., Bilenky,M., Cullum,R., Thiessen,N., Dagpinar,M., Delaney,A., Varhol R, Zhao Y, Zeng T, Bernier B, et al. (2008). Global analysis of in vivo Foxa2-binding sites in mouse adult liver using massively parallel sequencing. Nucleic Acids Res., 36, 4549-4564.](https://doi.org/10.1093/nar/gkn382) 
