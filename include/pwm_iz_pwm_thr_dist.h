@@ -46,7 +46,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	int count_val = 0;
 	int nthr_max = nthr - 1;
 	double score_min = 0.75;
-	double pvalue2 = pvalue * 2;
+	double pvalue2 = pvalue * 1.25;
 	for (n = 0; n<nseq_pro; n++)
 	{
 		//if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max],count_val);
