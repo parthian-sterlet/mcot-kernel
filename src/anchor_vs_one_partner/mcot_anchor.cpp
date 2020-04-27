@@ -19,7 +19,7 @@ int StrNStr(char *str, char c, int n)
 {
 	int i, len = strlen(str);
 	int k = 1;
-	for (i = 0; i<len; i++)
+	for (i = 0; i < len; i++)
 	{
 		if (str[i] == c)
 		{
@@ -33,10 +33,10 @@ char *TransStr(char *d)
 {
 	int i, c, lens;
 	lens = strlen(d);
-	for (i = 0; i<lens; i++)
+	for (i = 0; i < lens; i++)
 	{
 		c = int(d[i]);
-		if (c<97) d[i] = char(c + 32);
+		if (c < 97) d[i] = char(c + 32);
 		//else break;
 	}
 	return(d);
@@ -45,7 +45,7 @@ char *TransStrBack(char *d)
 {
 	int i, c, lens;
 	lens = strlen(d);
-	for (i = 0; i<lens; i++)
+	for (i = 0; i < lens; i++)
 	{
 		c = int(d[i]);
 		if (c >= 97) d[i] = char(c - 32);
@@ -59,7 +59,7 @@ void DelChar(char *str, char c)
 
 	size = 0;
 	lens = strlen(str);
-	for (i = 0; i<lens; i++)
+	for (i = 0; i < lens; i++)
 	{
 		if (str[i] != c)str[size++] = str[i];
 	}
@@ -72,16 +72,16 @@ void GetSostPro(char *d, int word, int *sost)
 	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
 	int lens = strlen(d);
 	int size = 1;
-	for (k = 0; k<word; k++)size *= 4;
-	for (i = 0; i<size; i++)sost[i] = 0;
-	for (i = 0; i<lens - word + 1; i++)
+	for (k = 0; k < word; k++)size *= 4;
+	for (i = 0; i < size; i++)sost[i] = 0;
+	for (i = 0; i < lens - word + 1; i++)
 	{
 		i_sost = 0;
 		for (j = word - 1; j >= 0; j--)
 		{
-			for (k = 0; k<4; k++)
+			for (k = 0; k < 4; k++)
 			{
-				if (d[i + j] == letter[k]){ let = k; break; }
+				if (d[i + j] == letter[k]) { let = k; break; }
 			}
 			i_sost += ten[word - 1 - j] * let;
 		}
@@ -97,20 +97,20 @@ int ComplStr(char *d)
 	if (d1 == NULL) return 0;
 	strcpy(d1, d);
 	//	memset(d,0,sizeof(d));
-	for (i = 0; i<len; i++)
+	for (i = 0; i < len; i++)
 	{
 		switch (d1[len - i - 1])
 		{
-		case 'a':{d[i] = 't'; break; }
-		case 't':{d[i] = 'a'; break; }
-		case 'c':{d[i] = 'g'; break; }
-		case 'g':{d[i] = 'c'; break; }
-		case 'A':{d[i] = 'T'; break; }
-		case 'T':{d[i] = 'A'; break; }
-		case 'C':{d[i] = 'G'; break; }
-		case 'G':{d[i] = 'C'; break; }
-		case 'N':{d[i] = 'N'; break; }
-		case 'n':{d[i] = 'n'; break; }
+		case 'a': {d[i] = 't'; break; }
+		case 't': {d[i] = 'a'; break; }
+		case 'c': {d[i] = 'g'; break; }
+		case 'g': {d[i] = 'c'; break; }
+		case 'A': {d[i] = 'T'; break; }
+		case 'T': {d[i] = 'A'; break; }
+		case 'C': {d[i] = 'G'; break; }
+		case 'G': {d[i] = 'C'; break; }
+		case 'N': {d[i] = 'N'; break; }
+		case 'n': {d[i] = 'n'; break; }
 		default: d[i] = 'n';
 		}
 	}
@@ -133,19 +133,18 @@ void BigMix1(char *d)
 {
 	int r;
 	int len = strlen(d);
-	for (r = 0; r<len - 1; r++) Mix(&d[r], &d[1 + r + (rand() % (len - 1 - r))]);
+	for (r = 0; r < len - 1; r++) Mix(&d[r], &d[1 + r + (rand() % (len - 1 - r))]);
 }
 void BigMix1(int *d1, int len) // pereme6ivanie stroki
 {
 	int r, s;
-	for (r = 0; r<len; r++)
+	for (r = 0; r < len; r++)
 	{
 		s = rand() % len;
 		if (s != r)Mix(&d1[r], &d1[s]);
 	}
 }
 #include "fasta_to_plain.h"
-//#include "pwm_score_distr_granul.h"
 #include "pwm_iz_pwm_thr_dist.h"
 #include "select_thresholds_from_pvalues.h"
 
@@ -167,14 +166,14 @@ int matrices::mem_in(int length)
 	len = length;
 	wei = new double *[len];
 	if (wei == NULL) return -1;
-	for (i = 0; i<len; i++)
+	for (i = 0; i < len; i++)
 	{
 		wei[i] = new double[OLIGNUM];
 		if (wei[i] == NULL) return -1;
 	}
 	fre = new double *[len];
 	if (fre == NULL) return -1;
-	for (i = 0; i<len; i++)
+	for (i = 0; i < len; i++)
 	{
 		fre[i] = new double[OLIGNUM];
 		if (fre[i] == NULL) return -1;
@@ -184,24 +183,24 @@ int matrices::mem_in(int length)
 void matrices::mem_out(int len)
 {
 	int i;
-	for (i = 0; i<len; i++) delete[] wei[i];
+	for (i = 0; i < len; i++) delete[] wei[i];
 	delete[] wei;
-	for (i = 0; i<len; i++) delete[] fre[i];
+	for (i = 0; i < len; i++) delete[] fre[i];
 	delete[] fre;
 }
 void matrices::norm(void)
 {
 	int i, j;
 	min = raz = 0;
-	for (i = 0; i<len; i++)
+	for (i = 0; i < len; i++)
 	{
 		double pwmmin = 100;
 		double pwmmax = -100;
-		for (j = 0; j<OLIGNUM; j++)
+		for (j = 0; j < OLIGNUM; j++)
 		{
 			double w = wei[i][j];
-			if (w<pwmmin)pwmmin = w;
-			if (w>pwmmax)pwmmax = w;
+			if (w < pwmmin)pwmmin = w;
+			if (w > pwmmax)pwmmax = w;
 		}
 		raz += pwmmax;
 		min += pwmmin;
@@ -244,9 +243,9 @@ int profile::mem_in_sta(void)
 	int i;
 	sta = new int*[nseq];
 	if (sta == NULL) return -1;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		if (nsit[i]>0)
+		if (nsit[i] > 0)
 		{
 			sta[i] = new int[nsit[i]];
 			if (sta[i] == NULL) return -1;
@@ -259,9 +258,9 @@ int profile::mem_in_cep(void)
 	int i;
 	cep = new char*[nseq];
 	if (cep == NULL) return -1;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		if (nsit[i]>0)
+		if (nsit[i] > 0)
 		{
 			cep[i] = new char[nsit[i]];
 			if (cep[i] == NULL) return -1;
@@ -274,9 +273,9 @@ int profile::mem_in_cel(void)
 	int i;
 	cel = new int*[nseq];
 	if (cep == NULL) return -1;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		if (nsit[i]>0)
+		if (nsit[i] > 0)
 		{
 			cel[i] = new int[nsit[i]];
 			if (cel[i] == NULL) return -1;
@@ -289,9 +288,9 @@ int profile::mem_in_sco(void)
 	int i;
 	sco = new double*[nseq];
 	if (sco == NULL) return -1;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		if (nsit[i]>0)
+		if (nsit[i] > 0)
 		{
 			sco[i] = new double[nsit[i]];
 			if (sco[i] == NULL) return -1;
@@ -304,9 +303,9 @@ int profile::mem_in_pv(void)
 	int i;
 	pv = new double*[nseq];
 	if (pv == NULL) return -1;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		if (nsit[i]>0)
+		if (nsit[i] > 0)
 		{
 			pv[i] = new double[nsit[i]];
 			if (pv[i] == NULL) return -1;
@@ -317,9 +316,9 @@ int profile::mem_in_pv(void)
 void profile::mem_out_sta(void)
 {
 	int i;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		if (nsit[i]>0)delete[] sta[i];
+		if (nsit[i] > 0)delete[] sta[i];
 	}
 	delete[] sta;
 	sta = NULL;
@@ -327,28 +326,28 @@ void profile::mem_out_sta(void)
 void profile::mem_out_cep(void)
 {
 	int i;
-	for (i = 0; i<nseq; i++)if (nsit[i]>0)delete[] cep[i];
+	for (i = 0; i < nseq; i++)if (nsit[i] > 0)delete[] cep[i];
 	delete[] cep;
 	cep = NULL;
 }
 void profile::mem_out_cel(void)
 {
 	int i;
-	for (i = 0; i<nseq; i++)if (nsit[i]>0)delete[] cel[i];
+	for (i = 0; i < nseq; i++)if (nsit[i] > 0)delete[] cel[i];
 	delete[] cel;
 	cel = NULL;
 }
 void profile::mem_out_sco(void)
 {
 	int i;
-	for (i = 0; i<nseq; i++)if (nsit[i]>0)delete[] sco[i];
+	for (i = 0; i < nseq; i++)if (nsit[i] > 0)delete[] sco[i];
 	delete[] sco;
 	sco = NULL;
 }
 void profile::mem_out_pv(void)
 {
 	int i;
-	for (i = 0; i<nseq; i++)if (nsit[i]>0)delete[] pv[i];
+	for (i = 0; i < nseq; i++)if (nsit[i] > 0)delete[] pv[i];
 	delete[] pv;
 	pv = NULL;
 }
@@ -357,7 +356,7 @@ int profile::mem_in_nsit(void)
 	nsit = new int[nseq];
 	if (nsit == NULL) return -1;
 	int i;
-	for (i = 0; i<nseq; i++)nsit[i] = 0;
+	for (i = 0; i < nseq; i++)nsit[i] = 0;
 	return 1;
 }
 void profile::mem_out_nsit(void)
@@ -369,32 +368,32 @@ int profile::get_copy_rand(profile *a, int height)
 	int i, j, h, z, ini;
 	a->mot = mot;
 	a->nam = nam;
-	a->nseq = height*nseq;
-	a->nsit_all = height*nsit_all;
-	a->nseq_rec = height*nseq_rec;
+	a->nseq = height * nseq;
+	a->nsit_all = height * nsit_all;
+	a->nseq_rec = height * nseq_rec;
 	z = 0;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
 		int nsi = nsit[i];
-		for (h = 0; h<height; h++)
+		for (h = 0; h < height; h++)
 		{
 			a->nsit[z++] = nsi;
 		}
 	}
 	ini = a->mem_in_sta();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = a->mem_in_cep();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = a->mem_in_cel();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = a->mem_in_pv();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	z = 0;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		for (h = 0; h<height; h++)
+		for (h = 0; h < height; h++)
 		{
-			for (j = 0; j<a->nsit[z]; j++)
+			for (j = 0; j < a->nsit[z]; j++)
 			{
 				a->sta[z][j] = sta[i][j];
 				a->cep[z][j] = cep[i][j];
@@ -415,15 +414,15 @@ int profile::clear_real(void)
 	mem_out_cel();
 	}*/
 	int ini = mem_in_sta();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = mem_in_cep();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = mem_in_cel();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = mem_in_sco();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	ini = mem_in_pv();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	return 1;
 }
 int profile::fprintf_pro(char *mot_db, double thr, char *mode)
@@ -450,10 +449,10 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 		printf("Input file %s can't be opened!\n", fileo);
 		return -1;
 	}
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
 		fprintf(out, ">Seq %d\tThr %f\tNsites %d\n", i + 1, thr, nsit[i]);
-		for (j = 0; j<nsit[i]; j++)
+		for (j = 0; j < nsit[i]; j++)
 		{
 			fprintf(out, "%d\t", sta[i][j]);
 			fprintf(out, "%f", pv[i][j]);
@@ -468,10 +467,10 @@ void profile::count_sites(void)
 {
 	nsit_all = nseq_rec = 0;
 	int i;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
 		int ns = nsit[i];
-		if (ns>0)
+		if (ns > 0)
 		{
 			nsit_all += ns;
 			nseq_rec++;
@@ -481,11 +480,11 @@ void profile::count_sites(void)
 int profile::test(void)
 {
 	int i, j;
-	for (i = 0; i<nseq; i++)
+	for (i = 0; i < nseq; i++)
 	{
-		for (j = 0; j<nsit[i]; j++)
+		for (j = 0; j < nsit[i]; j++)
 		{
-			if (sta[i][j]>5 * SEQLEN || sta[i][j]<0)return -1;
+			if (sta[i][j] > 5 * SEQLEN || sta[i][j] < 0)return -1;
 		}
 	}
 	return 1;
@@ -519,7 +518,7 @@ struct result {
 void result::ini(void)
 {
 	int j, k;
-	for (j = 0; j<NUM_THR; j++)for (k = 0; k<NUM_THR; k++)cell[j][k].ini();
+	for (j = 0; j < NUM_THR; j++)for (k = 0; k < NUM_THR; k++)cell[j][k].ini();
 	anc.ini();
 	par.ini();
 	sit.ini();
@@ -587,12 +586,12 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	for (j = n_partial; j >= 1; j--)fprintf(out, "\t%d%c", j, bo);
 	for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
 	fprintf(out, "\n");
-	if (mot>0)
+	if (mot > 0)
 	{
 		for (i = 3; i >= 0; i--)
 		{
 			fprintf(out, "\t\t%s", head[i]);
-			for (j = 0; j<n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
 		}
 	}
@@ -602,7 +601,7 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 		{
 			if (i != 1)fprintf(out, "\t\t%s", head[i]);
 			else fprintf(out, "\t\t%s", head0);
-			for (j = 0; j<n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
 		}
 	}
@@ -636,35 +635,35 @@ int asy_plot::mem_in(int karman, double xmin, double xmax, double xinter)
 	int i;
 	full = new int*[karman];
 	if (full == NULL) return -1;
-	for (i = 0; i<karman; i++)
+	for (i = 0; i < karman; i++)
 	{
 		full[i] = new int[karman];
 		if (full[i] == NULL) return -1;
 	}
 	partial = new int*[karman];
 	if (partial == NULL) return -1;
-	for (i = 0; i<karman; i++)
+	for (i = 0; i < karman; i++)
 	{
 		partial[i] = new int[karman];
 		if (partial[i] == NULL) return -1;
 	}
 	overlap = new int*[karman];
 	if (overlap == NULL) return -1;
-	for (i = 0; i<karman; i++)
+	for (i = 0; i < karman; i++)
 	{
 		overlap[i] = new int[karman];
 		if (overlap[i] == NULL) return -1;
 	}
 	spacer = new int*[karman];
 	if (spacer == NULL) return -1;
-	for (i = 0; i<karman; i++)
+	for (i = 0; i < karman; i++)
 	{
 		spacer[i] = new int[karman];
 		if (spacer[i] == NULL) return -1;
 	}
 	any = new int*[karman];
 	if (any == NULL) return -1;
-	for (i = 0; i<karman; i++)
+	for (i = 0; i < karman; i++)
 	{
 		any[i] = new int[karman];
 		if (any[i] == NULL) return -1;
@@ -736,7 +735,7 @@ int main(int argc, char *argv[])
 	strcpy(file_pfm_anchor[1], argv[3]);
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
-	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000005; // 0.0005 1.5 parametry dlya porogov matric
+	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
@@ -793,12 +792,12 @@ int main(int argc, char *argv[])
 	strcpy(file_pval[4], "fisher_spac_mot0");
 	strcpy(file_pval_table, "out_pval");
 	strcpy(file_hist_rand, "out_hist_rand");
-	for (i = 0; i<2; i++)
+	for (i = 0; i < 2; i++)
 	{
 		memset(name[i], '\0', sizeof(name[i]));
 		int len = strlen(file_pfm_anchor[i]);
 		k = 0;
-		for (j = 0; j<len; j++)
+		for (j = 0; j < len; j++)
 		{
 			char cc = file_pfm_anchor[i][j];
 			if (cc == '.' || cc == '\0')
@@ -821,18 +820,18 @@ int main(int argc, char *argv[])
 	}
 	int *peak_len_real;
 	peak_len_real = new int[nseq_real];
-	if (peak_len_real == NULL){ puts("Out of memory..."); return -1; }
+	if (peak_len_real == NULL) { puts("Out of memory..."); return -1; }
 
 	seq = new char**[2];
-	if (seq == NULL){ puts("Out of memory..."); return -1; }
-	for (k = 0; k<2; k++)
+	if (seq == NULL) { puts("Out of memory..."); return -1; }
+	for (k = 0; k < 2; k++)
 	{
 		seq[k] = new char*[nseq_real];
-		if (seq[k] == NULL){ puts("Out of memory..."); return -1; }
-		for (i = 0; i<nseq_real; i++)
+		if (seq[k] == NULL) { puts("Out of memory..."); return -1; }
+		for (i = 0; i < nseq_real; i++)
 		{
 			seq[k][i] = new char[length_fasta_max + 1];
-			if (seq[k][i] == NULL){ puts("Out of memory..."); return -1; }
+			if (seq[k][i] == NULL) { puts("Out of memory..."); return -1; }
 		}
 	}
 	ftp = fasta_to_plain1(file_fasta, length_fasta_max, nseq_real, seq, peak_len_real);
@@ -848,47 +847,47 @@ int main(int argc, char *argv[])
 	matrices matrix[2];
 
 	//for real
-	for (j = 0; j<2; j++)
+	for (j = 0; j < 2; j++)
 	{
 		real_one[j].nseq = nseq_real;
 		real_one[j].nam = 1;
 		int ini = real_one[j].mem_in_nsit();
-		if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+		if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	}
 
 	//for permutation
 	srand((unsigned)time(NULL));
-	int nseq_rand = nseq_real*height_permut;
-	if (nseq_rand<size_min_permut)height_permut = size_min_permut / nseq_real;
-	if (nseq_rand>size_max_permut)height_permut = size_max_permut / nseq_real;
-	nseq_rand = nseq_real*height_permut;
+	int nseq_rand = nseq_real * height_permut;
+	if (nseq_rand < size_min_permut)height_permut = size_min_permut / nseq_real;
+	if (nseq_rand > size_max_permut)height_permut = size_max_permut / nseq_real;
+	nseq_rand = nseq_real * height_permut;
 	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
-	for (j = 0; j<2; j++)
+	for (j = 0; j < 2; j++)
 	{
 		rand_one[j].nseq = nseq_rand;
 		rand_one[j].nam = 1;
 		int ini = rand_one[j].mem_in_nsit();
-		if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+		if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 	}
 	rand_hom_one.nseq = nseq_rand;
 	rand_hom_one.nam = 1;
 	rand_hom_one.mot = 0;
 	int ini = rand_hom_one.mem_in_nsit();
-	if (ini == -1){ puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
 
 	int *peak_len_rand;
 	peak_len_rand = new int[nseq_rand];
-	if (peak_len_rand == NULL){ puts("Out of memory..."); return -1; }
+	if (peak_len_rand == NULL) { puts("Out of memory..."); return -1; }
 	k = 0;
-	for (i = 0; i<nseq_real; i++)
+	for (i = 0; i < nseq_real; i++)
 	{
-		for (m = 0; m<height_permut; m++)peak_len_rand[k++] = peak_len_real[i];
+		for (m = 0; m < height_permut; m++)peak_len_rand[k++] = peak_len_real[i];
 	}
 	int *thr_err_real, *thr_err_rand;
 	thr_err_real = new int[nseq_real];
-	if (thr_err_real == NULL){ puts("Out of memory..."); return -1; }
+	if (thr_err_real == NULL) { puts("Out of memory..."); return -1; }
 	thr_err_rand = new int[nseq_rand];
-	if (thr_err_rand == NULL){ puts("Out of memory..."); return -1; }
+	if (thr_err_rand == NULL) { puts("Out of memory..."); return -1; }
 
 	FILE *out_hist, *out_hist_rand;
 	if ((out_hist = fopen(file_hist, "wt")) == NULL)
@@ -959,12 +958,12 @@ int main(int argc, char *argv[])
 	thr_all = new double[all_pos_rec];
 	if (thr_all == NULL) { puts("Out of memory..."); return -1; }
 	fp_rate = new double[all_pos_rec];
-	if (fp_rate == NULL){ puts("Out of memory..."); return -1; }
-	for (mot = 0; mot<2; mot++)
+	if (fp_rate == NULL) { puts("Out of memory..."); return -1; }
+	for (mot = 0; mot < 2; mot++)
 	{
 		printf("Mot %d\n", mot);
 		int length = pfm_to_pwm(file_pfm_anchor[mot], &matrix[mot]);
-		for (i = 0; i<length; i++)for (j = 0; j<OLIGNUM; j++)pwm_anchor[mot][i][j] = matrix[mot].wei[i][j];
+		for (i = 0; i < length; i++)for (j = 0; j < OLIGNUM; j++)pwm_anchor[mot][i][j] = matrix[mot].wei[i][j];
 		if (length <= 0 || length >= MATLEN)
 		{
 			printf("PFM to PWM conversion error, file %s\n", file_pfm_anchor);
@@ -972,7 +971,7 @@ int main(int argc, char *argv[])
 		}
 		int nthr_dist = 0;
 		int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor[mot], length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue, dpvalue);
-	//	int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor, length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
+		//	int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor, length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
 		if (piptd == -1)
 		{
 			printf("FP rate table error\n");
@@ -1020,12 +1019,12 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 		//count nsites for various thresholds
-		for (i = 0; i<nseq_real; i++)
+		for (i = 0; i < nseq_real; i++)
 		{
-			for (k = 0; k<real_one[mot].nsit[i]; k++)
+			for (k = 0; k < real_one[mot].nsit[i]; k++)
 			{
 				double sco = real_one[mot].sco[i][k];
-				for (j = 0; j<NUM_THR; j++)
+				for (j = 0; j < NUM_THR; j++)
 				{
 					if (sco >= thr[mot][j])
 					{
@@ -1036,9 +1035,9 @@ int main(int argc, char *argv[])
 			}
 		}
 		//transform score to fprate
-		for (i = 0; i<nseq_real; i++)
+		for (i = 0; i < nseq_real; i++)
 		{
-			for (k = 0; k<real_one[mot].nsit[i]; k++)
+			for (k = 0; k < real_one[mot].nsit[i]; k++)
 			{
 				double sco = real_one[mot].sco[i][k];
 				int inter = real_one[mot].cel[i][k];
@@ -1064,15 +1063,15 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 		int rec_seq[NUM_THR], rec_pos[NUM_THR];
-		for (i = 0; i<NUM_THR; i++)rec_seq[i] = rec_pos[i] = 0;
-		for (i = 0; i<nseq_real; i++)
+		for (i = 0; i < NUM_THR; i++)rec_seq[i] = rec_pos[i] = 0;
+		for (i = 0; i < nseq_real; i++)
 		{
 			int inx[NUM_THR];
-			for (j = 0; j<NUM_THR; j++)inx[j] = 0;
-			for (k = 0; k<real_one[mot].nsit[i]; k++)
+			for (j = 0; j < NUM_THR; j++)inx[j] = 0;
+			for (k = 0; k < real_one[mot].nsit[i]; k++)
 			{
 				double sco = real_one[mot].sco[i][k];
-				for (j = 0; j<NUM_THR; j++)
+				for (j = 0; j < NUM_THR; j++)
 				{
 					if (sco >= thr[mot][j])
 					{
@@ -1084,7 +1083,7 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
-		for (j = 0; j<NUM_THR; j++)
+		for (j = 0; j < NUM_THR; j++)
 		{
 			if (mot == 0)fprintf(out_stat, "Anchor");
 			else fprintf(out_stat, "Partner %d", mot);
@@ -1097,7 +1096,7 @@ int main(int argc, char *argv[])
 	delete[] fp_rate;
 	delete[] thr_all;
 
-	for (mot = 0; mot<2; mot++)len_motif[mot] = matrix[mot].len;
+	for (mot = 0; mot < 2; mot++)len_motif[mot] = matrix[mot].len;
 
 	int len_anchor, len_partner;
 	int mot_a = 0, mot_p;
@@ -1118,7 +1117,7 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 	}
-	for (mot_p = 0; mot_p<2; mot_p++)
+	for (mot_p = 0; mot_p < 2; mot_p++)
 	{
 		len_partner = len_motif[mot_p];
 		//one thresh  rand - &rand_hom_one,&rand_one[ap]   real - real_one[0],real_one[ap]
@@ -1147,7 +1146,7 @@ int main(int argc, char *argv[])
 			printf("Real print profile error, motif %d\n",mot);
 			return -1;
 			}*/
-			for (m = 0; m<nseq_real; m++)thr_err_real[m] = 0;
+			for (m = 0; m < nseq_real; m++)thr_err_real[m] = 0;
 			rand_one[mot_p].mot = mot_p;
 			int throwp = throw_predictions(peak_len_rand, &rand_hom_one, &rand_one[mot_p], len_anchor, len_partner, 0, thr_err_real, nseq_real, nseq_rand, seq[0], height_permut, file_err);
 			if (throwp == -1)
@@ -1191,9 +1190,9 @@ int main(int argc, char *argv[])
 			expected.ini();
 			real_one[mot_p].mot = mot_p;
 			k = 0;
-			for (i = 0; i<nseq_real; i++)
+			for (i = 0; i < nseq_real; i++)
 			{
-				for (j = 0; j<height_permut; j++)
+				for (j = 0; j < height_permut; j++)
 				{
 					thr_err_rand[k++] = thr_err_real[i];
 				}
@@ -1238,10 +1237,10 @@ int main(int argc, char *argv[])
 			rand_plot.sum();
 			if (mot_p != 0)
 			{
-				char *flow[5] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
+				char flow[5][8] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
 				FILE *out_plot[5];
 				char file_plot[5][80];
-				for (i = 0; i<5; i++)
+				for (i = 0; i < 5; i++)
 				{
 					strcpy(file_plot[i], "plot_");
 					strcat(file_plot[i], flow[i]);
@@ -1257,7 +1256,7 @@ int main(int argc, char *argv[])
 				char rzd = ',';
 				double val = real_plot.min;
 				fprintf(out_plot[0], "%c<%.1f", rzd, val);
-				for (i = 1; i<real_plot.n_karman; i++)
+				for (i = 1; i < real_plot.n_karman; i++)
 				{
 					fprintf(out_plot[0], "%c%.1f", rzd, val);
 					val += real_plot.inter;
@@ -1285,7 +1284,7 @@ int main(int argc, char *argv[])
 						if (real_plot.total_full != 0 && rand_plot.total_full != 0)
 						{
 							double mill = 1000 * ((double)real_plot.full[i][j] / real_plot.total_full - (double)rand_plot.full[i][j] / rand_plot.total_full);
-							if (fabs(mill)>0.5)fprintf(out_plot[0], "%.f", mill);
+							if (fabs(mill) > 0.5)fprintf(out_plot[0], "%.f", mill);
 						}
 					}
 					fprintf(out_plot[0], "\n");
@@ -1293,7 +1292,7 @@ int main(int argc, char *argv[])
 				fclose(out_plot[0]);
 				val = real_plot.min;
 				fprintf(out_plot[1], "%c<%.1f", rzd, val);
-				for (i = 1; i<real_plot.n_karman; i++)
+				for (i = 1; i < real_plot.n_karman; i++)
 				{
 					fprintf(out_plot[1], "%c%.1f", rzd, val);
 					val += real_plot.inter;
@@ -1321,7 +1320,7 @@ int main(int argc, char *argv[])
 						if (real_plot.total_partial != 0 && rand_plot.total_partial != 0)
 						{
 							double mill = 1000 * ((double)real_plot.partial[i][j] / real_plot.total_partial - (double)rand_plot.partial[i][j] / rand_plot.total_partial);
-							if (fabs(mill)>0.5)fprintf(out_plot[1], "%.f", mill);
+							if (fabs(mill) > 0.5)fprintf(out_plot[1], "%.f", mill);
 						}
 					}
 					fprintf(out_plot[1], "\n");
@@ -1329,7 +1328,7 @@ int main(int argc, char *argv[])
 				fclose(out_plot[1]);
 				val = real_plot.min;
 				fprintf(out_plot[2], "%c<%.1f", rzd, val);
-				for (i = 1; i<real_plot.n_karman; i++)
+				for (i = 1; i < real_plot.n_karman; i++)
 				{
 					fprintf(out_plot[2], "%c%.1f", rzd, val);
 					val += real_plot.inter;
@@ -1357,7 +1356,7 @@ int main(int argc, char *argv[])
 						if (real_plot.total_overlap != 0 && rand_plot.total_overlap != 0)
 						{
 							double mill = 1000 * ((double)real_plot.overlap[i][j] / real_plot.total_overlap - (double)rand_plot.overlap[i][j] / rand_plot.total_overlap);
-							if (fabs(mill)>0.5)fprintf(out_plot[2], "%.f", mill);
+							if (fabs(mill) > 0.5)fprintf(out_plot[2], "%.f", mill);
 						}
 					}
 					fprintf(out_plot[2], "\n");
@@ -1365,7 +1364,7 @@ int main(int argc, char *argv[])
 				fclose(out_plot[2]);
 				val = real_plot.min;
 				fprintf(out_plot[3], "%c<%.1f", rzd, val);
-				for (i = 1; i<real_plot.n_karman; i++)
+				for (i = 1; i < real_plot.n_karman; i++)
 				{
 					fprintf(out_plot[3], "%c%.1f", rzd, val);
 					val += real_plot.inter;
@@ -1393,7 +1392,7 @@ int main(int argc, char *argv[])
 						if (real_plot.total_spacer != 0 && rand_plot.total_spacer != 0)
 						{
 							double mill = 1000 * ((double)real_plot.spacer[i][j] / real_plot.total_spacer - (double)rand_plot.spacer[i][j] / rand_plot.total_spacer);
-							if (fabs(mill)>0.5)fprintf(out_plot[3], "%.f", mill);
+							if (fabs(mill) > 0.5)fprintf(out_plot[3], "%.f", mill);
 						}
 					}
 					fprintf(out_plot[3], "\n");
@@ -1401,7 +1400,7 @@ int main(int argc, char *argv[])
 				fclose(out_plot[3]);
 				val = real_plot.min;
 				fprintf(out_plot[4], "%c<%.1f", rzd, val);
-				for (i = 1; i<real_plot.n_karman; i++)
+				for (i = 1; i < real_plot.n_karman; i++)
 				{
 					fprintf(out_plot[4], "%c%.1f", rzd, val);
 					val += real_plot.inter;
@@ -1429,7 +1428,7 @@ int main(int argc, char *argv[])
 						if (real_plot.total_any != 0 && rand_plot.total_any != 0)
 						{
 							double mill = 1000 * ((double)real_plot.any[i][j] / real_plot.total_any - (double)rand_plot.any[i][j] / rand_plot.total_any);
-							if (fabs(mill)>0.5)fprintf(out_plot[4], "%.f", mill);
+							if (fabs(mill) > 0.5)fprintf(out_plot[4], "%.f", mill);
 						}
 					}
 					fprintf(out_plot[4], "\n");
@@ -1438,10 +1437,10 @@ int main(int argc, char *argv[])
 			}
 		}// one threshold
 		//many thresholds
-		for (i = 0; i<NUM_THR; i++)for (j = 0; j<NUM_THR; j++)pvalue_a[i][j] = pvalue_f[i][j] = pvalue_p[i][j] = pvalue_o[i][j] = pvalue_s[i][j] = 1;
-		for (j = 0; j<NUM_THR; j++)
+		for (i = 0; i < NUM_THR; i++)for (j = 0; j < NUM_THR; j++)pvalue_a[i][j] = pvalue_f[i][j] = pvalue_p[i][j] = pvalue_o[i][j] = pvalue_s[i][j] = 1;
+		for (j = 0; j < NUM_THR; j++)
 		{
-			for (k = 0; k<NUM_THR; k++)
+			for (k = 0; k < NUM_THR; k++)
 			{
 				//printf("Mot %d J %d K %d\n",mot,j+1,k+1);								
 				int fisher = fisher_exact_test(observed.cell[j][k].any, observed.cell[j][k].two_sites, expected.cell[j][k].any, expected.cell[j][k].two_sites, pvalue_a[j][k], 0);
@@ -1579,7 +1578,7 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		for (i = 0; i<5; i++)
+		for (i = 0; i < 5; i++)
 		{
 			char file_pval0[80];
 			strcpy(file_pval0, file_pval[i]);
@@ -1593,11 +1592,11 @@ int main(int argc, char *argv[])
 			}
 			fprintf(out_pval[i], "Anchor Thr\tPartner Thr\t\tReal CE+\tReal Total\tRand CE+\tRand Total\tFold\tP-value\n");
 		}
-		for (j = 0; j<NUM_THR; j++)
+		for (j = 0; j < NUM_THR; j++)
 		{
-			for (k = 0; k<NUM_THR; k++)
+			for (k = 0; k < NUM_THR; k++)
 			{
-				for (i = 0; i<5; i++)fprintf(out_pval[i], "A %d\tP %d\t\t", j + 1, k + 1);
+				for (i = 0; i < 5; i++)fprintf(out_pval[i], "A %d\tP %d\t\t", j + 1, k + 1);
 				fprintf(out_pval[0], "%d\t%d\t%d\t%d\t\t%g\n", observed.cell[j][k].any, observed.cell[j][k].two_sites, expected.cell[j][k].any, expected.cell[j][k].two_sites, pvalue_a[j][k]);
 				fprintf(out_pval[1], "%d\t%d\t%d\t%d\t\t%g\n", observed.cell[j][k].full, observed.cell[j][k].two_sites, expected.cell[j][k].full, expected.cell[j][k].two_sites, pvalue_f[j][k]);
 				fprintf(out_pval[2], "%d\t%d\t%d\t%d\t\t%g\n", observed.cell[j][k].partial, observed.cell[j][k].two_sites, expected.cell[j][k].partial, expected.cell[j][k].two_sites, pvalue_p[j][k]);
@@ -1606,7 +1605,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		double rat_a, rat_p;
-		for (i = 0; i<5; i++)fprintf(out_pval[i], "\n");
+		for (i = 0; i < 5; i++)fprintf(out_pval[i], "\n");
 		//any vs rand
 		fprintf(out_pval[0], "Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor);
 		fprintf(out_pval[0], "Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner);
@@ -1652,17 +1651,17 @@ int main(int argc, char *argv[])
 		if (rat_p == 0)pv_spacer.fold_anc_par = 1000;
 		else pv_spacer.fold_anc_par = rat_a / rat_p;
 		fprintf(out_pval[4], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.spacer, observed.sit.spacer, expected.anc_sit.spacer, expected.sit.spacer, pv_spacer.fold_anc_par, pv_spacer.anc_par);
-		for (i = 0; i<5; i++)fclose(out_pval[i]);
+		for (i = 0; i < 5; i++)fclose(out_pval[i]);
 
 		double pval_tot_min[5] = { 0, 0, 0, 0, 0 };
 		double limit = 300;
 		double pv_limit = 1E-300;
 		double lgpv[5][NUM_THR][NUM_THR];
-		for (j = 0; j<NUM_THR; j++)
+		for (j = 0; j < NUM_THR; j++)
 		{
-			for (k = 0; k<NUM_THR; k++)
+			for (k = 0; k < NUM_THR; k++)
 			{
-				for (i = 0; i<5; i++)lgpv[i][k][j] = 0;
+				for (i = 0; i < 5; i++)lgpv[i][k][j] = 0;
 				if (pvalue_a[k][j] <= pv_limit)lgpv[0][k][j] = limit;
 				else lgpv[0][k][j] = -log10(pvalue_a[k][j]);
 				if (pvalue_f[k][j] <= pv_limit)lgpv[1][k][j] = limit;
@@ -1675,13 +1674,13 @@ int main(int argc, char *argv[])
 				else lgpv[4][k][j] = -log10(pvalue_s[k][j]);
 			}
 		}
-		for (i = 0; i<5; i++)
+		for (i = 0; i < 5; i++)
 		{
 			int limit_found = 0;
-			int mnoj = NUM_THR*NUM_THR;
-			for (j = 0; j<NUM_THR; j++)
+			int mnoj = NUM_THR * NUM_THR;
+			for (j = 0; j < NUM_THR; j++)
 			{
-				for (k = 0; k<NUM_THR; k++)
+				for (k = 0; k < NUM_THR; k++)
 				{
 					double val = lgpv[i][k][j];
 					if (val == limit)
@@ -1698,12 +1697,12 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				for (j = 0; j<NUM_THR; j++)
+				for (j = 0; j < NUM_THR; j++)
 				{
-					for (k = 0; k<NUM_THR; k++)
+					for (k = 0; k < NUM_THR; k++)
 					{
 						double val = lgpv[i][k][j];
-						if (val>pval_tot_min[i])pval_tot_min[i] = val;
+						if (val > pval_tot_min[i])pval_tot_min[i] = val;
 					}
 				}
 				//pval_tot_min[i]=pow(10,-pval_tot_min[i]);
@@ -1715,29 +1714,29 @@ int main(int argc, char *argv[])
 			pv_partial.anc_par = -log10(pv_partial.anc_par);
 			pv_overlap.anc_par = -log10(pv_overlap.anc_par);
 			pv_spacer.anc_par = -log10(pv_spacer.anc_par);
-			if (pv_any.anc_par>bonferroni_corr_asy)
+			if (pv_any.anc_par > bonferroni_corr_asy)
 			{
-				if (pv_any.fold_anc_par<1)pv_any.anc_par *= -1;
+				if (pv_any.fold_anc_par < 1)pv_any.anc_par *= -1;
 			}
 			else pv_any.anc_par = 0;
-			if (pv_full.anc_par>bonferroni_corr_asy)
+			if (pv_full.anc_par > bonferroni_corr_asy)
 			{
-				if (pv_full.fold_anc_par<1)pv_full.anc_par *= -1;
+				if (pv_full.fold_anc_par < 1)pv_full.anc_par *= -1;
 			}
 			else pv_full.anc_par = 0;
-			if (pv_partial.anc_par>bonferroni_corr_asy)
+			if (pv_partial.anc_par > bonferroni_corr_asy)
 			{
-				if (pv_partial.fold_anc_par<1)pv_partial.anc_par *= -1;
+				if (pv_partial.fold_anc_par < 1)pv_partial.anc_par *= -1;
 			}
 			else pv_partial.anc_par = 0;
-			if (pv_overlap.anc_par>bonferroni_corr_asy)
+			if (pv_overlap.anc_par > bonferroni_corr_asy)
 			{
-				if (pv_overlap.fold_anc_par<1)pv_overlap.anc_par *= -1;
+				if (pv_overlap.fold_anc_par < 1)pv_overlap.anc_par *= -1;
 			}
 			else pv_overlap.anc_par = 0;
-			if (pv_spacer.anc_par>bonferroni_corr_asy)
+			if (pv_spacer.anc_par > bonferroni_corr_asy)
 			{
-				if (pv_spacer.fold_anc_par<1)pv_spacer.anc_par *= -1;
+				if (pv_spacer.fold_anc_par < 1)pv_spacer.anc_par *= -1;
 			}
 			else pv_spacer.anc_par = 0;
 		}
@@ -1750,12 +1749,12 @@ int main(int argc, char *argv[])
 		if (mot_p == 0)fprintf(out_pval_table, "Anchor");
 		else fprintf(out_pval_table, "Partner %d", mot_p);
 		fprintf(out_pval_table, "\t%s", name[mot_p]);
-		for (i = 1; i<5; i++)
+		for (i = 1; i < 5; i++)
 		{
-			if (pval_tot_min[i]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
+			if (pval_tot_min[i] > bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
 			else fprintf(out_pval_table, "\t0");
 		}
-		if (pval_tot_min[0]>bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
+		if (pval_tot_min[0] > bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
 		else fprintf(out_pval_table, "\t0");
 		double pvalue_similarity_tot;
 		double pval_sim[2] = { 1, 1 };
@@ -1774,25 +1773,25 @@ int main(int argc, char *argv[])
 			pvalue_similarity_tot = pfm_similarity(&matrix[mot_a], &matrix[mot_p], s_granul, s_overlap_min, s_ncycle_small, s_ncycle_large, pval_sim);
 			//fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
 			fprintf(out_pval_table, "\t%.2f\t%.2f\t%.2f", -log10(pvalue_similarity_tot), -log10(pval_sim[0]), -log10(pval_sim[1]));
-			if (pv_full.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.anchor);
+			if (pv_full.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.anchor);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_partial.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.anchor);
+			if (pv_partial.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.anchor);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_overlap.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor);
+			if (pv_overlap.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_spacer.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor);
+			if (pv_spacer.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_any.anchor>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.anchor);
+			if (pv_any.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.anchor);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_full.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.partner);
+			if (pv_full.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.partner);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_partial.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.partner);
+			if (pv_partial.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.partner);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_overlap.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner);
+			if (pv_overlap.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_spacer.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner);
+			if (pv_spacer.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_any.partner>bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.partner);
+			if (pv_any.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.partner);
 			else fprintf(out_pval_table, "\t0");
 			if (pv_full.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
 			else fprintf(out_pval_table, "\t0");
@@ -1811,7 +1810,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			char slash = '/';
-			for (i = 0; i<18; i++)fprintf(out_pval_table, "\tn%ca", slash);
+			for (i = 0; i < 18; i++)fprintf(out_pval_table, "\tn%ca", slash);
 			fprintf(out_pval_table, "\t%.2f\t\t", bonferroni_corr);
 		}
 		fprintf(out_pval_table, "\n");
@@ -1820,7 +1819,7 @@ int main(int argc, char *argv[])
 		rand_one[mot_p].mem_out_cep();
 		rand_one[mot_p].mem_out_cel();
 		rand_one[mot_p].mem_out_pv();
-		for (i = 0; i<nseq_rand; i++)rand_one[mot_p].nsit[i] = 0;
+		for (i = 0; i < nseq_rand; i++)rand_one[mot_p].nsit[i] = 0;
 	}
 	real_plot.mem_out();
 	rand_plot.mem_out();
@@ -1843,10 +1842,10 @@ int main(int argc, char *argv[])
 	delete[] thr_err_rand;
 	delete[] peak_len_real;
 	delete[] peak_len_rand;
-	for (mot = 0; mot<2; mot++)matrix[mot].mem_out(matrix[mot].len);
-	for (k = 0; k<2; k++)
+	for (mot = 0; mot < 2; mot++)matrix[mot].mem_out(matrix[mot].len);
+	for (k = 0; k < 2; k++)
 	{
-		for (i = 0; i<nseq_real; i++)
+		for (i = 0; i < nseq_real; i++)
 		{
 			delete[] seq[k][i];
 		}
