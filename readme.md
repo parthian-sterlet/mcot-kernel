@@ -168,7 +168,7 @@ MCOT gives the following output data:
 
 
 
-* __Files <*_thr5>, recognition profiles of motifs__ Each file respects to one motif. A file has fasta-like format, i.e. for each peak the header line starts with ‘>’ symbol. Next, each subsequent line represents one hit in a peak, particularly it position, respective conservation value -Log10(FPR) and DNA strand.
+* __Files <\*\_thr5>, recognition profiles of motifs__ . Each file respects to one motif. A file has fasta-like format, i.e. for each peak the header line starts with ‘>’ symbol. Next, each subsequent line represents one hit in a peak, particularly it position, respective conservation value -Log10(FPR) and DNA strand.
 
 ```
 Example
@@ -184,9 +184,8 @@ Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β (Wederell et al
 
 
 
-* __File <rec_pos.txt>, the detailed recognition statistics__. For each motif and each recognition threshold MCOT provides (1) the number* and the name of the motif, (2) the number and the value of the threshold; (3) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
+* __File <rec_pos.txt>, the detailed recognition statistics__. For each motif and each recognition threshold MCOT provides (1) the number and the name of the motif (anchor motif is designated as ‘Anchor’; numbers 1,2, ... belong to partner motifs), (2) the number and the value of the threshold; (3) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
 
-*number 0 respects to an anchor motif; numbers 1,2, ... belong to partner motifs.  
 
 
 Example
@@ -206,134 +205,142 @@ Example
 |1          |Partner     | 0.959810  | 18.60      | 1403       | 7543        | 3.94E-04     | 1575      | 4002535         |
 
 
-* __File <out_pval>, the summary for statistical significances for all pairs of anchor-partner motifs__ represents the calculation results for different potential CE variants: a homotypic CE (Partner Number 0),  one or several heterotypic CE(s) (Partner Numbers 1,2...). Any - any co-occurrence of the motifs, Full - full overlap, Part - partial overlap, Over - Partial or Full overlap, Spac - spacer. The list contains (a) for each pair of motifs five p-values (Pv) of CE enrichment in five computation flows; (b) for each heterotypic pair the p-value for similarity of the anchor and the partner motifs.
+* __File <out_pval>, the summary for statistical significances for all pairs of anchor-partner motifs__ represents the calculation results for different potential CE variants: a homotypic CE (# Motif = Anchor) and  one/several heterotypic CE(s) (Partner 1, Partner 2, etc.) for five computation flows (Full/Partial overlap, Overlap, Spacer and Any).
 
-The first block of output data represents the significances of CEs for five computation flows and estimates of similarity between two participants of CE.
-
-
-Example:
-
-
-
-
-|Partner Num|   Partner Name | Any Pv | Full Pv | Partial Pv | Overlap Pv | Spacer Pv |    |Sim   |Sim SSD| Sim PCC |
-|-----------|----------------|--------|---------|------------|------------|-----------|----|------|-------|---------|
-|0          | Anchor         |7.8E-16 | 1       | 5.9E-08    | 3.2E-07    | 4.0E-13   |    |      |       |         |
-|1          | Partner 1      |4.6E-10 | 1       | 4.0E-09    | 3.0E-06    | 6.6E-05   |    | 0.09 |0.09   | 1       |
-
-
-The second block of data consequently for five computation flows (Any, Full, etc.) represents significances for CEs with more conserved anchor motif, for those with more conserved partner motif and for those with similar conservation of motifs.
+The first block of output data for each pair of motifs represents (a) five P-values of CE enrichment in five computation flows; (b) for each heterotypic pair three P-value for similarity between Anchor and Partner motifs.
 
 Example:
 
 
-
-|Partner Number|..|Anchor Any|Partner Any|Equal Any| | Anchor Full|Partner Full|Equal Full|etc.|
-|--------------|--|----------|-----------|---------|-|------------|------------|----------|----|
-|0             |  |5.0E-11   |7.2E-11    |6.6E-07  | |2           |2           | 1        |    |
-|1             |  |1.9E-22   |1.2E-53    |1.3E-22  | |3.4E-45     |3.4E-171    |4.1E-23   |    |
-
-
-The third block of data consequently for five computation flows (Any, Full, etc.) represents three significances (-Log10[p-value]) of asymmetry in CEs: ‘Anchor vs. Partner’, ‘Anchor vs Equal’ and ‘Partner vs. Equal’. The positive/negative values reflect an enrichment toward the first/second participant in a comparison
-
-Example:
-
-|Partner Number|..|Anchor Partner Any|Anchor Equal Any|Partner Equal Any| |Anchor Partner Full|Anchor Equal Full|Partner Equal Full|etc.|
-|--------------|--|------------------|----------------|-----------------|-|-------------------|-----------------|------------------|----|
-|0             |  |0.00              |0.41            |0.32             | |-0.30              |-0.30            |-0.30             |    |
-|1             |  |-2.57             |1.16            |6.44             | |-10.14             |2.70             |22.44             |    |
+|# Motif  | Motif Name | Full  overlap, -Log10[P-value] | Partial overlap,-Log10[P-value]| Overlap, -Log10[P-value] | Spacer, -Log10[P-value] | Any, -Log10[P-value] | Similarity to Anchor, -Log10[P-value] | Similarity to Anchor, SSD | Similarity to Anchor, PCC |...|
+|---------|------------|--------------------------------|--------------------------------|--------------------------|-------------------------|----------------------|---------------------------------------|---------------------------|---------------------------|---|
+|Anchor   | FOXA2      | 0.0                            | 97.4                           | 92.4                     | 9.8                     | 35.4                 | n/a                                   | n/a                       | n/a                       |   |
+|Partner 1| HNF1B      | 76.6                           | 53.2                           | 64.3                     | 4.3                     | 35.3                 | 0                                     | 0                         | 0                         |   |
 
 
-* __File <out_hist>, the abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from the minimal to the maximal spacer length (‘S’).
+
+
+The second block of data consequently for five computation flows represents significances for CEs with more conserved Anchor and Partner motifs.
 
 Example:
 
+| # Motif | Motif Name | ... | Full overlap, Conservative Anchor, -Log10[P-value] | Full overlap, Conservative Partner, -Log10[P-value] | Partial overlap, Conservative Anchor, -Log10[P-value] | Partial overlap, Conservative Partner, -Log10[P-value] | ... |
+|---------|------------|-----|----------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|-----|
+| Anchor  | FOXA2      |     | n/a                                                | n/a                                                 | n/a                                                   | n/a                                                    |     |
+|Partner 1| HNF1B      |     | 50.8                                               | 0.6                                                 | 40.1                                                  | 19.2                                                   |     |
 
 
 
-|              | 1F | 10P | 9P | 8P | 7P | 6P | 5P | 4P | 3P | 2P | 1P | 0S | 1S | 2S |
-|--------------|----|-----|----|----|----|----|----|----|----|----|----|----|----|----|
-| Everted      |    |     |    |    |    |    |0.93|0.03|0.13|0.20|0.19|0.09|0.19|0.08|
-| Inverted     |    |     |    |0.72|    |0.04|0.12|0.04|0.16|0.20|0.19|0.19|0.20|0.17|
-| DirectPA     |    |     |    |    |    |    |    |0.05|0.01|0.08|0.04|0.07|0.09|0.17|
-| DirectAP     |    |     |    |3.31|    |0.03|0.34|0.15|0.11|0.30|0.23|0.13|0.08|0.16|
+
+The third block of data consequently for five computation flows represents five significances of asymmetry (p-value) in CEs: ‘Anchor vs. Partner’. The positive/negative values reflect the enrichment toward the Anchor/Partner motifs.
+
+Example:
 
 
-* __Files <fisher\_*>, the 2x2 tables of CE significance for five computation flows for all motifs pairs and for  all 5x5 combination of motifs conservation__. Each line of output file contains data concerning one 2x2 contingency table, in particular (1) the designation of conservation (PWM threshold (T), indices from 1 to 5 mean the change from the most stringent to the most permissive, see above); (2) four counts for 2x2 contingency table, ‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) and permuted (Rand) datasets. Finally, the table contains significance of CEs (p-values) computed by Fisher’s exact test for 25 cells of 5x5 tables of combinations of thresholds. Next, the respective data are shown for  (a) significances of CEs with more conserved anchor motif, with more conserved partner motif and with balanced conservation of two motifs; and (b) significances of asymmetry in CEs ‘Anchor vs. Partner’, Anchor vs. Equal’ and ‘Partner vs. Equal’, in the latter three cases the Fold for each Fisher’s test are also provided. For example, for ‘Anchor vs. Partner’ test criteria fols>1 & fold<1 imply the enrichment of CEs with more conserved anchor & partner motifs.
+| # Motif  | Motif Name | ... | Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value] | Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value] | Overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value] | ... |
+|----------|------------|-----|--------------------------------------------------------------|-----------------------------------------------------------------|---------------------------------------------------------|-----|
+| Anchor   | FOXA2      |     | n/a                                                          | n/a                                                             | n/a                                                     |     |
+| Partner 1| HNF1B      |     | -46.9                                                        | -73.1                                                           | -113.1                                                  |     |
+
+
+
+* __File <out_hist\*>, the abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from the minimal to the  spacer length (‘S’).
+
+Example:
+
+| |1F|0F|11P|10P|9P|8P|7P|6P|5P|4P|3P|2P|1P|0S|1S|
+|-|--|--|---|---|--|--|--|--|--|--|--|--|--|--|--|
+|Everted||2.54||||3.88|||0.16|0.94||0.07|0.18|0.76|0.09|
+|Inverted||0.07|2.51|||0.07|1.08||0.04|0.13|0.72|0.16|0.18|0.31|0.67|
+|DirectPA||0.04|||1.86||||0.09|0.45||0.02|0.11|0.13|0.09|
+|DirectAP||0.04|0.18|||0.07|0.16|0.11||0.02|0.18|0.11|0.11|0.2|0.22|
+
+
+This example shows distribution for heterotypic CE, since notations DirectAP / DirectPA imply Anchor-Partner / Partner-Anchor cases. A homotypic CE has only one direct orientation of CE, Anchor-Anchor (notation DirectAA).
+
+
+
+* __Files <fisher\_*>, the 2x2 tables of CE significance for five computation flows for all motifs pairs and for  all 5x5 combination of motifs conservation__. 
+Each line of output file contains data concerning one 2x2 contingency table, in particular (1) the designation of conservation (PWM threshold (T), indices from 
+1 to 5 mean the change from the most stringent to the most permissive, see above); (2) four counts for 2x2 contingency table (see Table 1 above), 
+‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) 
+and permuted (Rand) datasets. Finally, the table contains significance of CEs (p-values) computed by Fisher’s exact test for 25 cells of 5x5 tables 
+of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs, and 
+(b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs.
+
+Example, FOXA2 (Anchor) and HNF1B (Partner) motifs, Overlap computation flow.
+
+|Anchor Thr|Partner Thr|Real CE+|Real Total|Rand CE+|Rand Total|Fold|P-value|
+|----------|-----------|--------|----------|--------|----------|----|-------|
+|A 1|P 1|13|211|534|14137||0.13|
+|A 1|P 2|10|165|466|11055||0.31|
+|A 1|P 3|9|144|378|9648||0.25|
+|A 1|P 4|22|311|793|20837||0.0091|
+|A 1|P 5|32|359|935|24053||3.7E-05|
+|A 2|P 1|10|125|321|8375||0.045|
+|A 2|P 2|13|78|179|5226||6.3E-06|
+|A 2|P 3|10|89|199|5963||0.0016|
+|A 2|P 4|21|172|434|11524||5.6E-06|
+|A 2|P 5|23|190|507|12730||5.6E-06|
+|A 3|P 1|7|161|401|10787||0.81|
+|A 3|P 2|11|106|215|7102||0.0008|
+|A 3|P 3|15|108|235|7236||5.9E-06|
+|A 3|P 4|18|230|593|15410||0.0074|
+|A 3|P 5|23|263|680|17621||0.00051|
+|A 4|P 1|11|192|478|12864||0.22|
+|A 4|P 2|11|134|315|8978||0.014|
+|A 4|P 3|24|124|324|8308||3E-10|
+|A 4|P 4|36|305|823|20435||2.8E-08|
+|A 4|P 5|37|285|846|19095||1.6E-08|
+|A 5|P 1|17|168|425|11256||0.00046|
+|A 5|P 2|20|123|279|8241||2E-08|
+|A 5|P 3|80|152|423|10184||4.9E-65|
+|A 5|P 4|55|229|594|15343||1.2E-26|
+|A 5|P 5|53|249|623|16683||7.6E-24|
+|||||||||
+|Anchor||170|1389|3151|93063||8.9E-45|
+|Partner||125|1056|3567|70752||1.3E-17|
+|Anchor_Partner||306|1418|7519|14378|0.413|8.1E-114|
+
+
+
+* __Files <\*.best>, the list of predicted CEs__. 
+For each recognized CE MCOT provides (1) the header of a peak, (2) the start and the end positions of each motif in a peak, (3) mutual location (Full / Partial / Spacer types and the respective base pair measures, see above), (4) the strands of the Anchor/Partner motifs in a peak and the mutual orientation of the motifs (one of four types), (5) conservation scores and DNA sequences of the motifs. To provide detailed information on asymmetry ‘Anchor vs. Partner’ in comparison of peaks and permuted sequences MCOT provides files <real*.best> and rand*.best> that show the lists of predicted CE for peaks and permuted sequences.
+
+
+|#Seq|Anchor start|Anchor end|Partner start|Partner end|Mutual Loc|Loc Type|Strands|Mutual Ori|Anchor hit conservation, -Log10(FPR)|Partner hit conservation, -Log10(FPR)|Anchor seq|Partner seq|
+|----|------------|----------|-------------|-----------|----------|--------|-------|----------|------------------------------------|-------------------------------------|----------|-----------|
+|Seq 18|271|282|268|282|0F|Full|-+|Inverted|3.365|3.447|tgtttatctttc|agtgaaagataaaca|
+|Seq 23|565|576|569|583|8P|Partial|-+|Everted|3.457|4.506|tattgacttacc|agtcaataagttaca|
+|Seq 33|145|156|179|193|22S|Spacer|++|DirectAP|3.448|4.289|tgttgacagact|ggttaatgctttcct|
+
+
+
+* __Files <plot\_\*>, heatmaps that show the CE asymmetry, i.e. the abundance of CEs with various ratios of conservation of Anchor and Partner motifs__ 
+For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one heatmap is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(FPR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(FPR) of Anchor and Partner motifs. This conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
+
+$`{1000*OBS_{i,j}/N(OBS)}`$ and $`{1000*EXP_{i,j}/N(EXP)}`$, 
+
+where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed and expected lists. The output heatmap shows the difference between relative frequencies of observed and expected CEs. Example below shows the asymmetry toward the Partner (HNF1B) motif in Overlap computation flow.
 
 Example
 
 
+| |<3.5|3.5..3.7|3.7..3.9|3.9..4.1|4.1..4.3|4.3..4.5|4.5..4.7|4.7..4.9|4.9..5.1|5.1..5.3|5.3..5.5|>5.5|
+|-|----|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|----|
+|<3.5|14|14|-8|-14|-26|-12|1||||||
+|3.5..3.7|7||-15||-7|-7||||||-2|
+|3.7..3.9|37|-4|-2|-6|4|-11|-3|||||-3|
+|3.9..4.1|17|-1|14|1|-4|-9|||||||
+|4.1..4.3|39||-2|8|5|-8|-2||||||
+|4.3..4.5||3|-6|4|5|5|||||||
+|4.5..4.7||-10|22|||-5|||||||
+|4.7..4.9|13|-4|||-3||||||||
+|4.9..5.1|-23||-3||5|-4|1||||||
+|5.1..5.3|1||||-2||||||||
+|5.3..5.5|-4|-3|-2||-3||||||||
+|>5.5|4|2|-1|-2|-3||||||||
 
-|Anchor Thr|Partner Thr|  |Real CE+|Real Total|Rand CE+|Rand Total|Fold|P-value |
-|----------|-----------|--|--------|----------|--------|----------|----|--------|
-|1         |1          |  |5       |135       |298     |5400      |    |1       |
-|1         |2          |  |4       |157       |310     |6480      |    |1       |
-|1         |3          |  |5       |202       |382     |8080      |    |1       |
-|1         |4          |  |23      |290       |622     |11600     |    |0.08    |
-|1         |5          |  |61      |304       |637     |12160     |    |1.62E-18|
-|2         |1          |  |2       |123       |252     |4920      |    |1       |
-|2         |2          |  |2       |121       |211     |4840      |    |1       |
-|2         |3          |  |7       |168       |318     |6720      |    |1       | 
-|2         |4          |  |35      |234       |472     |9360      |    |3.27E-08|
-|2         |5          |  |45      |230       |501     |9200      |    |4.59E-13|
-|3         |1          |  |7       |196       |406     |7840      |    |1       |
-|3         |2          |  |8       |184       |413     |7360      |    |1       |
-|3         |3          |  |19      |278       |560     |11120     |    |0.21    |
-|3         |4          |  |42      |386       |865     |15440     |    |1.07E-04|
-|3         |5          |  |61      |383       |839     |15320     |    |4.67E-13|
-|4         |1          |  |6       |209       |492     |8360      |    |1       |
-|4         |2          |  |3       |184       |359     |7360      |    |1       |
-|4         |3          |  |4       |248       |562     |9920      |    |1       |
-|4         |4          |  |9       |346       |724     |13840     |    |1       |
-|4         |5          |  |25      |353       |785     |14120     |    |0.28    |
-|5         |1          |  |4       |192       |464     |7680      |    |1       |
-|5         |2          |  |2       |203       |468     |8120      |    |1       |
-|5         |3          |  |6       |296       |663     |11840     |    |1       |
-|5         |4          |  |23      |424       |979     |16960     |    |1       |
-|5         |5          |  |31      |384       |824     |15360     |    |0.04    |
-|          |           |  |        |          |        |          |    |        |
-|Anchor    |           |  |172     |1286      |3637    |51440     |    |6.82E-15|
-|Partner   |           |  |54      |1172      |3511    |46880     |    |1       |
-|Equal     |           |  |66      |1062      |2523    |42480     |    |0.74    |
-|Anchor    | Partner   |  |172     |1286      |54      |1172      |2.90|2.42E-14|
-|Anchor    | Equal     |  |172     |1286      |66      |1062      |2.15|8.46E-09|
-|Partner   | Equal     |  |54      |1172      |66      |1062      |0.74|0.13    |
-
-
-
-* __Files <*.best>, the list of predicted CEs__. For each recognized CE MCOT provides (1) the header of a peak, (2) the start and the end positions of each motif in a peak, (3) mutual location (Full / Partial / Spacer types and the respective base pair measures, see above), (4) the strands of the motifs in a peak and the mutual orientation of the motifs (one of four types), (5) PWM scores and DNA sequences of the motifs.
-
-
-
-|\#Seq    |Anchor start|Anchor end|Partner start|Partner end|Mutual Loc|Loc Type|Strands|Mutual Ori|Anchor score|Partner score|Anchor seq  |Partner seq  | 
-|---------|------------|----------|-------------|-----------|----------|--------|-------|----------|------------|-------------|------------|-------------|
-|Seq 491  |135         |146       |134          |146        |0F        |Full    |+-     |Evert     |0.918       |0.937        |ccaggatgtcaa|ttgacatcctggg|
-|Seq 493  |354         |365       |378          |390        |12S       |Spacer  |+-     |Invert    |0.936       |0.955        |tgaggaagtgaa|ttgacattcttcc|
-|Seq 513  |156         |167       |148          |160        |5P        |Partial |--     |DirectAP  |0.949       |0.959        |agaggaaatgac|atgacagattggg|
-
-
-* __Files <plot_*>, scatterplots that show the CE asymmetry, i.e. the abundance of CEs with various ratios of conservation of Anchor and Partner motifs__ For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one scatterplot is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(FPR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(FPR) of Anchor and Partner motifs. This conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
-{1000\*OBSi,j/N(OBS)} and {1000\*EXPi,j/N(EXP)}, where N(OBS) and N(EXP) are total counts of predicted CEs in observed and expected lists. The output scatterplot shows the difference between relative frequencies of observed and expected CEs. Example below shows the asymmetry toward the Partner (HNF1B) motif in Overlap computation flow.
-
-Example
-
-
-```
-,<3.5,3.5..3.7,3.7..3.9,3.9..4.1,4.1..4.3,4.3..4.5,4.5..4.7,4.7..4.9,4.9..5.1,5.1..5.3,5.3..5.5,>5.5
-<3.5,14,14,-8,-14,-26,-12,1,,,,,
-3.5..3.7,7,,-15,,-7,-7,,,,,,-2
-3.7..3.9,37,-4,-2,-6,4,-11,-3,,,,,-3
-3.9..4.1,17,-1,14,1,-4,-9,,,,,,
-4.1..4.3,39,,-2,8,5,-8,-2,,,,,
-4.3..4.5,,3,-6,4,5,5,,,,,,
-4.5..4.7,,-10,22,,,-5,,,,,,
-4.7..4.9,13,-4,,,-3,,,,,,,
-4.9..5.1,-23,,-3,,5,-4,1,,,,,
-5.1..5.3,1,,,,-2,,,,,,,
-5.3..5.5,-4,-3,-2,,-3,,,,,,,
->5.5,4,2,-1,-2,-3,,,,,,,
-```
 
 ## References
 
