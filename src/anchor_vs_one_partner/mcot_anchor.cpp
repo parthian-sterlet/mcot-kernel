@@ -735,7 +735,7 @@ int main(int argc, char *argv[])
 	strcpy(file_pfm_anchor[1], argv[3]);
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
-	double pvalue = 0.0005, pvalue_mult = 1.5; // 0.0005 1.5
+	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
@@ -970,7 +970,7 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 		int nthr_dist = 0;
-		int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor[mot], length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
+		int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor[mot], length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue, dpvalue);
 		//	int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor, length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
 		if (piptd == -1)
 		{
