@@ -49,7 +49,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	double pvalue2 = pvalue * 2;
 	for (n = 0; n<nseq_pro; n++)
 	{
-		//if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max],count_val);
+		if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max],count_val);
 		fgets(dp, len_pro + 2, in);
 		DelChar(dp, '\n');
 		int len_pro1 = strlen(dp);
