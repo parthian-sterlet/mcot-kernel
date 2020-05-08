@@ -1110,6 +1110,10 @@ int main(int argc, char *argv[])
 			if (bad == 1)continue;
 		}
 		printf("Mot %d\n", mot);		
+		if (mot == 24)
+		{
+			int yy = 0;
+		}
 		int index[NUM_THR];
 		double *thr_all;
 		int n_thr_all = 0;

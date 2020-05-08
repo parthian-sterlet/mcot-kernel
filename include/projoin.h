@@ -2,9 +2,9 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot, int &nseq_two_sites)
 {	
 	int n, k,j, x,y;
-	char filebest[120], file_nsit_par[120], file_nsit_anc[120]; 
+	char filebest[120]; 
 
-	FILE *outbest, *out_nsit_par, *out_nsit_anc;// *outhead,*out,  
+	FILE *outbest;// *outhead,*out,  
 //	FILE *out_cepi_seq;//*out_cepi_sit, *out_over_spac;//*outnsite_any,*out_hist,
 
 	memset(filebest,'\0',sizeof(filebest));
@@ -21,20 +21,15 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	strcat(filebest,buf);
 	sprintf(buf,"%d",prf_p.nam);
 	strcat(filebest,buf);
-	strcpy(file_nsit_anc,filebest);
-	strcpy(file_nsit_par,filebest);
 	strcat(filebest,".best");
-	strcat(file_nsit_anc,".anchor");
-	strcat(file_nsit_par,".partner");	
 	nseq_two_sites = 0;
 		
 	int *cepi_seq[4], *cepi_seq_dir;
 	//int *cepi_sit[4];
-	int *cepi_sit_one[4];	
-	outbest=out_nsit_anc=out_nsit_par=NULL;
-	int real=0;
-	if(strstr(rera,"real")!=NULL)real=1;
-	if(real==1)
+	int *cepi_sit_one[4];
+	//if(strncmp(rera,"rand",4)!=0)
+	outbest=NULL;
+	if(strstr(rera,"real")!=NULL)
 	{
 		if((outbest=fopen(filebest,"wt"))==NULL)
 		{
@@ -42,16 +37,6 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 			return -1;
 		}
 		fprintf(outbest,"#Seq\tA Start\tA End\tP Start\tP End\tMutual Loc\tLoc Type\tStrands\tMutual Ori\tA Score\tP Score\tA Seq\tP Seq\n");
-		if((out_nsit_anc=fopen(file_nsit_anc,"wt"))==NULL)
-		{
- 			printf("Input file %s can't be opened!\n",file_nsit_anc);
-			return -1;
-		}		
-		if((out_nsit_par=fopen(file_nsit_par,"wt"))==NULL)
-		{
- 			printf("Input file %s can't be opened!\n",file_nsit_par);
-			return -1;
-		}
 	}
 	int noverp=Min(len_p,len_a);//partial overlap
 	noverp--;
@@ -82,19 +67,10 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 
 	for(n=0;n<nseq;n++)
 	{						
-		int join_sites[NUM_THR][NUM_THR], join_sites_anc=0, join_sites_par=0;		
-		int asym_anc=0,asym_par=0;
-		if(prf_a.nsit[n]==0 || prf_p.nsit[n]==0)
-		{		
-			if(real==1)
-			{
-				fprintf(out_nsit_anc,"%d\n",asym_anc);
-				fprintf(out_nsit_par,"%d\n",asym_par);
-			}
-			continue;
-		}
+		if(prf_a.nsit[n]==0 || prf_p.nsit[n]==0)continue;
 	//	printf("%8d",n+1);
 		int lenp=peak_len[n];
+		int join_sites[NUM_THR][NUM_THR], join_sites_anc=0, join_sites_par=0;
 		int ce_full[NUM_THR][NUM_THR], ce_part[NUM_THR][NUM_THR], ce_spac[NUM_THR][NUM_THR];// no. of CE 
 		for(j=0;j<NUM_THR;j++)for(k=0;k<NUM_THR;k++)join_sites[j][k]=ce_full[j][k]=ce_part[j][k]=ce_spac[j][k]=0;		
 		int ce_full_anc = 0, ce_part_anc = 0, ce_spac_anc = 0;// no. of CE , anc
@@ -265,16 +241,8 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					if(take_distance==1)
 					{		
 						sam->sit.any++;
-						if (r_dif > 0)
-						{
-							sam->anc_sit.any++;
-							asym_anc=1;
-						}
-						else 
-						{
-							sam->par_sit.any++;
-							asym_par=1;
-						}
+						if (r_dif > 0)sam->anc_sit.any++;
+						else sam->par_sit.any++;
 						plot->any[a_karman][p_karman]++;
 //						printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
 //						printf("2y=%d\t%d\t%d\t\n",y,ysta,yend);
@@ -363,7 +331,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						int dir;
 						if(prf_p.cep[n][x]=='+')dir=1;
 						else dir=-1;																									
-						if(real==1)
+						if(strstr(rera,"real")!=NULL)
 						{
 							fprintf(outbest,"Seq %d\t",n+1);							
 							fprintf(outbest,"%d\t%d\t",prf_a.sta[n][y],prf_a.sta[n][y]+len_a-1);
@@ -412,14 +380,11 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					}									
 				}
 			}
-			if(join_sites_anc==1 || join_sites_par==1)
+			for(j=0;j<NUM_THR;j++)
 			{
-				for(j=0;j<NUM_THR;j++)
+				for(k=0;k<NUM_THR;k++)
 				{
-					for(k=0;k<NUM_THR;k++)
-					{
-						if(join_sites[j][k]==1)sam->cell[j][k].two_sites++;
-					}
+					if(join_sites[j][k]==1)sam->cell[j][k].two_sites++;
 				}
 			}
 			if(join_sites_anc==1)
@@ -488,19 +453,12 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 			if(prf_p.nsit[n]>0)nseq_rec_err[0]++;
 			if(prf_a.nsit[n]>0)nseq_rec_err[1]++;				
 		}
-		if(real==1)
-		{
-			fprintf(out_nsit_anc,"%d\n",asym_anc);
-			fprintf(out_nsit_par,"%d\n",asym_par);
-		}
 	}	
 	//strcpy(filerec,"projoin.txt");
 //	printf("Debug - Start print!\n");
-	if(real==1)
+	if (strstr(rera, "real") != NULL)
 	{
 		fclose(outbest);
-		fclose(out_nsit_anc);
-		fclose(out_nsit_par);
 	}
 	if(prf_a.mot==prf_p.mot)
 	{
