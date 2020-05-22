@@ -48,8 +48,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	double score_min = 0.7;
 	double pvalue2 = pvalue * 2;
 	for (n = 0; n < nseq_pro; n++)
-	{
-		if (n % 100 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max], count_val);
+	{		
 		fgets(dp, len_pro + 2, in);
 		DelChar(dp, '\n');
 		int len_pro1 = strlen(dp);
@@ -66,6 +65,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 				thresh_min = thr[n_check];
 			}
 		}
+	//	if (n % 50 == 0)printf("%5d %f\t%f\t%d\n", n, thresh_min, thr[nthr_max], count_val);
 		int compl1;
 		for (compl1 = 0; compl1 < 2; compl1++)
 		{
@@ -116,11 +116,11 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	nthr_dist = 0;
 	int nthr_final = nthr - 1;
 	double fpr_pred = (double)1 / all_pos;
-	double thr_pred = thr[0];
+	double thr_pred = thr[0];		
 	for (j = 1; j < nthr; j++)
 	{
 		double fpr = (double)(j + 1) / all_pos;
-		if ((thr[j] != thr_pred && fpr - fpr_pred > dpvalue) || j == nthr_final)
+		if (thr[j] != thr_pred && fpr - fpr_pred > dpvalue)
 		{
 			nthr_dist++;
 			if (fpr_pred >= pvalue)
@@ -130,7 +130,8 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 			thr_pred = thr[j];
 			fpr_pred = fpr;
 		}
-	}
+		if(j == nthr_final && thr[j] == thr_pred)nthr_dist++;
+	}	
 	double *thr_dist, *fpr_dist;
 	thr_dist = new double[nthr_dist];
 	if (thr_dist == NULL) { puts("Out of memory..."); return -1; }
@@ -142,7 +143,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	for (j = 1; j < nthr; j++)
 	{
 		double fpr = (double)(j + 1) / all_pos;
-		if ((thr[j] != thr_pred && fpr - fpr_pred > dpvalue) || j == nthr_final)
+		if (thr[j] != thr_pred && fpr - fpr_pred > dpvalue)
 		{
 			thr_dist[count] = thr_pred;
 			fpr_dist[count] = fpr_pred;
@@ -153,6 +154,11 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 			}
 			thr_pred = thr[j];
 			fpr_pred = fpr;
+		}
+		if (j == nthr_final && thr[j] == thr_pred)
+		{
+			thr_dist[count] = thr[j];
+			fpr_dist[count] = fpr;
 		}
 	}
 	for (j = 0; j < nthr_dist; j++)
