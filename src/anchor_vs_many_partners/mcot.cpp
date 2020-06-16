@@ -653,13 +653,17 @@ struct combi {
 	//	int n_full;
 	//int n_tot;
 	double freq[4][MATLEN + SPACLEN];
+	double freqa[MATLEN + SPACLEN];// sum of all orientation
+	double freqc[MATLEN + SPACLEN];// sum of all orientation
 	//	void ini(int len_a, int len_p, int len_sp);
 	//	void mem_out(void);
 	int fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode);
 };
 int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode)
 {
-	char head[4][10];
+	char head[6][12];
+	strcpy(head[5], "Cumulative");
+	strcpy(head[4], "Any");
 	strcpy(head[0], "DirectAP");
 	strcpy(head[1], "DirectPA");
 	strcpy(head[2], "Inverted");
@@ -686,12 +690,12 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	for (j = n_partial; j >= 1; j--)fprintf(out, "\t%d%c", j, bo);
 	for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
 	fprintf(out, "\n");
-	if (mot>0)
+	if (mot > 0)
 	{
 		for (i = 3; i >= 0; i--)
 		{
 			fprintf(out, "\t\t%s", head[i]);
-			for (j = 0; j<n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
 		}
 	}
@@ -701,14 +705,19 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 		{
 			if (i != 1)fprintf(out, "\t\t%s", head[i]);
 			else fprintf(out, "\t\t%s", head0);
-			for (j = 0; j<n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
 		}
 	}
+	fprintf(out, "\t\t%s", head[4]);
+	for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqa[j]);
+	fprintf(out, "\n");
+	fprintf(out, "\t\t%s", head[5]);
+	for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqc[j]);
+	fprintf(out, "\n");
 	fclose(out);
 	return 1;
 }
-
 struct asy_plot {
 	int **full;
 	int **partial;
@@ -1110,10 +1119,6 @@ int main(int argc, char *argv[])
 			if (bad == 1)continue;
 		}
 		printf("Mot %d\n", mot);		
-		if (mot == 24)
-		{
-			int yy = 0;
-		}
 		int index[NUM_THR];
 		double *thr_all;
 		int n_thr_all = 0;
