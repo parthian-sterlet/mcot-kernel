@@ -553,13 +553,17 @@ struct combi {
 	//	int n_full;
 	//int n_tot;
 	double freq[4][MATLEN + SPACLEN];
+	double freqa[MATLEN + SPACLEN];// sum of all orientation
+	double freqc[MATLEN + SPACLEN];// sum of all orientation
 	//	void ini(int len_a, int len_p, int len_sp);
 	//	void mem_out(void);
 	int fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode);
 };
 int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode)
 {
-	char head[4][10];
+	char head[6][12];
+	strcpy(head[5], "Cumulative");
+	strcpy(head[4], "Any");
 	strcpy(head[0], "DirectAP");
 	strcpy(head[1], "DirectPA");
 	strcpy(head[2], "Inverted");
@@ -605,6 +609,12 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 			fprintf(out, "\n");
 		}
 	}
+	fprintf(out, "\t\t%s", head[4]);
+	for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqa[j]);
+	fprintf(out, "\n");
+	fprintf(out, "\t\t%s", head[5]);
+	for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqc[j]);
+	fprintf(out, "\n");
 	fclose(out);
 	return 1;
 }
@@ -735,7 +745,7 @@ int main(int argc, char *argv[])
 	strcpy(file_pfm_anchor[1], argv[3]);
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
-	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000005; // 0.0005 1.5
+	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
@@ -748,9 +758,11 @@ int main(int argc, char *argv[])
 
 	if ((strstr(mypath_data, "hs") != NULL || strstr(mypath_data, "hg") != NULL) || (strstr(mypath_data, "HS") != NULL || strstr(mypath_data, "HG") != NULL))
 	{
+		//strcat(prom, "ups2kb.plaintest");
 		strcat(prom, "ups2kb.plain");
 		len_genome = 2000;
 		nseq_genome = 19795;
+		//nseq_genome = 1000;
 	}
 	else
 	{
@@ -984,7 +996,7 @@ int main(int argc, char *argv[])
 			printf("Output file %s can't be opened!\n", file_fpr[mot]);
 			return -1;
 		}
-		for (i = 0; i < nthr_dist; i++)fprintf(out_fpr, "%.8f\t%g\n", thr_all[i], fp_rate[i]);
+		for (i = 0; i < nthr_dist; i++)fprintf(out_fpr, "%.18f\t%.18g\n", thr_all[i], fp_rate[i]);
 		fclose(out_fpr);
 		double fpr_select[NUM_THR];
 		int index[NUM_THR];
