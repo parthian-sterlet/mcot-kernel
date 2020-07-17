@@ -385,11 +385,13 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 					if(implant==1)
 					{
 						pos=par->sta[n][nsit_cur]+k;
+						if (pos > peak_len[n] - 1)continue;
 						y = peak_par[pos];					
 					}
 					else 
 					{
 						pos=anc->sta[n][nsit_cur]+k;
+						if (pos > peak_len[n] - 1)continue;
 						y = peak_anc[pos];					
 					}
 					if(y == 'n')continue;
