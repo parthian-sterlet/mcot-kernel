@@ -144,7 +144,7 @@ MCOT have two options for definition of the partner motif:
 
 MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
 
-Anchor_pro program require **Table Threshold vs. FPR** file for each of two model. For a PWM the respictive file can be taken from the output files of  of `<anchor_vs_one>` or `<anchor_vs_many>` programs respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the respective table should be deduced from recognition of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
+Anchor_pro program require **Table Threshold vs. FPR** file for each of two model. For a PWM the respictive file can be taken from the output files of  of `<anchor_vs_one>` or `<anchor_vs_many>` programs respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the respective table should be deduced from the recognition profile of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
 
 ## Motifs recognition
 
