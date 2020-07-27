@@ -17,7 +17,7 @@ partner motifs imply the search for CEs of homotypic or heterotypic type
 MCOT implemented in C++ and it can be conventionally compiled in Linux or 
 Windows operating system. To run MCOT user should compile the corresponding 
 source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and 
-many partners options for Position Weight Matrix (PWM) model of binding site. File anchor_pro.cpp 
+many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp 
 respects to to one-partner option, but it runs with arbitrary models of site, including not-PWM ones.
 
 ## Installation
