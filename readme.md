@@ -144,6 +144,8 @@ MCOT have two options for definition of the partner motif:
 
 MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
 
+Anchor_pro program require **Table Threshold vs. FPR** file for each of two model. For a PWM the respictive file can be taken from the output files of  of `<anchor_vs_one>` or `<anchor_vs_many>` programs respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the respective table should be deduced from recognition of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
+
 ## Motifs recognition
 
 MCOT applies the recognition model of Position Weight Matrix (PWM) for mapping motifs  in peaks. For each matrix, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of five expected false positive rates (FPR) for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
