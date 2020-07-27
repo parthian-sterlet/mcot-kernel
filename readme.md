@@ -18,7 +18,7 @@ MCOT implemented in C++ and it can be conventionally compiled in Linux or
 Windows operating system. To run MCOT user should compile the corresponding 
 source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and 
 many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp 
-respects to to one-partner option, but it runs with arbitrary models of site, including not-PWM ones.
+respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones.
 
 ## Installation
 (Linux) Run in terminal (Packages “build-essential” and “cmake” 
@@ -43,7 +43,7 @@ cd tmp
 cmake ..
 MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 ```
-Programs `anchor_vs_many`, `anchor_vs_one` and `anchor_pro` for one\_partner, many\_partners and non-PWM one\_partner
+Programs `anchor_vs_many`, `anchor_vs_one` and `anchor_pro` for one\_partner, many\_partners and arbitrary\_models\_one\_partner
 options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/` and  `src/anchor_pro/Release/`
 
 
