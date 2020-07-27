@@ -99,6 +99,36 @@ The command line for many-partner option:
 `<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of H.sapiens, M.musculus and A.thaliana promoter datasets for setting of thresholds for input motifs.
 
 
+The command line for anchor_pro option
+
+`./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_fpr> <7 int motif1.table_thr_fpr> <8 int spacer_min> <9 int spacer_max>`
+
+
+`<1 file_fasta>` = DNA sequences of ChIP-seq peaks in fasta format
+
+
+`<2 motif1.profile>` = Profile for the first model, see below the example of format for recognition profile of motif in the #Output data# section
+
+
+`<3 motif2.profile>` = Profile for the second model, see below the example of format for recognition profile of motif in the #Output data# section
+
+
+`<4 int motif1.length>` = Length of the first model
+
+
+`<5 int motif1.length>` = Length of the second model
+
+
+`<6 int motif1.table_thr_fpr>` = Table Threshold vs. FPR (False Positive Rate) for the first model, see below the example of format for recognition profile of motif in the #Output data# section
+
+
+`<7 int motif1.table_thr_fpr>` = Table Threshold vs. FPR (False Positive Rate) for the second model, see below the example of format for recognition profile of motif in the #Output data# section
+
+
+`<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
+
+
+`<9 int spacer_max>` = integer value from 0 to 100 (the default value 29)
 
 
 ## Input data
