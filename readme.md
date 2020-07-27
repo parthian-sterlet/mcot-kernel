@@ -44,8 +44,7 @@ cmake ..
 MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 ```
 Programs `anchor_vs_many`, `anchor_vs_one` and `anchor_pro` for one\_partner, many\_partners and non-PWM one\_partner
-options should be in `src/anchor_vs_one_partner/Release/`
-and `src/anchor_vs_many_partners/Release/`
+options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/` and  `src/anchor_pro/Release/`
 
 
 ## Command line arguments
