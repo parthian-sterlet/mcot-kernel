@@ -31,7 +31,7 @@ cmake ..
 make
 ```
 
-All executable files for one-partner and many partners options will be in src/anchor\_vs\_one and src/anchor\_vs\_many
+All executable files for one-partner, many-partners and anchor-pro options will be in src/anchor\_vs\_one, src/anchor\_vs\_many and src/anchor\_pro
 
 (Windows) Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
 VC -> Native Tools x64. Else, you should install “CMake” module while VS 2017 installing)
@@ -99,7 +99,7 @@ The command line for many-partner option:
 `<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of H.sapiens, M.musculus and A.thaliana promoter datasets for setting of thresholds for input motifs.
 
 
-The command line for anchor_pro option
+The command line for anchor_pro option:
 
 `./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_fpr> <7 int motif1.table_thr_fpr> <8 int spacer_min> <9 int spacer_max>`
 
@@ -133,7 +133,7 @@ The command line for anchor_pro option
 
 ## Input data
 
-MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional de novo motif search tool, e.g. HOMER (Heinz et al., 2010) to define the anchor motif. 
+MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional __de novo__ motif search tool, e.g. HOMER (Heinz et al., 2010) to define the anchor motif. 
 
 MCOT have two options for definition of the partner motif:
 
@@ -153,7 +153,8 @@ e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special
 
 ## Motifs recognition
 
-MCOT applies the recognition model of Position Weight Matrix (PWM) for mapping motifs  in peaks. For each matrix, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of five expected false positive rates (FPR) for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
+MCOT with options one\_partner, many\_partners applies the recognition model of PWM for mapping motifs in peaks, otherwise for option anchor\_pro MCOT takes ready mapping of predicted hits from a file. 
+For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of FPRs for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
 
 
 ## Composite elements search and annotation
