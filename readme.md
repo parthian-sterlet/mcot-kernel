@@ -144,13 +144,16 @@ MCOT have two options for definition of the partner motif:
 
 MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
 
-Anchor_pro program require **Table Threshold vs. FPR** file for each of two model. For a PWM the respictive file can be taken from the output files of  of `<anchor_vs_one>` or `<anchor_vs_many>` programs respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the respective table should be deduced from the recognition profile of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
+`<anchor_pro>` requires input files **Table Threshold vs. FPR** for each of two model. 
+For a PWM model the respictive file can be taken as the output files of `<anchor_vs_one>` or `<anchor_vs_many>` programs
+respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the respective table should be deduced from the recognition profile 
+of potential hits for the whole genome dataset of promoters of protein-coding genes, 
+e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
+
 
 ## Motifs recognition
 
 MCOT applies the recognition model of Position Weight Matrix (PWM) for mapping motifs  in peaks. For each matrix, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of five expected false positive rates (FPR) for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
-
-
 
 
 ## Composite elements search and annotation
@@ -229,7 +232,6 @@ Example
 ```
 
 * __File <rec_pos.txt>, the detailed recognition statistics__. For each motif and each recognition threshold MCOT provides (1) the number and the name of the motif (anchor motif is designated as ‘Anchor’; numbers 1,2, ... belong to partner motifs), (2) the number and the value of the threshold; (3) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
-
 
 
 Example
@@ -388,7 +390,9 @@ Example
 
 ## References
 
-[Levitsky V.G., Zemlyanskaya E.V., Oshchepkov D.Yu., Podkolodnaya O.A., Ignatieva E.V., Grosse I., Mironova V.V., Merkulova T.I. A single ChIP-seq dataset is sufficient for comprehensive analysis of motifs co-occurrence with MCOT package. Nucleic Acids Research, 2019](https://doi.org/10.1093/nar/gkz800)
+[Levitsky,V., Zemlyanskaya,E., Oshchepkov,D., Podkolodnaya,O., Ignatieva,E., Grosse,I., Mironova,V., Merkulova,T.  (2019) A single ChIP-seq dataset is sufficient for comprehensive analysis of motifs co-occurrence with MCOT package. Nucleic Acids Res.,](https://doi.org/10.1093/nar/gkz800)
+
+[Levitsky,V., Oshchepkov,D., Zemlyanskaya,E. and Merkulova,T. (under revision) Asymmetric conservation within pairs of co-occurred motifs mediates weak direct transcription factor binding in ChIP-seq data. Int J Mol Sci.](https://www.preprints.org/manuscript/202007.0639/v1)
 
 [Heinz,S., Benner,C., Spann,N., Bertolino,E., Lin,Y.C., Laslo,P., Cheng,J.X., Murre,C., Singh,H. and Glass,C.K. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.](https://doi.org/10.1016/j.molcel.2010.05.004)
 
