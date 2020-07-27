@@ -85,18 +85,17 @@ The command line for many-partner option:
 
 ```
 
-`<partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of human/mouse core (396/353) and full (747/509) collections of motifs (Kulakovskiy et al., 2018, http://hocomoco11.autosome.ru/); and the library of 514 motifs from Plant Cistrome of A. thaliana motifs (http://neomorph.salk.edu/dap_web/pages/index.php, O’Malley et al., 2016).
+`<partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs (Kulakovskiy et al., 2018); and the library of 514 motifs from the [Plant Cistrome Datanase](http://neomorph.salk.edu/dap_web/pages/index.php, O’Malley et al., 2016) for *A.thaliana* motifs.
 
 
 `<minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
-
 
 
 `<maximal spacer length>` = integer value from 0 to 100 (the default value 29)
 
 
 
-`<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of H.sapiens, M.musculus and A.thaliana promoter datasets for setting of thresholds for input motifs.
+`<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
 
 The command line for anchor_pro option:
@@ -113,16 +112,16 @@ The command line for anchor_pro option:
 `<3 motif2.profile>` = Profile for the second model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
-`<4 int motif1.length>` = Length of the first model
+`<4 int motif1.length>` = integer value, length of the first model
 
 
-`<5 int motif1.length>` = Length of the second model
+`<5 int motif1.length>` = integer value, length of the second model
 
 
-`<6 int motif1.table_thr_fpr>` = Table Threshold vs. FPR (False Positive Rate) for the first model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<6 int motif1.table_thr_fpr>` = Table **Threshold vs. FPR** (False Positive Rate) for the first model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
-`<7 int motif1.table_thr_fpr>` = Table Threshold vs. FPR for the second model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<7 int motif1.table_thr_fpr>` = Table **Threshold vs. FPR** for the second model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
 `<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
@@ -133,7 +132,7 @@ The command line for anchor_pro option:
 
 ## Input data
 
-MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional __de novo__ motif search tool, e.g. HOMER (Heinz et al., 2010) to define the anchor motif. 
+MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. HOMER (Heinz et al., 2010) to define the anchor motif. 
 
 MCOT have two options for definition of the partner motif:
 
@@ -144,9 +143,9 @@ MCOT have two options for definition of the partner motif:
 
 MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
 
-`<anchor_pro>` requires input files **Table Threshold vs. FPR** for each of two model. 
-For a PWM model the respictive file can be taken as the output files of `<anchor_vs_one>` or `<anchor_vs_many>` programs
-respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the respective table should be deduced from the recognition profile 
+`<anchor_pro>` requires input files **Table Threshold vs. FPR** for each of two models. 
+For a PWM model the respictive file can be taken as the output files of runs with `<anchor_vs_one>` or `<anchor_vs_many>` options,
+respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile 
 of potential hits for the whole genome dataset of promoters of protein-coding genes, 
 e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
 
@@ -175,7 +174,7 @@ For each of 25 combinations of motifs conservation and each computation flow MCO
 
 The background model implies the preservation of content for each motif in each peak. MCOT generates background profiles of hits of anchor and partner motifs iteratively for each peak with a special permutation procedure.
 
-MCOT computes CE significance separately for five computation flows:  Any (Spacer or Overlap), Full (overlap), Partial (overlap), Overlap (full and partial), Spacer.
+MCOT computes CE significance separately for five computation flows:  Any (Spacer or Overlap), Full, Partial, Overlap (Full and Partial), Spacer.
 
 Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of conservation of motifs. Since MCOT checks five conservation ranges for each motifs, the Bonferroni-corrected
 
@@ -201,7 +200,6 @@ Detailed enrichment or depletion of CEs with specific combinations of motifs con
 ## Output data
 
 MCOT gives the following output data:
-
 
 
 * __Files <\*\_thr5>, recognition profiles of motifs__ . Each file respects to one motif. A file has fasta-like format, i.e. for each peak the header line starts with ‘>’ symbol. Next, each subsequent line represents one hit in a peak, particularly it position, respective conservation value -Log10(FPR) and DNA strand.
