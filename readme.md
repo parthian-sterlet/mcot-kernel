@@ -107,10 +107,10 @@ The command line for anchor_pro option
 `<1 file_fasta>` = DNA sequences of ChIP-seq peaks in fasta format
 
 
-`<2 motif1.profile>` = Profile for the first model, see below the example of format for recognition profile of motif in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<2 motif1.profile>` = Profile for the first model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
-`<3 motif2.profile>` = Profile for the second model, see below the example of format for recognition profile of motif in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<3 motif2.profile>` = Profile for the second model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
 `<4 int motif1.length>` = Length of the first model
@@ -119,10 +119,10 @@ The command line for anchor_pro option
 `<5 int motif1.length>` = Length of the second model
 
 
-`<6 int motif1.table_thr_fpr>` = Table Threshold vs. FPR (False Positive Rate) for the first model, see below the example of format for recognition profile of motif in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<6 int motif1.table_thr_fpr>` = Table Threshold vs. FPR (False Positive Rate) for the first model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
-`<7 int motif1.table_thr_fpr>` = Table Threshold vs. FPR (False Positive Rate) for the second model, see below the example of format for recognition profile of motif in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<7 int motif1.table_thr_fpr>` = Table Threshold vs. FPR for the second model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 
 `<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
