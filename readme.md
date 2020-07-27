@@ -213,6 +213,18 @@ Example
 Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β (Wederell et al., 2008) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search (Homer, Heinz et al., 2009) and the partner HNF1β motif we took from the mouse Hocomoco core collection (Kulakovskiy et al., 2018).
 
 
+* __Files <fpr\*\.txt>, Table Threshold vs. FPR (False Positive Rate)__ . File contains two columns: threshold and FPR estimated as the site density for the whole genome dataset of protein-coding genes
+
+```
+Example
+0.99745670	1.63517e-07
+0.99660894	1.88674e-07
+0.99612450	4.02504e-07
+...
+0.81195753	0.0179257
+0.81191716	0.0179369
+0.81187679	0.0179517
+```
 
 * __File <rec_pos.txt>, the detailed recognition statistics__. For each motif and each recognition threshold MCOT provides (1) the number and the name of the motif (anchor motif is designated as ‘Anchor’; numbers 1,2, ... belong to partner motifs), (2) the number and the value of the threshold; (3) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
 
