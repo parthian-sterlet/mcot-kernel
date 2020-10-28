@@ -41,9 +41,9 @@ void DelHole(char *str)
 	hole = strstr(str, "\n");
 	if (hole != NULL) *hole = 0;
 }
-int UnderStol(char *str, int nstol, char *ret, char sep)
+int UnderStol(char *str, int nstol, char *ret, size_t size, char sep)
 {
-	memset(ret, 0, sizeof(ret));
+	memset(ret, 0, size);
 	int p1, p2, len;
 	if (nstol == 0)
 	{
@@ -108,9 +108,9 @@ int IdeLetCom(char c)
 int main(int argc, char *argv[])
 {
 	int i, j, k;
-	char file_hist[120], file_ce[120], fileo[120], fileo_mata[120], fileo_matp[120];
-	char name[10], namea[10], namep[10], nameap[10], partner_num[5], partner_name[50];
-	char d[5][5000], s[500], ori[4][15], loc[5], val[20], loc_best[5], ori_best[15];
+	char file_hist[120] = {0}, file_ce[120] = {0}, fileo[120] = {0}, fileo_mata[120] = {0}, fileo_matp[120] = {0};
+	char name[10] = {0}, namea[10] = {0}, namep[10] = {0}, nameap[10] = {0}, partner_num[5] = {0}, partner_name[50] = {0};
+	char d[5][5000] = {0}, s[500] = {0}, ori[4][15] = {0}, loc[5] = {0}, val[20] = {0}, loc_best[5] = {0}, ori_best[15] = {0};
 	//	double *val;
 	FILE *in, *out, *outa, *outp;
 
@@ -137,26 +137,26 @@ int main(int argc, char *argv[])
 		DelChar(d[i], '\n');
 	}
 	int test;
-	test = UnderStol(d[0], 0, partner_num, '\t');
+	test = UnderStol(d[0], 0, partner_num, sizeof(partner_num), '\t');
 	if (test == -1) { printf("Wrong format %s\n", d[0]); exit(1); }
-	test = UnderStol(d[0], 1, partner_name, '\t');
+	test = UnderStol(d[0], 1, partner_name, sizeof(partner_name), '\t');
 	if (test == -1) { printf("Wrong format %s\n", d[0]); exit(1); }
 	for (i = 1; i < 5; i++)
 	{
 		int i1 = i - 1;
 		memset(ori[i1], '\0', sizeof(ori[i1]));
-		test = UnderStol(d[i], 2, ori[i1], '\t');
+		test = UnderStol(d[i], 2, ori[i1], sizeof(ori[i1]), '\t');
 		if (test == -1) { printf("Wrong format %s\n", d[i]); exit(1); }
 	}	
 	for (j = 3;; j++)
 	{
 		memset(loc, '\0', sizeof(loc));
-		test = UnderStol(d[0], j, loc, '\t');
+		test = UnderStol(d[0], j, loc, sizeof(loc), '\t');
 		if (test == -1) { printf("Wrong format %s\n", d[0]); exit(1); }
 		if (strstr(loc, "S") != NULL)break;
 		for (i = 1; i < 5; i++)
 		{
-			test = UnderStol(d[i], j, val, '\t');
+			test = UnderStol(d[i], j, val, sizeof(val), '\t');
 			if (test == -1) { printf("Wrong format %s\n", d[i]); exit(1); }
 			fr = atof(val);
 			if (fr > fr_max)
@@ -184,29 +184,29 @@ int main(int argc, char *argv[])
 	fgets(s, sizeof(s), in);
 	while (fgets(s, sizeof(s), in) != NULL)
 	{
-		test = UnderStol(s, 5, val, '\t');
+		test = UnderStol(s, 5, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (strstr(val, loc_best) == NULL)continue;
-		test = UnderStol(s, 8, val, '\t');
+		test = UnderStol(s, 8, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (strstr(val, ori_best) == NULL)continue;
-		test = UnderStol(s, 11, sa, '\t');
+		test = UnderStol(s, 11, sa, sizeof(sa), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		lena = strlen(sa);
-		test = UnderStol(s, 12, sp, '\t');
+		test = UnderStol(s, 12, sp, sizeof(sp), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		DelHole(sp);
 		lenp = strlen(sp);
-		test = UnderStol(s, 1, val, '\t');
+		test = UnderStol(s, 1, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		asta = atoi(val);
-		test = UnderStol(s, 2, val, '\t');
+		test = UnderStol(s, 2, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		aend = atoi(val);
-		test = UnderStol(s, 3, val, '\t');
+		test = UnderStol(s, 3, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		psta = atoi(val);
-		test = UnderStol(s, 4, val, '\t');
+		test = UnderStol(s, 4, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		pend = atoi(val);
 		int min = Min(asta, psta);
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
 		int maxend = Max(aend, pend);
 		len_tot = maxend - minsta + 1;
 		overlap = minend - maxsta + 1;
-		test = UnderStol(s, 7, val, '\t');
+		test = UnderStol(s, 7, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (val[0] == '-')
 		{
@@ -248,24 +248,24 @@ int main(int argc, char *argv[])
 	fgets(s, sizeof(s), in);
 	while (fgets(s, sizeof(s), in) != NULL)
 	{
-		test = UnderStol(s, 0, name, '\t');
+		test = UnderStol(s, 0, name, sizeof(name), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
-		test = UnderStol(s, 5, val, '\t');
+		test = UnderStol(s, 5, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (strstr(val, loc_best) == NULL)continue;
-		test = UnderStol(s, 8, val, '\t');
+		test = UnderStol(s, 8, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (strstr(val, ori_best) == NULL)continue;
-		test = UnderStol(s, 9, val, '\t');
+		test = UnderStol(s, 9, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		ca = atof(val);
-		test = UnderStol(s, 10, val, '\t');
+		test = UnderStol(s, 10, val, sizeof(val), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		cp = atof(val);
-		test = UnderStol(s, 11, sa, '\t');
+		test = UnderStol(s, 11, sa, sizeof(sa), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (strstr(sa, "n") != NULL)continue;
-		test = UnderStol(s, 12, sp, '\t');
+		test = UnderStol(s, 12, sp, sizeof(sp), '\t');
 		if (test == -1) { printf("Wrong format %s\n", s); exit(1); }
 		if (strstr(sp, "n") != NULL)continue;
 		DelHole(sp);
