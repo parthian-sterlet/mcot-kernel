@@ -1762,9 +1762,16 @@ int main(int argc, char *argv[])
 			printf("Input file %s can't be opened!\n", file_pval_table);
 			return -1;
 		}
-		if (mot_p == 0)fprintf(out_pval_table, "Anchor");
-		else fprintf(out_pval_table, "Partner %d", mot_p);
-		fprintf(out_pval_table, "\t%s", name[mot_p]);
+		if (mot_p == 0)
+		{
+			fprintf(out_pval_table, "Anchor %d", mot_p);
+			fprintf(out_pval_table, "\tAnchor");
+		}
+		else
+		{
+			fprintf(out_pval_table, "Partner %d", mot_p);
+			fprintf(out_pval_table, "\t%s", name[mot_p]);
+		}
 		for (i = 1; i < 5; i++)
 		{
 			if (pval_tot_min[i] > bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[i]);
