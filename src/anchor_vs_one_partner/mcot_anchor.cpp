@@ -726,7 +726,7 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[80], mypath_data[200], prom[200], file_pfm_anchor[2][50];
+	char file_fasta[80], mypath_data[200], prom[200], file_pfm_anchor[2][500];
 	char ***seq;// peaks
 	char file_hist[80], file_pval[5][80], file_pval_table[80], file_hist_rand[80];
 	char name[2][50];
@@ -807,7 +807,9 @@ int main(int argc, char *argv[])
 	strcpy(file_pval[4], "fisher_spac_mot0");
 	strcpy(file_pval_table, "out_pval");
 	strcpy(file_hist_rand, "out_hist_rand");
-	for (i = 0; i < 2; i++)
+	strcpy(name[0], "Anchor");
+	strcpy(name[1], "Partner");
+	/*for (i = 0; i < 2; i++)
 	{
 		memset(name[i], '\0', sizeof(name[i]));
 		int len = strlen(file_pfm_anchor[i]);
@@ -823,7 +825,7 @@ int main(int argc, char *argv[])
 			name[i][k++] = cc;
 		}
 		TransStrBack(name[i]);
-	}
+	}*/
 	double pvalue_equal = 0.01;
 	int length_fasta_max = 0, nseq_real = 0;
 	seq = NULL;
