@@ -10,7 +10,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	memset(filebest,'\0',sizeof(filebest));
 	strcpy(filebest,rera);//real or random
 	strcat(filebest,"_");
-	strcat(filebest,motif);//hocomoco or dapseq
+	// strcat(filebest,motif);//hocomoco or dapseq
 	char buf[10];
 	sprintf(buf,"%d",prf_a.mot);
 	strcat(filebest,buf);
