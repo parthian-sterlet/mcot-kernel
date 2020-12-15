@@ -299,7 +299,8 @@ Example:
 |Inverted||0.07|2.51|||0.07|1.08||0.04|0.13|0.72|0.16|0.18|0.31|0.67|
 |DirectPA||0.04|||1.86||||0.09|0.45||0.02|0.11|0.13|0.09|
 |DirectAP||0.04|0.18|||0.07|0.16|0.11||0.02|0.18|0.11|0.11|0.2|0.22|
-
+|Any||6.84|6.84|0.00|4.77|10.23|3.10|0.29|0.75|3.79|2.24|0.92|1.49|3.51|2.70|
+|Cumulative||6.84|9.60|9.60|14.02|19.43|19.83|20.06|20.34|20.92|21.21|21.95|22.87|23.79|24.66|
 
 This example shows distribution for heterotypic CE, since notations DirectAP / DirectPA imply Anchor-Partner / Partner-Anchor cases. A homotypic CE has only one direct orientation of CE, Anchor-Anchor (notation DirectAA).
 
@@ -394,7 +395,7 @@ Example
 
 [Heinz,S., Benner,C., Spann,N., Bertolino,E., Lin,Y.C., Laslo,P., Cheng,J.X., Murre,C., Singh,H. and Glass,C.K. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.](https://doi.org/10.1016/j.molcel.2010.05.004)
 
-[Kulakovskiy,I.V., Vorontsov,I.E., Yevshin,I.S., Sharipov,R.N., Fedorova,A.D., Rumynskiy,E.I., Medvedeva,Y.A., Magana-Mora,A., Bajic,V.B., Papatsenko,D.A., et al. (2018) HOCOMOCO: expansion and enhancement of the collection of transcription factor binding sites models. Nucleic Acids Res., 46, D252-D259.](https://academic.oup.com/nar/article/46/D1/D252/4616875)
+[Kulakovskiy,I.V., Vorontsov,I.E., Yevshin,I.S., Sharipov,R.N., Fedorova,A.D., Rumynskiy,E.I., Medvedeva,Y.A., Magana-Mora,A., Bajic,V.B., Papatsenko,D.A., et al. (2018) HOCOMOCO: expansion and enhancement of the collection of transcription factor binding sites models. Nucleic Acids Res., 46, D252-D259.](https://doi.org/10.1093/nar/gkx1106)
 
 [O'Malley,R.C., Huang,S.C., Song,L., Lewsey,M.G., Bartlett,A., Nery,J.R., Galli,M., Gallavotti,A., Ecker,R. (2016) Cistrome and epicistrome features shape the regulatory DNA landscape. Cell,165, 1280-1292.](https://doi.org/10.1016/j.cell.2016.08.063)
 
