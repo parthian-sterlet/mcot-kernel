@@ -968,15 +968,17 @@ int main(int argc, char *argv[])
 	if (peak_len_real == NULL){ puts("Out of memory..."); return -1; }
 
 	seq = new char**[2];
-	if (seq == NULL){ puts("Out of memory..."); return -1; }
-	for (k = 0; k<2; k++)
+	if (seq == NULL) { puts("Out of memory..."); return -1; }
+	for (k = 0; k < 2; k++)
 	{
 		seq[k] = new char*[nseq_real];
-		if (seq[k] == NULL){ puts("Out of memory..."); return -1; }
-		for (i = 0; i<nseq_real; i++)
+		if (seq[k] == NULL) { puts("Out of memory..."); return -1; }
+		for (i = 0; i < nseq_real; i++)
 		{
-			seq[k][i] = new char[length_fasta_max + 1];
-			if (seq[k][i] == NULL){ puts("Out of memory..."); return -1; }
+			int length_fasta_max1 = length_fasta_max + 1;
+			seq[k][i] = new char[length_fasta_max1];
+			if (seq[k][i] == NULL) { puts("Out of memory..."); return -1; }
+			memset(seq[k][i], '\0', length_fasta_max1);
 		}
 	}
 	ftp = fasta_to_plain1(file_fasta, length_fasta_max, nseq_real, seq, peak_len_real);
