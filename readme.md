@@ -302,7 +302,7 @@ Example:
 |Any||6.84|6.84|0.00|4.77|10.23|3.10|0.29|0.75|3.79|2.24|0.92|1.49|3.51|2.70|
 |Cumulative||6.84|9.60|9.60|14.02|19.43|19.83|20.06|20.34|20.92|21.21|21.95|22.87|23.79|24.66|
 
-This example shows distribution for heterotypic CE, since notations DirectAP / DirectPA imply Anchor-Partner / Partner-Anchor cases. A homotypic CE has only one direct orientation of CE, Anchor-Anchor (notation DirectAA).
+This example shows distribution for heterotypic CE, since notations DirectAP / DirectPA imply Anchor-Partner / Partner-Anchor cases. A homotypic CE has only one direct orientation of CE, Anchor-Anchor (notation DirectAA). 'Any' row implies frequency of CEs with a certain spacer or an overlap for all four orientations. 'Cumulative' row means the sum of frequencies for all mutual locations which respect to the current and closer positioning of motifs, i.e. the sum of values of 'All' row from the most left column to the current one.
 
 
 * __Files <fisher\_*>, the 2x2 tables of CE significance for five computation flows for all motifs pairs and for  all 5x5 combination of motifs conservation__. 
