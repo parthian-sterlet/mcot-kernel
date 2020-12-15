@@ -58,7 +58,7 @@ int fasta_to_plain0(char *file_in_fasta, int &length_fasta_max, int &nseq_fasta)
 }
 int fasta_to_plain1(char *file_in_fasta, int length_fasta_max, int nseq_fasta, char ***seq, int *peak_len)
 {
-	int i, fl=1, n=0, len=0;
+	int fl=1, n=0, len=0;
 	char head[200];		
 	char c, symbol = '>';
 	char alfavit4[]="acgtnACGTN";
