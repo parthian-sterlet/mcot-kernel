@@ -67,8 +67,7 @@ int fasta_to_plain1(char *file_in_fasta, int length_fasta_max, int nseq_fasta, c
 	{
 		printf("Input file %s can't be opened\n",file_in_fasta);
 		return -1;
-	}
-	for(i=0;i<2;i++)memset(seq[i][n],'\0',sizeof(seq[i][n]));
+	}	
 	do  
 	{
 		c=getc(in);
@@ -88,8 +87,7 @@ int fasta_to_plain1(char *file_in_fasta, int length_fasta_max, int nseq_fasta, c
 				{
 					if(fl!=-1)
 					{
-						n++;
-						for(i=0;i<2;i++)memset(seq[i][n],'\0',sizeof(seq[i][n]));
+						n++;						
 						len=0;
 					}
 				}
