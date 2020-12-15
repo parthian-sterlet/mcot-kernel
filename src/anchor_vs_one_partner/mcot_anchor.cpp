@@ -847,8 +847,10 @@ int main(int argc, char *argv[])
 		if (seq[k] == NULL) { puts("Out of memory..."); return -1; }
 		for (i = 0; i < nseq_real; i++)
 		{
-			seq[k][i] = new char[length_fasta_max + 1];
+			int length_fasta_max1 = length_fasta_max + 1;
+			seq[k][i] = new char[length_fasta_max1];
 			if (seq[k][i] == NULL) { puts("Out of memory..."); return -1; }
+			memset(seq[k][i], '\0', length_fasta_max1);
 		}
 	}
 	ftp = fasta_to_plain1(file_fasta, length_fasta_max, nseq_real, seq, peak_len_real);
