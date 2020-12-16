@@ -366,8 +366,6 @@ $`{1000*OBS_{i,j}/N(OBS)}`$ and $`{1000*EXP_{i,j}/N(EXP)}`$,
 
 where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed and expected lists. The output heatmap shows the difference between relative frequencies of observed and expected CEs. Example below shows the asymmetry toward the Partner (HNF1B) motif in Overlap computation flow.
 
-Example
-
 
 | |<3.5|3.5..3.7|3.7..3.9|3.9..4.1|4.1..4.3|4.3..4.5|4.5..4.7|4.7..4.9|4.9..5.1|5.1..5.3|5.3..5.5|>5.5|
 |-|----|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|----|
