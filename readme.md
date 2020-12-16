@@ -18,7 +18,7 @@ MCOT implemented in C++ and it can be conventionally compiled in Linux or
 Windows operating system. To run MCOT user should compile the corresponding 
 source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and 
 many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp 
-respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones.
+respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver), [InMode](https://www.jstacs.de/index.php/InMoDe) and [SiteGA](https://github.com/parthian-sterlet/sitega)).
 
 ## Installation
 (Linux) Run in terminal (Packages “build-essential” and “cmake” 
