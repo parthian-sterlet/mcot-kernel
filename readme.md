@@ -291,7 +291,7 @@ Example:
 | Anchor| FOXA2      |     | n/a                                                          | n/a                                                             | n/a                                                     |     |
 | Partner| HNF1B      |     | -46.9                                                        | -73.1                                                           | -113.1                                                  |     |
 
-The final fourth block shows recommended Bonferroni’s correction thresholds (-Log10[P-value])for significances:
+The final fourth block shows recommended Bonferroni’s correction thresholds (-Log10[P-value]) for significances:
 
 | # Motif   | ... | Bonferroni_CE | Bonferroni_CE(AncPar) | Bonferroni_Asym |
 |-----------|---|---------|-------|--------------------------------------------------------------|
