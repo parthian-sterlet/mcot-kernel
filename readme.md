@@ -2,23 +2,13 @@
 
 ## General description
 
-MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of 
-composite elements (CEs) in a single ChIP-seq dataset. CEs  detected by MCOT 
-include two potential binding sites of transcription factors (TFs) in all 
-possible mutual orientations. MCOT considers CEs with a full/partial overlap of 
-motifs or with a spacer in a certain range. Each potential CE recognized by MCOT 
-contains the motif of immunoprecipitated TF in respective ChIP-seq experiment 
-(anchor motif) and another motif (partner). Identical/distinct anchor and 
-partner motifs imply the search for CEs of homotypic or heterotypic type 
-(respectively).
+MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset. CEs  detected by MCOT 
+include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
 
 ## Implementation
 
-MCOT implemented in C++ and it can be conventionally compiled in Linux or 
-Windows operating system. To run MCOT user should compile the corresponding 
-source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and 
-many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp 
-respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver), [InMode](https://www.jstacs.de/index.php/InMoDe) and [SiteGA](https://github.com/parthian-sterlet/sitega)).
+MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding 
+source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver), [InMode](https://www.jstacs.de/index.php/InMoDe) and [SiteGA](https://github.com/parthian-sterlet/sitega)).
 
 ## Installation
 (Linux) Run in terminal (Packages “build-essential” and “cmake” 
@@ -85,7 +75,7 @@ The command line for many-partner option:
 
 ```
 
-`<partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs (Kulakovskiy et al., 2018); and the library of 514 motifs from the [Plant Cistrome Database](http://neomorph.salk.edu/dap_web/pages/index.php) for *A.thaliana* motifs (O’Malley et al., 2016).
+`<partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of 514 motifs from the [Plant Cistrome Database](http://neomorph.salk.edu/dap_web/pages/index.php) for *A.thaliana* motifs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
 
 
 `<minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
@@ -132,7 +122,7 @@ The command line for anchor_pro option:
 
 ## Input data
 
-MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. HOMER (Heinz et al., 2010) to define the anchor motif. 
+MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. HOMER ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) to define the anchor motif. 
 
 MCOT have two options for definition of the partner motif:
 
@@ -178,7 +168,7 @@ MCOT computes CE significance separately for five computation flows:  Any (Space
 
 Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of conservation of motifs. Since MCOT checks five conservation ranges for each motifs, the Bonferroni-corrected
 
-Finally, MCOT estimates the similarity of anchor and partner motifs with the motifs similarity p-value. MCOT used matrix column similarities measures PCC (Pearson Correlation Coefficient, Pietrokovski, 1996) and SSD (Sum of Squared Distances, Wasserman and Sandelin, 2004) to compute two p-values. If maximum among them was less than 0.05, then pair of motifs had the significant similarity. Hence, a respective CE may be a possible false positive prediction.
+Finally, MCOT estimates the similarity of anchor and partner motifs with the motifs similarity p-value. MCOT used matrix column similarities measures PCC ([Pearson Correlation Coefficient, Pietrokovski, 1996](https://academic.oup.com/nar/article/24/19/3836/2384639)) and SSD ([Sum of Squared Distances, Sandelin and Wasserman, 2004](https://doi.org/10.1016/j.jmb.2004.02.048)) to compute two p-values. If maximum among them was less than 0.05, then pair of motifs had the significant similarity. Hence, a respective CE may be a possible false positive prediction.
 
 Additionally, MCOT computed significance of CEs with more conserved anchor motif and more conserved partner motif. These calculations are performed according to scheme represented above in Table 1, but MCOT counts either CEs with more conserved Anchor or Partner motifs, i.e. either -Log10[FPR(Anchor)] > -Log10[FPR(Partner)] or -Log10[FPR(Anchor)] ≤ -Log10[FPR(Partner)].
 
@@ -218,7 +208,7 @@ Example
 160    3.338550    -
 ```
 
-Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β (Wederell et al., 2008) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search (Homer, Heinz et al., 2009) and the partner HNF1β motif we took from the mouse Hocomoco core collection (Kulakovskiy et al., 2018).
+Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β ([Wederell et al., 2008](https://doi.org/10.1093/nar/gkn382)) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search ([Homer, Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and the partner HNF1β motif we took from the mouse Hocomoco core collection ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)).
 
 
 * __Files <fpr\*\.txt>, Table Threshold vs. FPR (False Positive Rate)__ . File contains two columns: threshold and FPR estimated as the site density for the whole genome dataset of protein-coding genes
