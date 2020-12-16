@@ -263,7 +263,7 @@ Example:
 
 |# Motif  | Motif Name | Full  overlap, -Log10[P-value] | Partial overlap,-Log10[P-value]| Overlap, -Log10[P-value] | Spacer, -Log10[P-value] | Any, -Log10[P-value] | Similarity to Anchor, -Log10[P-value] | Similarity to Anchor, SSD | Similarity to Anchor, PCC |...|
 |---------|------------|--------------------------------|--------------------------------|--------------------------|-------------------------|----------------------|---------------------------------------|---------------------------|---------------------------|---|
-|Anchor   | FOXA2      | 0.0                            | 97.4                           | 92.4                     | 9.8                     | 35.4                 | n/a                                   | n/a                       | n/a                       |   |
+|Anchor 0| FOXA2      | 0.0                            | 97.4                           | 92.4                     | 9.8                     | 35.4                 | n/a                                   | n/a                       | n/a                       |   |
 |Partner 1| HNF1B      | 76.6                           | 53.2                           | 64.3                     | 4.3                     | 35.3                 | 0                                     | 0                         | 0                         |   |
 
 
@@ -275,7 +275,7 @@ Example:
 
 | # Motif | Motif Name | ... | Full overlap, Conservative Anchor, -Log10[P-value] | Full overlap, Conservative Partner, -Log10[P-value] | Partial overlap, Conservative Anchor, -Log10[P-value] | Partial overlap, Conservative Partner, -Log10[P-value] | ... |
 |---------|------------|-----|----------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|-----|
-| Anchor  | FOXA2      |     | n/a                                                | n/a                                                 | n/a                                                   | n/a                                                    |     |
+| Anchor 0| FOXA2      |     | n/a                                                | n/a                                                 | n/a                                                   | n/a                                                    |     |
 |Partner 1| HNF1B      |     | 50.8                                               | 0.6                                                 | 40.1                                                  | 19.2                                                   |     |
 
 
@@ -288,9 +288,14 @@ Example:
 
 | # Motif  | Motif Name | ... | Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value] | Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value] | Overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value] | ... |
 |----------|------------|-----|--------------------------------------------------------------|-----------------------------------------------------------------|---------------------------------------------------------|-----|
-| Anchor   | FOXA2      |     | n/a                                                          | n/a                                                             | n/a                                                     |     |
+| Anchor 0| FOXA2      |     | n/a                                                          | n/a                                                             | n/a                                                     |     |
 | Partner 1| HNF1B      |     | -46.9                                                        | -73.1                                                           | -113.1                                                  |     |
 
+Final fourth block shows recommended Bonferroni’s correction thresholds for significances:
+
+# Motif|Bonferroni_CE|Bonferroni_CE(AncPar)|Bonferroni_Asym
+Anchor 0|11.8||
+Partner 1|11.71|10.61|10.31
 
 
 * __File <out_hist\*>, the abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from the minimal to the  spacer length (‘S’).
