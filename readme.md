@@ -163,9 +163,8 @@ For each of 25 combinations of motifs conservation and each computation flow MCO
 
 The background model implies the preservation of content for each motif in each peak. MCOT generates background profiles of hits of anchor and partner motifs iteratively for each peak with a special permutation procedure.
 
-MCOT computes CE significance separately for five computation flows:  Any (Spacer or Overlap), Full, Partial, Overlap (Full and Partial), Spacer.
-
-Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of conservation of motifs. Since MCOT checks five conservation ranges for each motifs, the Bonferroni-corrected
+MCOT computes CE significance separately for five computation flows:  Any (Spacer or Overlap), Full, Partial, Overlap (Full and Partial), Spacer. 
+Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of conservation of motifs. 
 
 Finally, MCOT estimates the similarity of anchor and partner motifs with the motifs similarity p-value. MCOT used matrix column similarities measures PCC ([Pearson Correlation Coefficient, Pietrokovski, 1996](https://academic.oup.com/nar/article/24/19/3836/2384639)) and SSD ([Sum of Squared Distances, Sandelin and Wasserman, 2004](https://doi.org/10.1016/j.jmb.2004.02.048)) to compute two p-values. If maximum among them was less than 0.05, then pair of motifs had the significant similarity. Hence, a respective CE may be a possible false positive prediction.
 
