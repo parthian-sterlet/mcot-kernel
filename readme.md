@@ -195,9 +195,9 @@ Finally, to estimate the asymmetry of CE, MCOT partitions all CEs on those with 
 Detailed enrichment or depletion of CEs with specific combinations of motifs conservation are represented in the scatterplot text file plot_*, see below.
 
 To take into account multiple comparisons we applied the Bonferroni’s correction and used the following critical values to filter out not significant results:
-* significance of CEs regardless motifs conservation, 0.05/(Nfor\*Nback\*Nflow\*Nthr\*Nthr);
-* significance of asymmetric CEs toward one of motifs, 0.05/(Nfor\*Nback\*Nflow\*2);
-* CE asymmetry, 0.05/(Nfor\*Nback\*Nflow). 
+* significance of CEs regardless motifs conservation, Bonferroni_CE = 0.05/(Nfor\*Nback\*Nflow\*Nthr\*Nthr);
+* significance of asymmetric CEs toward one of motifs, Bonferroni_CE(AncPar) = 0.05/(Nfor\*Nback\*Nflow\*2);
+* CE asymmetry, Bonferroni_Asym = 0.05/(Nfor\*Nback\*Nflow). 
 Here Nfor and Nback means the size of foreground and background datasets (i.e., the number of peaks and random sequences, which generated in MCOT, 
 Nflow = 5 designates the number of MCOT computation flows and Nthr = 5 means the number of thresholds for each motif. 
 
@@ -293,9 +293,10 @@ Example:
 
 The final fourth block shows recommended Bonferroni’s correction thresholds for significances:
 
-|# Motif|Bonferroni_CE|Bonferroni_CE(AncPar)|Bonferroni_Asym
-Anchor 0|11.8||
-Partner 1|11.71|10.61|10.31
+| # Motif   | Bonferroni_CE | Bonferroni_CE(AncPar) | Bonferroni_Asym |
+|-----------|------------|-------|--------------------------------------------------------------|
+| Anchor 0  | 11.8       |       |       |
+| Partner 1 | 11.71      | 10.61 | 10.31 |
 
 
 * __File <out_hist\*>, the abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from the minimal to the  spacer length (‘S’).
