@@ -121,7 +121,7 @@ The command line for anchor_pro option:
 
 ## Input data
 
-MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. HOMER ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) to define the anchor motif. 
+MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) to define the anchor motif. 
 
 MCOT have two options for definition of the partner motif:
 
