@@ -178,9 +178,6 @@ MCOT computes CE significance separately for five computation flows:  Any (Space
 
 Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of conservation of motifs. Since MCOT checks five conservation ranges for each motifs, the Bonferroni-corrected
 
-p-value < 0.05/(5*5) = 0.002 is used to mark the adjusted threshold of CE significance in each computation flows. I.e. the fall of the minimal p-value among 25 estimates below 0.002 implied the significance. If simultaneously 396/353 matrices of human/mouse TFs were applied (option ‘many partners’) then p-value threshold fell below to 0.002/396 ≈ 5E-6.
-
-
 Finally, MCOT estimates the similarity of anchor and partner motifs with the motifs similarity p-value. MCOT used matrix column similarities measures PCC (Pearson Correlation Coefficient, Pietrokovski, 1996) and SSD (Sum of Squared Distances, Wasserman and Sandelin, 2004) to compute two p-values. If maximum among them was less than 0.05, then pair of motifs had the significant similarity. Hence, a respective CE may be a possible false positive prediction.
 
 Additionally, MCOT computed significance of CEs with more conserved anchor motif and more conserved partner motif. These calculations are performed according to scheme represented above in Table 1, but MCOT counts either CEs with more conserved Anchor or Partner motifs, i.e. either -Log10[FPR(Anchor)] > -Log10[FPR(Partner)] or -Log10[FPR(Anchor)] ≤ -Log10[FPR(Partner)].
@@ -196,6 +193,13 @@ Finally, to estimate the asymmetry of CE, MCOT partitions all CEs on those with 
 
 
 Detailed enrichment or depletion of CEs with specific combinations of motifs conservation are represented in the scatterplot text file plot_*, see below.
+
+To take into account multiple comparisons we applied the Bonferroni’s correction and used the following critical values to filter out not significant results:
+* significance of CEs regardless motifs conservation, 0.05/(Nfor\*Nback\*Nflow\*Nthr\*Nthr);
+* significance of asymmetric CEs toward one of motifs, 0.05/(Nfor\*Nback\*Nflow\*2);
+* CE asymmetry, 0.05/(Nfor\*Nback\*Nflow). 
+Here Nfor and Nback means the size of foreground and background datasets (i.e., the number of peaks and random sequences, which generated in MCOT, 
+Nflow = 5 designates the number of MCOT computation flows and Nthr = 5 means the number of thresholds for each motif. 
 
 ## Output data
 
