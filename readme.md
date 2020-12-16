@@ -207,7 +207,7 @@ Example
 160    3.338550    -
 ```
 
-Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β ([Wederell et al., 2008](https://doi.org/10.1093/nar/gkn382)) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search ([Homer, Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and the partner HNF1β motif we took from the mouse Hocomoco core collection ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)).
+Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β ([Wederell et al., 2008](https://doi.org/10.1093/nar/gkn382)) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and the partner HNF1β motif we took from the mouse Hocomoco core collection ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)).
 
 
 * __Files <fpr\*\.txt>, Table Threshold vs. FPR (False Positive Rate)__ . File contains two columns: threshold and FPR estimated as the site density for the whole genome dataset of protein-coding genes
