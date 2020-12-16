@@ -293,10 +293,10 @@ Example:
 
 The final fourth block shows recommended Bonferroni’s correction thresholds for significances:
 
-| # Motif   | Bonferroni_CE | Bonferroni_CE(AncPar) | Bonferroni_Asym |
-|-----------|------------|-------|--------------------------------------------------------------|
-| Anchor  | 11.8       |       |       |
-| Partner 1 | 11.71      | 10.61 | 10.31 |
+| # Motif   | ... | Bonferroni_CE | Bonferroni_CE(AncPar) | Bonferroni_Asym |
+|-----------||------------|-------|--------------------------------------------------------------|
+| Anchor  || 11.8       |       |       |
+| Partner 1 || 11.71      | 10.61 | 10.31 |
 
 
 * __File <out_hist\*>, the abundance of various CE types as a function of mutual orientation and location of the motifs__ The percentage of peaks containing CE variants specific in mutual orientation (four types) and mutual locations from a few possible full overlaps (‘F’), through a variety of partial overlaps (‘P’) and finally from the minimal to the  spacer length (‘S’).
