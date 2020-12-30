@@ -1139,7 +1139,7 @@ int main(int argc, char *argv[])
 			}
 			for (i = 0; i<length; i++)for (j = 0; j<OLIGNUM; j++)pwm_anchor[i][j] = matrix.wei[i][j];
 			matrix.get_copy(&matrix0);
-			int all_pos_rec = int(2*nseq_genome*(len_genome - matrix.len + 1)*pvalue);
+			int all_pos_rec = 1+(int)(2* pvalue*nseq_genome*(len_genome - matrix.len + 1));
 			thr_all = new double[all_pos_rec];
 			if (thr_all == NULL) { puts("Out of memory..."); return -1; }
 			fp_rate = new double[all_pos_rec];
