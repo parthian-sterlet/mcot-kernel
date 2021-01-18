@@ -51,7 +51,7 @@ The command line for many-partner option:
 
 
 
-`<fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 200-300, the maximum number is not restricted, however 10000 or higher number of peaks requires higher computation time than several thousands of peaks.
+`<fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 200-300, the maximum number is not restricted, however 10000 or higher number of peaks requires higher computation time than several thousands of peaks. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
 
 
 `<anchor.motif>`, `<partner.motif>` = frequency matrices of motifs in standard format, e.g.  
