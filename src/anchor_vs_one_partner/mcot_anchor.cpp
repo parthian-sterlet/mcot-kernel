@@ -1,6 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #define _CRT_SECURE_NO_WARNINGS
 
 #include  <stdio.h>
@@ -384,13 +381,13 @@ int profile::get_copy_rand(profile *a, int height)
 		}
 	}
 	ini = a->mem_in_sta();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = a->mem_in_cep();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = a->mem_in_cel();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = a->mem_in_pv();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	z = 0;
 	for (i = 0; i < nseq; i++)
 	{
@@ -417,15 +414,15 @@ int profile::clear_real(void)
 	mem_out_cel();
 	}*/
 	int ini = mem_in_sta();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = mem_in_cep();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = mem_in_cel();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = mem_in_sco();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	ini = mem_in_pv();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	return 1;
 }
 int profile::fprintf_pro(char *mot_db, double thr, char *mode)
@@ -449,7 +446,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	strcat(fileo, buf);//nomer poroga	
 	if ((out = fopen(fileo, "wt")) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", fileo);
+		fprintf(stderr,"Input file %s can't be opened!\n", fileo);
 		return -1;
 	}
 	for (i = 0; i < nseq; i++)
@@ -584,7 +581,7 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	FILE *out;
 	if ((out = fopen(file, mode)) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file);
+		fprintf(stderr,"Input file %s can't be opened!\n", file);
 		return -1;
 	}
 	fprintf(out, "%d\t%s\t", mot, motif);
@@ -726,7 +723,7 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[80], mypath_data[200], prom[200], file_pfm_anchor[2][500];
+	char file_fasta[80], mypath_data[200], prom[200], file_pfm_anchor[2][200];
 	char ***seq;// peaks
 	char file_hist[80], file_pval[5][80], file_pval_table[80], file_hist_rand[80];
 	char name[2][50];
@@ -737,9 +734,9 @@ int main(int argc, char *argv[])
 
 	if (argc != 7)
 	{
-		printf("%s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
-		printf("2 motif1 3motif2 ");
-		printf(" 4int spacer_min 5int spacer_max 6char path_genome\n");//9char mot_anchor 
+		fprintf(stderr, "%s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
+		fprintf(stderr, "2 motif1 3motif2 ");
+		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome\n");//9char mot_anchor 
 		return -1;
 	}
 	int thresh_num_min = 1, thresh_num_max = 5;	// 1 5    or 5 5
@@ -781,7 +778,7 @@ int main(int argc, char *argv[])
 			{
 				strcat(prom, "ups1500.plain");
 				len_genome = 1500;
-				nseq_genome = 27202;
+				nseq_genome = 27193;
 			}
 			else
 			{
@@ -793,7 +790,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					printf("Error species %s\n", mypath_data);
+					fprintf(stderr, "Error species %s\n", mypath_data);
 					return -1;
 				}
 			}
@@ -832,31 +829,31 @@ int main(int argc, char *argv[])
 	int ftp = fasta_to_plain0(file_fasta, length_fasta_max, nseq_real);
 	if (ftp == -1)
 	{
-		printf("File %s error 1st stage\n", file_fasta);
+		fprintf(stderr,"File %s error 1st stage\n", file_fasta);
 		return -1;
 	}
 	int *peak_len_real;
 	peak_len_real = new int[nseq_real];
-	if (peak_len_real == NULL) { puts("Out of memory..."); return -1; }
+	if (peak_len_real == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 
 	seq = new char**[2];
-	if (seq == NULL) { puts("Out of memory..."); return -1; }
+	if (seq == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 	for (k = 0; k < 2; k++)
 	{
 		seq[k] = new char*[nseq_real];
-		if (seq[k] == NULL) { puts("Out of memory..."); return -1; }
+		if (seq[k] == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 		for (i = 0; i < nseq_real; i++)
 		{
 			int length_fasta_max1 = length_fasta_max + 1;
 			seq[k][i] = new char[length_fasta_max1];
-			if (seq[k][i] == NULL) { puts("Out of memory..."); return -1; }
+			if (seq[k][i] == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 			memset(seq[k][i], '\0', length_fasta_max1);
 		}
 	}
 	ftp = fasta_to_plain1(file_fasta, length_fasta_max, nseq_real, seq, peak_len_real);
 	if (ftp == -1)
 	{
-		printf("File %s error 2nd stage\n", file_fasta);
+		fprintf(stderr,"File %s error 2nd stage\n", file_fasta);
 		return -1;
 	}
 	double thr[2][NUM_THR];
@@ -871,7 +868,7 @@ int main(int argc, char *argv[])
 		real_one[j].nseq = nseq_real;
 		real_one[j].nam = 1;
 		int ini = real_one[j].mem_in_nsit();
-		if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+		if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	}
 
 	//for permutation
@@ -886,17 +883,17 @@ int main(int argc, char *argv[])
 		rand_one[j].nseq = nseq_rand;
 		rand_one[j].nam = 1;
 		int ini = rand_one[j].mem_in_nsit();
-		if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+		if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 	}
 	rand_hom_one.nseq = nseq_rand;
 	rand_hom_one.nam = 1;
 	rand_hom_one.mot = 0;
 	int ini = rand_hom_one.mem_in_nsit();
-	if (ini == -1) { puts("Not enough memory...\n"); return -1; }
+	if (ini == -1) { fprintf(stderr,"Not enough memory...\n"); return -1; }
 
 	int *peak_len_rand;
 	peak_len_rand = new int[nseq_rand];
-	if (peak_len_rand == NULL) { puts("Out of memory..."); return -1; }
+	if (peak_len_rand == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 	k = 0;
 	for (i = 0; i < nseq_real; i++)
 	{
@@ -904,27 +901,27 @@ int main(int argc, char *argv[])
 	}
 	int *thr_err_real, *thr_err_rand;
 	thr_err_real = new int[nseq_real];
-	if (thr_err_real == NULL) { puts("Out of memory..."); return -1; }
+	if (thr_err_real == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 	thr_err_rand = new int[nseq_rand];
-	if (thr_err_rand == NULL) { puts("Out of memory..."); return -1; }
+	if (thr_err_rand == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 
 	FILE *out_hist, *out_hist_rand;
 	if ((out_hist = fopen(file_hist, "wt")) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file_hist);
+		fprintf(stderr,"Input file %s can't be opened!\n", file_hist);
 		return -1;
 	}
 	fclose(out_hist);
 	if ((out_hist_rand = fopen(file_hist_rand, "wt")) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file_hist_rand);
+		fprintf(stderr,"Input file %s can't be opened!\n", file_hist_rand);
 		return -1;
 	}
 	fclose(out_hist_rand);
 	FILE *out_pval_table;
 	if ((out_pval_table = fopen(file_pval_table, "wt")) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file_pval_table);
+		fprintf(stderr,"Input file %s can't be opened!\n", file_pval_table);
 		return -1;
 	}
 	{
@@ -969,15 +966,15 @@ int main(int argc, char *argv[])
 	FILE *out_stat;
 	if ((out_stat = fopen("rec_pos.txt", "wt")) == NULL)
 	{
-		printf("Input file can't be opened!\n");
+		fprintf(stderr,"Input file can't be opened!\n");
 		return -1;
 	}
 	fprintf(out_stat, "# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
-	int all_pos_rec = int(2 * nseq_genome*len_genome*pvalue);
+	int all_pos_rec = int(2 * pvalue * nseq_genome*len_genome);
 	thr_all = new double[all_pos_rec];
-	if (thr_all == NULL) { puts("Out of memory..."); return -1; }
+	if (thr_all == NULL) { fprintf(stderr,"Out of memory..."); return -1; }
 	fp_rate = new double[all_pos_rec];
-	if (fp_rate == NULL) { puts("Out of memory..."); return -1; }	
+	if (fp_rate == NULL) { fprintf(stderr,"Out of memory..."); return -1; }	
 	for (mot = 0; mot < 2; mot++)
 	{
 		printf("Mot %d\n", mot);
@@ -986,7 +983,7 @@ int main(int argc, char *argv[])
 		for (i = 0; i < length; i++)for (j = 0; j < OLIGNUM; j++)pwm_anchor[mot][i][j] = matrix[mot].wei[i][j];
 		if (length <= 0 || length >= MATLEN)
 		{
-			printf("PFM to PWM conversion error, file %s\n", file_pfm_anchor);
+			fprintf(stderr, "PFM to PWM conversion error, file %s\n", file_pfm_anchor);
 			return -1;
 		}
 		int nthr_dist = 0;
@@ -994,13 +991,13 @@ int main(int argc, char *argv[])
 		//	int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor, length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
 		if (piptd == -1)
 		{
-			printf("FP rate table error\n");
+			fprintf(stderr, "FP rate table error\n");
 			return -1;
 		}
 		FILE *out_fpr;
 		if ((out_fpr = fopen(file_fpr[mot], "wt")) == NULL)
 		{
-			printf("Output file %s can't be opened!\n", file_fpr[mot]);
+			fprintf(stderr, "Output file %s can't be opened!\n", file_fpr[mot]);
 			return -1;
 		}
 		for (i = 0; i < nthr_dist; i++)fprintf(out_fpr, "%.18f\t%.18g\n", thr_all[i], fp_rate[i]);
@@ -1011,7 +1008,7 @@ int main(int argc, char *argv[])
 			int stfp = select_thresholds_from_pvalues(nthr_dist, thr_all, fp_rate, pvalue, pvalue_mult, fpr_select, thr[mot], index);
 			if (stfp == -1)
 			{
-				printf("Too bad input matrix of %d motif\n", mot);
+				fprintf(stderr, "Too bad input matrix of %d motif\n", mot);
 				return -1;
 			}
 		}
@@ -1023,7 +1020,7 @@ int main(int argc, char *argv[])
 		int wm_rec = pwm_rec0(&matrix[mot], thr[mot][NUM_THR - 1], length_fasta_max, nseq_real, seq, &real_one[mot], all_pos);
 		if (wm_rec == -1)
 		{
-			printf("Motif %d recognition 1st stage error\n", mot);
+			fprintf(stderr, "Motif %d recognition 1st stage error\n", mot);
 			return -1;
 		}
 		//memory allocation for all sites
@@ -1035,7 +1032,7 @@ int main(int argc, char *argv[])
 		wm_rec = pwm_rec1(&matrix[mot], thr[mot][NUM_THR - 1], length_fasta_max, nseq_real, seq, &real_one[mot]);
 		if (wm_rec == -1)
 		{
-			printf("Motif %d recognition 2nd stage error\n", mot);
+			fprintf(stderr, "Motif %d recognition 2nd stage error\n", mot);
 			return -1;
 		}
 		//count nsites for various thresholds
@@ -1079,7 +1076,7 @@ int main(int argc, char *argv[])
 		int fprint_pro = real_one[mot].fprintf_pro(name[mot], thr[mot][NUM_THR - 1], xreal);
 		if (fprint_pro == -1)
 		{
-			printf("Real print profile error, motif %d\n", mot);
+			fprintf(stderr, "Real print profile error, motif %d\n", mot);
 			return -1;
 		}
 		int rec_seq[NUM_THR], rec_pos[NUM_THR];
@@ -1125,7 +1122,7 @@ int main(int argc, char *argv[])
 	int cop = real_one[mot_a].get_copy_rand(&rand_hom_one, height_permut);
 	if (cop == -1)
 	{
-		printf("Rand Copy error Mot %d Thr One\n", mot);
+		fprintf(stderr, "Rand Copy error Mot %d Thr One\n", mot);
 		return -1;
 	}
 	char file_err[] = "throw_prediction.txt";
@@ -1133,7 +1130,7 @@ int main(int argc, char *argv[])
 		FILE *out_err;
 		if ((out_err = fopen(file_err, "wt")) == NULL)
 		{
-			printf("Input file %s can't be opened!\n", file_err);
+			fprintf(stderr,"Input file %s can't be opened!\n", file_err);
 			return -1;
 		}
 	}
@@ -1146,7 +1143,7 @@ int main(int argc, char *argv[])
 			int cop = real_one[mot_p].get_copy_rand(&rand_one[mot_p], height_permut);
 			if (cop == -1)
 			{
-				printf("Rand Copy error Mot %d Thr One\n", mot);
+				fprintf(stderr, "Rand Copy error Mot %d Thr One\n", mot);
 				return -1;
 			}
 		}
@@ -1171,7 +1168,7 @@ int main(int argc, char *argv[])
 			int throwp = throw_predictions(peak_len_rand, &rand_hom_one, &rand_one[mot_p], len_anchor, len_partner, 0, thr_err_real, nseq_real, nseq_rand, seq[0], height_permut, file_err);
 			if (throwp == -1)
 			{
-				printf("Throw Prediction error One - Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Throw Prediction error One - Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			/*	if(mot_p==1)
@@ -1199,7 +1196,7 @@ int main(int argc, char *argv[])
 			strcat(file_throw_err,"_one.txt");
 			if((out_nsit_throw=fopen(file_throw_err,"wt"))==NULL)
 			{
-			printf("Input file %s can't be opened!\n", file_throw_err);
+			fprintf(stderr,"Input file %s can't be opened!\n", file_throw_err);
 			return -1;
 			}
 			for(m=0;m<nseq_real;m++)fprintf(out_nsit_throw,"%d\n",thr_err_real[m]);
@@ -1221,13 +1218,13 @@ int main(int argc, char *argv[])
 			int proj = projoin(xrand, name[mot_p], rand_hom_one, rand_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_rand, nseq_rand, seq, &expected, &hist_exp_one, peak_len_rand, &rand_plot, nseq_two_sites_rand);
 			if (proj == -1)
 			{
-				printf("Projoin Rand error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Projoin Rand error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			proj = projoin(xreal, name[mot_p], real_one[0], real_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_real, nseq_real, seq, &observed, &hist_obs_one, peak_len_real, &real_plot, nseq_two_sites_real);
 			if (proj == -1)
 			{
-				printf("Projoin Real error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			{
@@ -1269,7 +1266,7 @@ int main(int argc, char *argv[])
 					strcat(file_plot[i], buf);
 					if ((out_plot[i] = fopen(file_plot[i], "wt")) == NULL)
 					{
-						printf("Input file %s can't be opened!\n", file_plot[i]);
+						fprintf(stderr,"Input file %s can't be opened!\n", file_plot[i]);
 						return -1;
 					}
 				}
@@ -1466,31 +1463,31 @@ int main(int argc, char *argv[])
 				int fisher = fisher_exact_test(observed.cell[j][k].any, observed.cell[j][k].two_sites, expected.cell[j][k].any, expected.cell[j][k].two_sites, pvalue_a[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 				fisher = fisher_exact_test(observed.cell[j][k].full, observed.cell[j][k].two_sites, expected.cell[j][k].full, expected.cell[j][k].two_sites, pvalue_f[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 				fisher = fisher_exact_test(observed.cell[j][k].partial, observed.cell[j][k].two_sites, expected.cell[j][k].partial, expected.cell[j][k].two_sites, pvalue_p[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 				fisher = fisher_exact_test(observed.cell[j][k].overlap, observed.cell[j][k].two_sites, expected.cell[j][k].overlap, expected.cell[j][k].two_sites, pvalue_o[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 				fisher = fisher_exact_test(observed.cell[j][k].spacer, observed.cell[j][k].two_sites, expected.cell[j][k].spacer, expected.cell[j][k].two_sites, pvalue_s[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 			}
@@ -1506,95 +1503,95 @@ int main(int argc, char *argv[])
 			fisher = fisher_exact_test(observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.anc_sit.any, observed.sit.any, expected.anc_sit.any, expected.sit.any, pv_any.anc_par, 1);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//full
 			fisher = fisher_exact_test(observed.anc.full, observed.anc.two_sites, expected.anc.full, expected.anc.two_sites, pv_full.anchor, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.par.full, observed.par.two_sites, expected.par.full, expected.par.two_sites, pv_full.partner, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.anc_sit.full, observed.sit.full, expected.anc_sit.full, expected.sit.full, pv_full.anc_par, 1);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//partial
 			fisher = fisher_exact_test(observed.anc.partial, observed.anc.two_sites, expected.anc.partial, expected.anc.two_sites, pv_partial.anchor, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.par.partial, observed.par.two_sites, expected.par.partial, expected.par.two_sites, pv_partial.partner, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.anc_sit.partial, observed.sit.partial, expected.anc_sit.partial, expected.sit.partial, pv_partial.anc_par, 1);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//overlap
 			fisher = fisher_exact_test(observed.anc.overlap, observed.anc.two_sites, expected.anc.overlap, expected.anc.two_sites, pv_overlap.anchor, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.par.overlap, observed.par.two_sites, expected.par.overlap, expected.par.two_sites, pv_overlap.partner, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.anc_sit.overlap, observed.sit.overlap, expected.anc_sit.overlap, expected.sit.overlap, pv_overlap.anc_par, 1);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//spacer
 			fisher = fisher_exact_test(observed.anc.spacer, observed.anc.two_sites, expected.anc.spacer, expected.anc.two_sites, pv_spacer.anchor, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.par.spacer, observed.par.two_sites, expected.par.spacer, expected.par.two_sites, pv_spacer.partner, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			fisher = fisher_exact_test(observed.anc_sit.spacer, observed.sit.spacer, expected.anc_sit.spacer, expected.sit.spacer, pv_spacer.anc_par, 1);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr,"Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 		}
@@ -1607,7 +1604,7 @@ int main(int argc, char *argv[])
 			strcat(file_pval0, buf);
 			if ((out_pval[i] = fopen(file_pval0, "wt")) == NULL)
 			{
-				printf("Input file %s can't be opened!\n", file_pval0);
+				fprintf(stderr,"Input file %s can't be opened!\n", file_pval0);
 				return -1;
 			}
 			fprintf(out_pval[i], "Anchor Thr\tPartner Thr\t\tReal CE+\tReal Total\tRand CE+\tRand Total\tFold\tP-value\n");
@@ -1763,7 +1760,7 @@ int main(int argc, char *argv[])
 		if ((out_pval_table = fopen(file_pval_table, "at")) == NULL)
 		{
 
-			printf("Input file %s can't be opened!\n", file_pval_table);
+			fprintf(stderr,"Input file %s can't be opened!\n", file_pval_table);
 			return -1;
 		}
 		if (mot_p == 0)
