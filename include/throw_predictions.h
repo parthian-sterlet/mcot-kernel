@@ -29,8 +29,14 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 	for(n=0;n<nseq_rand;n++)
 	{
 		if(anc->nsit[n]==0 || par->nsit[n]==0)continue;
-		int n_clust[2], *nsit_clust[2], *clust_len[2], clust_tot_len[2];
 		int n_real=n/height;// nomer realnoy posl-ti
+		if (anc->nsit[n] >= 100 || par->nsit[n] >= 100)
+		{
+			throw_err_real[n_real] = 1;
+			ret_value++;
+			continue;
+		}
+		int n_clust[2], *nsit_clust[2], *clust_len[2], clust_tot_len[2];		
 		int len[2], nsit[2];
 		memset(peak_anc,'n',peak_len[n]);
 		peak_anc[peak_len[n]]='\0';							
@@ -327,7 +333,7 @@ int throw_predictions(int *peak_len, profile *anc, profile *par, int len_a, int 
 		}
 		//printf("Impl %d Perm %d\t",implant,permut);
 		int cycle=0;
-		int cycle_max=10000;
+		int cycle_max=100;
 		int gom=0;
 		for(j=0;j<n_clust[permut];j++)order[permut][j]=j;
 		do
