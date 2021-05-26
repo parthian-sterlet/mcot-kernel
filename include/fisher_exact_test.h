@@ -104,6 +104,7 @@ int fisher_exact_test(int a, int b, int c, int d, double &pvalue, int depletion_
 //		double fab = (double)(a) / b;
 //		double fcd = (double)(c) / d;
 	long double pcrit=FicsherExact(x);
+	int small = Min(x[0], x[1]);
 	long double p, ret_a=0, ret_b=0;
 	//printf("External %g\n", pcrit);
 	y[0]=x[0]+x[1];
@@ -111,16 +112,17 @@ int fisher_exact_test(int a, int b, int c, int d, double &pvalue, int depletion_
 	y[2]=x[2]-x[1];
 	y[3]=x[3]+x[1];
 	p=0;
-	while(y[1]<=x[1])
+	while (y[1] <= small)
 	{
 		p=FicsherExact(y);
 	//	printf("External %Lf\n", p);
 	//	fprintf(out,"%d\t%d\t%d\t%d\t",y[0],y[1],y[2],y[3]);
 	//	fprintf(out,"\t%Lf\n",p);
-		if(p<=pcrit)ret_a+=p;			
+		if (p <= pcrit)ret_a += p;
+		else break;
 		y[0]--;y[1]++;
 		y[2]++;y[3]--;
-		if(y[0]<0 || y[3]<0)break;		
+	//	if(y[0]<0 || y[3]<0)break;		
 	}
 	//printf("External sum %Lf\n", ret_a);
 	y[0]=0;//x[0]-x[0]
@@ -128,16 +130,17 @@ int fisher_exact_test(int a, int b, int c, int d, double &pvalue, int depletion_
 	y[2]=x[2]+x[0];
 	y[3]=x[3]-x[0];
 	p=0;
-	while(y[0]<=x[0])
+	while (y[0] <= small)
 	{
 		p=FicsherExact(y);
 	//	printf("External %Lf\n", p);
 	//	fprintf(out,"%d\t%d\t%d\t%d\t",y[0],y[1],y[2],y[3]);
 	//	fprintf(out,"\t%Lg\n",p);
-		if(p<=pcrit)ret_b+=p;
+		if (p <= pcrit)ret_b += p;
+		else break;
 		y[0]++;y[1]--;
 		y[2]--;y[3]++;
-		if(y[1]<0 || y[2]<0)break;
+		//if(y[1]<0 || y[2]<0)break;
 	}
 	//printf("External sum %Lf\n", ret_b);		
 	pvalue=ret_a + ret_b;
