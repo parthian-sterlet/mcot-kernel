@@ -78,70 +78,82 @@ int fisher_exact_test(int a, int b, int c, int d, double &pvalue, int depletion_
 	else fold=1.01;
 	if(fold<1 && depletion_check==0){pvalue=1;return 0;}
 	//x[0]=a;x[1]=b;x[2]=c;x[3]=d;
-	int min = 0;
-	int num;
-	{			
+	{
 		int ab = a + b;
-		min = ab; num = 1;
-		int cd = c + d;
-		if (cd < min){ min = cd; num = 2; }
-	}
-	//if (matrix_opt == 1)
-	{						
 		int ac = a + c;
-		if (ac < min){ min = ac; num = 3; }
 		int bd = b + d;
-		if (bd < min){ min = bd; num = 4; }
-		//if (matrix_opt == 0)num = 1;
+		int cd = c + d;
+		int min1 = Min(ab, ac);
+		int min2 = Min(bd, cd);
+		int min3 = Min(min1, min2);
+		x[0] = a; x[1] = b; x[2] = c; x[3] = d;
+		if (min3 == ab)
+		{
+			if (a < b) { x[0] = a; x[1] = b; x[2] = c; x[3] = d; }
+			else { x[0] = b; x[1] = a; x[2] = d; x[3] = c; }
+		}
+		else
+		{
+			if (min3 == ac)
+			{
+				if (a < c) { x[0] = a; x[1] = c; x[2] = b; x[3] = d; }
+				else { x[0] = c; x[1] = a; x[2] = d; x[3] = b; }
+			}
+			else
+			{
+				if (min3 == bd)
+				{
+					if (b < d) { x[0] = b; x[1] = d; x[2] = a; x[3] = c; }
+					else { x[0] = d; x[1] = b; x[2] = c; x[3] = a; }
+				}
+				else// cd
+				{
+					if (c < d) { x[0] = c; x[1] = d; x[2] = a; x[3] = b; }
+					else { x[0] = d; x[1] = c; x[2] = b; x[3] = a; }
+				}
+			}
+		}
 	}
-	switch(num)
+	long double pcrit = FicsherExact(x);
+	long double p, ret_a = 0, ret_b = 0;
+//	printf("pcrit %g\n", pcrit);
+	//for (i = 0; i < 4; i++)y[i] = x[i];		
+	y[0] = x[0] + x[1];
+	y[1] = 0;//x[1]-x[1];
+	y[2] = x[2] - x[1];
+	y[3] = x[3] + x[1];
+	p = 0;
+	do
 	{
-	case 1:{x[0]=a;x[1]=b;x[2]=c;x[3]=d;break;}
-	case 2:{x[0]=c;x[1]=d;x[2]=a;x[3]=b;break;}
-	case 3:{x[0]=a;x[1]=c;x[2]=b;x[3]=d;break;}
-	case 4:{x[0]=b;x[1]=d;x[2]=a;x[3]=c;break;}
-	}		
-//		double fab = (double)(a) / b;
-//		double fcd = (double)(c) / d;
-	long double pcrit=FicsherExact(x);
-	int small = Min(x[0], x[1]);
-	long double p, ret_a=0, ret_b=0;
-	//printf("External %g\n", pcrit);
-	y[0]=x[0]+x[1];
-	y[1]=0;//x[1]-x[1];
-	y[2]=x[2]-x[1];
-	y[3]=x[3]+x[1];
-	p=0;
-	while (y[1] <= small)
-	{
-		p=FicsherExact(y);
-	//	printf("External %Lf\n", p);
-	//	fprintf(out,"%d\t%d\t%d\t%d\t",y[0],y[1],y[2],y[3]);
-	//	fprintf(out,"\t%Lf\n",p);
+		p = FicsherExact(y);
+		//	printf("External %Lf\n", p);
+	//	printf("%d\t%d\t%d\t%d\t", y[0], y[1], y[2], y[3]);
+	//	printf("\t%Lf\n", p);
 		if (p <= pcrit)ret_a += p;
 		else break;
-		y[0]--;y[1]++;
-		y[2]++;y[3]--;
-	//	if(y[0]<0 || y[3]<0)break;		
-	}
-	//printf("External sum %Lf\n", ret_a);
-	y[0]=0;//x[0]-x[0]
-	y[1]=x[1]+x[0];
-	y[2]=x[2]+x[0];
-	y[3]=x[3]-x[0];
-	p=0;
-	while (y[0] <= small)
+		y[0]--; y[1]++;
+		y[2]++; y[3]--;
+		//if(y[0]<0 || y[3]<0)break;		
+	} while (y[0] >= 0 && y[3] >= 0);
+	//printf("Sum1 %Lf\n", ret_a);
+	y[0] = 0;//x[0]-x[0]
+	y[1] = x[1] + x[0];
+	y[2] = x[2] + x[0];
+	y[3] = x[3] - x[0];
+	//for (i = 0; i < 4; i++)y[i] = x[i];
+	p = 0;
+	do
 	{
-		p=FicsherExact(y);
-	//	printf("External %Lf\n", p);
-	//	fprintf(out,"%d\t%d\t%d\t%d\t",y[0],y[1],y[2],y[3]);
-	//	fprintf(out,"\t%Lg\n",p);
+		p = FicsherExact(y);
+		//	printf("External %Lf\n", p);
+		//printf("%d\t%d\t%d\t%d\t", y[0], y[1], y[2], y[3]);
+		//printf("\t%Lg\n", p);
 		if (p <= pcrit)ret_b += p;
 		else break;
-		y[0]++;y[1]--;
-		y[2]--;y[3]++;
+		y[0]++; y[1]--;
+		y[2]--; y[3]++;
 		//if(y[1]<0 || y[2]<0)break;
-	}
+	} while (y[1] >= 0 && y[2] >= 0);
 	//printf("External sum %Lf\n", ret_b);		
 	pvalue=ret_a + ret_b;
 	if(pvalue<limit)pvalue=limit;
