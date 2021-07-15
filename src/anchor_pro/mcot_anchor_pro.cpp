@@ -1,6 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #define _CRT_SECURE_NO_WARNINGS
 
 #include  <stdio.h>
@@ -13,7 +10,7 @@
 #define Min(a,b) ((a)>(b))? (b):(a);
 #define Max(a,b) ((a)>(b))? (a):(b);
 #define SEQLEN 12000
-#define MATLEN 50 //max matrix length
+#define MATLEN 110 //max matrix length
 #define SPACLEN 100 //max spacer length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
@@ -351,7 +348,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	//if(strncmp(mode,"real",4)==0)print_sco=1;
 	//	else print_sco=0;
 	int i, j;
-	char fileo[80];
+	char fileo[200];
 	FILE *out;
 	memset(fileo, '\0', sizeof(fileo));
 	strcpy(fileo, mode);
@@ -409,9 +406,9 @@ int profile::test(void)
 	}
 	return 1;
 }
-int UnderStol(char *str, int nstol, char *ret, char sep)
+int UnderStol(char *str, int nstol, char *ret, size_t size, char sep)
 {
-	memset(ret, 0, sizeof(ret));
+	memset(ret, 0, size);
 	int p1, p2, len;
 	if (nstol == 0)
 	{
@@ -429,7 +426,7 @@ int UnderStol(char *str, int nstol, char *ret, char sep)
 		{
 			p2 = strlen(str);
 		}
-		if (p1 == -1 || p2 == -1) return 0;
+		if (p1 == -1 || p2 == -1) return -1;
 		len = p2 - p1 - 1;
 		strncpy(ret, &str[p1 + 1], len);
 		ret[len] = '\0';
@@ -668,12 +665,12 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[120], file_profile[2][120], file_table[2][120];
+	char file_fasta[200], file_profile[2][200], file_table[2][200];
 	char ***seq;// peaks
-	char file_hist[120], file_pval[5][120], file_pval_table[120], file_hist_rand[120];
-	char name[2][120], name_fasta[120];
+	char file_hist[200], file_pval[5][200], file_pval_table[200], file_hist_rand[200];
+	char name[2][200], name_fasta[200];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
-	char file_fpr[2][80];
+	char file_fpr[2][200];
 	strcpy(file_fpr[0], "fpr_anchor.txt");
 	strcpy(file_fpr[1], "fpr_partner.txt");
 
@@ -926,7 +923,7 @@ int main(int argc, char *argv[])
 	fprintf(out_stat, "# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
 	*/
 	FILE *out_stat;
-	char file_stat[120];
+	char file_stat[200];
 	memset(file_stat, '\0', sizeof(file_stat));
 	strcpy(file_stat, name_fasta);
 	strcat(file_stat, "_");
@@ -950,8 +947,8 @@ int main(int argc, char *argv[])
 			printf("Input file %s can't be opened!", file_table[mot]);
 			return -1;
 		}
-		char d[100];		
-		fgets(d, sizeof(d), in_tab);//header
+		char d[200];		
+		//fgets(d, sizeof(d), in_tab);//header
 		while (fgets(d, sizeof(d), in_tab) != NULL)
 		{
 			char c = d[0];
@@ -959,7 +956,7 @@ int main(int argc, char *argv[])
 			if (c == '-' || isdigit(c))
 			{
 				char s[30];
-				int test = UnderStol(d, 1, s, sep);
+				int test = UnderStol(d, 1, s, sizeof(s), sep);
 				if (test == -1) { printf("Wrong format %s\n", d); exit(1); }
 				n_thresh++;
 				double fprx = atof(s);
@@ -967,7 +964,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		rewind(in_tab);
-		fgets(d, sizeof(d), in_tab);//header		
+	//	fgets(d, sizeof(d), in_tab);//header		
 		thr_all = new double[n_thresh];
 		if (thr_all == NULL) { puts("Out of memory..."); return -1; }
 		fp_rate = new double[n_thresh];
@@ -979,7 +976,8 @@ int main(int argc, char *argv[])
 			if (c == '-' || isdigit(c))
 			{
 				char s[30];
-				int test = UnderStol(d, 1, s, '\t');
+				char sep = '\t';
+				int test = UnderStol(d, 1, s, sizeof(s), sep);
 				if (test == -1) { printf("Wrong format %s\n", d); exit(1); }
 				thr_all[k] = atof(d);
 				fp_rate[k] = atof(s);
@@ -1075,7 +1073,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		{
-			char name_print[120];
+			char name_print[200];
 			memset(name_print, '\0', sizeof(name_print));
 			strcpy(name_print, name_fasta);
 			strcat(name_print, "_");
@@ -1131,7 +1129,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	char file_err[120];// = "throw_prediction.txt";	
+	char file_err[200];// = "throw_prediction.txt";	
 	for (mot_p = 0; mot_p < 2; mot_p++)
 	{
 		len_partner = len_motif[mot_p];
@@ -1145,7 +1143,7 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		//		char file_throw_err[80], file_throw_err0[80];
+		//		char file_throw_err[200], file_throw_err0[200];
 		//	FILE *out_nsit_throw;
 		{// one threshold
 			//				int fprint_pro;
@@ -1233,7 +1231,7 @@ int main(int argc, char *argv[])
 				printf("Projoin Rand error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			char name_proj[120];
+			char name_proj[200];
 			memset(name_proj, '\0', sizeof(name_proj));
 			strcpy(name_proj, name_fasta);
 			strcat(name_proj, "_");
@@ -1260,7 +1258,7 @@ int main(int argc, char *argv[])
 				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
 			}
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[80];
+			char file_hist_one[200];
 			strcpy(file_hist_one, file_hist);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
@@ -1275,7 +1273,7 @@ int main(int argc, char *argv[])
 			{
 				char flow[5][8] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
 				FILE *out_plot[5];
-				char file_plot[5][80];
+				char file_plot[5][200];
 				for (i = 0; i < 5; i++)
 				{
 					strcpy(file_plot[i], name_fasta);
@@ -1622,7 +1620,7 @@ int main(int argc, char *argv[])
 		}
 		for (i = 0; i < 5; i++)
 		{
-			char file_pval0[80];
+			char file_pval0[200];
 			strcpy(file_pval0, file_pval[i]);
 			char buf[10];
 			sprintf(buf, "%d", mot_p);
