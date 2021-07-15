@@ -431,7 +431,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	//if(strncmp(mode,"real",4)==0)print_sco=1;
 	//	else print_sco=0;
 	int i, j;
-	char fileo[200];
+	char fileo[300];
 	FILE *out;
 	memset(fileo, '\0', sizeof(fileo));
 	strcpy(fileo, mode);
@@ -723,12 +723,12 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[200], mypath_data[200], prom[200], file_pfm_anchor[2][200];
+	char file_fasta[300], mypath_data[300], prom[300], file_pfm_anchor[2][300];
 	char ***seq;// peaks
-	char file_hist[200], file_pval[5][200], file_pval_table[200], file_hist_rand[200];
-	char name[2][200];
+	char file_hist[300], file_pval[5][300], file_pval_table[300], file_hist_rand[300];
+	char name[2][50];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
-	char file_fpr[2][200];
+	char file_fpr[2][300];
 	strcpy(file_fpr[0], "fpr_anchor.txt");
 	strcpy(file_fpr[1], "fpr_partner.txt");
 
@@ -1147,7 +1147,7 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		//		char file_throw_err[80], file_throw_err0[80];
+		//		char file_throw_err[300], file_throw_err0[300];
 		//	FILE *out_nsit_throw;
 		{// one threshold
 			//				int fprint_pro;
@@ -1241,7 +1241,7 @@ int main(int argc, char *argv[])
 				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
 			}
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[200];
+			char file_hist_one[300];
 			strcpy(file_hist_one, file_hist);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
@@ -1256,7 +1256,7 @@ int main(int argc, char *argv[])
 			{
 				char flow[5][8] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
 				FILE *out_plot[5];
-				char file_plot[5][200];
+				char file_plot[5][300];
 				for (i = 0; i < 5; i++)
 				{
 					strcpy(file_plot[i], "plot_");
@@ -1597,7 +1597,7 @@ int main(int argc, char *argv[])
 		}
 		for (i = 0; i < 5; i++)
 		{
-			char file_pval0[200];
+			char file_pval0[300];
 			strcpy(file_pval0, file_pval[i]);
 			char buf[10];
 			sprintf(buf, "%d", mot_p);
