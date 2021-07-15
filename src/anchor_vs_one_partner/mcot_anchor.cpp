@@ -431,7 +431,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	//if(strncmp(mode,"real",4)==0)print_sco=1;
 	//	else print_sco=0;
 	int i, j;
-	char fileo[80];
+	char fileo[200];
 	FILE *out;
 	memset(fileo, '\0', sizeof(fileo));
 	strcpy(fileo, mode);
