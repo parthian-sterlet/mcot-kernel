@@ -531,7 +531,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	//if(strncmp(mode,"real",4)==0)print_sco=1;
 	//	else print_sco=0;
 	int i, j;
-	char fileo[200];
+	char fileo[300];
 	FILE *out;
 	memset(fileo, '\0', sizeof(fileo));
 	strcpy(fileo, mode);
@@ -826,13 +826,13 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, n_motifs, mot, *bad_matrix;
-	char file_fasta[200], mot_db[30], mypath_data[200], prom[200], partner_db[30], file_pfm_anchor[200];
+	char file_fasta[300], mot_db[30], mypath_data[300], prom[300], partner_db[30], file_pfm_anchor[300];
 	char ***seq;// peaks
 
-	char file_hist[200], file_hist_rand[200], file_pval[5][200], file_pval_table[200];
-	char name_anchor[200], name_partner[200];
+	char file_hist[300], file_hist_rand[300], file_pval[5][300], file_pval_table[300];
+	char name_anchor[300], name_partner[300];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
-	char file_fpr[200];
+	char file_fpr[300];
 	strcpy(file_fpr, "fpr_anchor.txt");
 
 	if (argc != 7)
@@ -1507,7 +1507,7 @@ int main(int argc, char *argv[])
 
 			//printf("Mot %d Enter hist\n",mot);
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[200];
+			char file_hist_one[300];
 			strcpy(file_hist_one, file_hist);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
@@ -1523,7 +1523,7 @@ int main(int argc, char *argv[])
 			{
 				char flow[5][8] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
 				FILE *out_plot[5];
-				char file_plot[5][200];
+				char file_plot[5][300];
 				for (i = 0; i<5; i++)
 				{
 					strcpy(file_plot[i], "plot_");
@@ -1864,7 +1864,7 @@ int main(int argc, char *argv[])
 		}
 		for (i = 0; i<5; i++)
 		{
-			char file_pval0[200];
+			char file_pval0[300];
 			strcpy(file_pval0, file_pval[i]);
 			char buf[10];
 			sprintf(buf, "%d", mot);
