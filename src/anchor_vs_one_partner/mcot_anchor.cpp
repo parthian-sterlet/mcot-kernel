@@ -12,6 +12,7 @@
 #define SEQLEN 12000
 #define MATLEN 50 //max matrix length
 #define SPACLEN 100 //max spacer length
+#define ARGLEN 300 //max matrix length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
 
@@ -431,7 +432,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	//if(strncmp(mode,"real",4)==0)print_sco=1;
 	//	else print_sco=0;
 	int i, j;
-	char fileo[300];
+	char fileo[ARGLEN];
 	FILE *out;
 	memset(fileo, '\0', sizeof(fileo));
 	strcpy(fileo, mode);
@@ -723,12 +724,12 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[300], mypath_data[300], prom[300], file_pfm_anchor[2][300];
+	char file_fasta[ARGLEN], mypath_data[ARGLEN], prom[ARGLEN], file_pfm_anchor[2][ARGLEN];
 	char ***seq;// peaks
-	char file_hist[300], file_pval[5][300], file_pval_table[300], file_hist_rand[300];
+	char file_hist[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN], file_hist_rand[ARGLEN];
 	char name[2][50];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
-	char file_fpr[2][300];
+	char file_fpr[2][ARGLEN];
 	strcpy(file_fpr[0], "fpr_anchor.txt");
 	strcpy(file_fpr[1], "fpr_partner.txt");
 
@@ -738,6 +739,15 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "2 motif1 3motif2 ");
 		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome\n");//9char mot_anchor 
 		return -1;
+	}
+	for (i = 1; i < argc; i++)
+	{
+		int alen = strlen(argv[i]);
+		if (alen > ARGLEN)
+		{
+			fprintf(stderr, "Error! Argument number %d %s\nof command line is too long!\nMaximim %d symbols allowed\n", i, argv[i], ARGLEN);
+			return -1;
+		}
 	}
 	int thresh_num_min = 1, thresh_num_max = 5;	// 1 5    or 5 5
 	strcpy(file_fasta, argv[1]);
@@ -1147,7 +1157,7 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		//		char file_throw_err[300], file_throw_err0[300];
+		//		char file_throw_err[ARGLEN], file_throw_err0[ARGLEN];
 		//	FILE *out_nsit_throw;
 		{// one threshold
 			//				int fprint_pro;
@@ -1241,7 +1251,7 @@ int main(int argc, char *argv[])
 				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
 			}
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[300];
+			char file_hist_one[ARGLEN];
 			strcpy(file_hist_one, file_hist);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
@@ -1256,7 +1266,7 @@ int main(int argc, char *argv[])
 			{
 				char flow[5][8] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
 				FILE *out_plot[5];
-				char file_plot[5][300];
+				char file_plot[5][ARGLEN];
 				for (i = 0; i < 5; i++)
 				{
 					strcpy(file_plot[i], "plot_");
@@ -1597,7 +1607,7 @@ int main(int argc, char *argv[])
 		}
 		for (i = 0; i < 5; i++)
 		{
-			char file_pval0[300];
+			char file_pval0[ARGLEN];
 			strcpy(file_pval0, file_pval[i]);
 			char buf[10];
 			sprintf(buf, "%d", mot_p);
