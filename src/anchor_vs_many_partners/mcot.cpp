@@ -12,7 +12,7 @@
 #define SEQLEN 12000 // max length of peak in input fasta
 #define MATLEN 50 //max matrix length
 #define SPACLEN 100 //max upper bound of spacer length
-#define ARGLEN 300 //max matrix length
+#define ARGLEN 300 //max argv length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
 #define Min(a,b) ((a)>(b))? (b):(a);
