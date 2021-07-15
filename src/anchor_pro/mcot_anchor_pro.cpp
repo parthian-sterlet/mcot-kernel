@@ -12,6 +12,7 @@
 #define SEQLEN 12000
 #define MATLEN 110 //max matrix length
 #define SPACLEN 100 //max spacer length
+#define ARGLEN 300 //max matrix length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
 
@@ -348,7 +349,7 @@ int profile::fprintf_pro(char *mot_db, double thr, char *mode)
 	//if(strncmp(mode,"real",4)==0)print_sco=1;
 	//	else print_sco=0;
 	int i, j;
-	char fileo[300];
+	char fileo[ARGLEN];
 	FILE *out;
 	memset(fileo, '\0', sizeof(fileo));
 	strcpy(fileo, mode);
@@ -665,12 +666,12 @@ void asy_plot::mem_out(void)
 int main(int argc, char *argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[300], file_profile[2][300], file_table[2][300];
+	char file_fasta[ARGLEN], file_profile[2][ARGLEN], file_table[2][ARGLEN];
 	char ***seq;// peaks
-	char file_hist[300], file_pval[5][300], file_pval_table[300], file_hist_rand[300];
-	char name[2][300], name_fasta[300];
+	char file_hist[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN], file_hist_rand[ARGLEN];
+	char name[2][ARGLEN], name_fasta[ARGLEN];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
-	char file_fpr[2][300];
+	char file_fpr[2][ARGLEN];
 	strcpy(file_fpr[0], "fpr_anchor.txt");
 	strcpy(file_fpr[1], "fpr_partner.txt");
 
@@ -680,6 +681,15 @@ int main(int argc, char *argv[])
 		printf("2 motif1.profile 3motif2.profile 4int motif1.length 5int motif1.length 6int motif1.table_thr_fpr 7int motif1.table_thr_fpr");
 		printf(" 8int spacer_min 9int spacer_max\n");//9char mot_anchor 
 		return -1;
+	}
+	for (i = 1; i < argc; i++)
+	{
+		int alen = strlen(argv[i]);
+		if (alen > ARGLEN)
+		{
+			fprintf(stderr, "Error! Argument number %d %s\nof command line is too long!\nMaximim %d symbols allowed\n", i, argv[i], ARGLEN);
+			return -1;
+		}
 	}
 	int thresh_num_min = 1, thresh_num_max = 5;	// 1 5    or 5 5
 	strcpy(file_fasta, argv[1]);
@@ -923,7 +933,7 @@ int main(int argc, char *argv[])
 	fprintf(out_stat, "# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
 	*/
 	FILE *out_stat;
-	char file_stat[300];
+	char file_stat[ARGLEN];
 	memset(file_stat, '\0', sizeof(file_stat));
 	strcpy(file_stat, name_fasta);
 	strcat(file_stat, "_");
@@ -947,7 +957,7 @@ int main(int argc, char *argv[])
 			printf("Input file %s can't be opened!", file_table[mot]);
 			return -1;
 		}
-		char d[300];		
+		char d[ARGLEN];		
 		//fgets(d, sizeof(d), in_tab);//header
 		while (fgets(d, sizeof(d), in_tab) != NULL)
 		{
@@ -1073,7 +1083,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		{
-			char name_print[300];
+			char name_print[ARGLEN];
 			memset(name_print, '\0', sizeof(name_print));
 			strcpy(name_print, name_fasta);
 			strcat(name_print, "_");
@@ -1129,7 +1139,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	char file_err[300];// = "throw_prediction.txt";	
+	char file_err[ARGLEN];// = "throw_prediction.txt";	
 	for (mot_p = 0; mot_p < 2; mot_p++)
 	{
 		len_partner = len_motif[mot_p];
@@ -1143,7 +1153,7 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		//		char file_throw_err[300], file_throw_err0[300];
+		//		char file_throw_err[ARGLEN], file_throw_err0[ARGLEN];
 		//	FILE *out_nsit_throw;
 		{// one threshold
 			//				int fprint_pro;
@@ -1231,7 +1241,7 @@ int main(int argc, char *argv[])
 				printf("Projoin Rand error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			char name_proj[300];
+			char name_proj[ARGLEN];
 			memset(name_proj, '\0', sizeof(name_proj));
 			strcpy(name_proj, name_fasta);
 			strcat(name_proj, "_");
@@ -1258,7 +1268,7 @@ int main(int argc, char *argv[])
 				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
 			}
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[300];
+			char file_hist_one[ARGLEN];
 			strcpy(file_hist_one, file_hist);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
@@ -1273,7 +1283,7 @@ int main(int argc, char *argv[])
 			{
 				char flow[5][8] = { "Full", "Partial", "Overlap", "Spacer", "Any" };
 				FILE *out_plot[5];
-				char file_plot[5][300];
+				char file_plot[5][ARGLEN];
 				for (i = 0; i < 5; i++)
 				{
 					strcpy(file_plot[i], name_fasta);
@@ -1620,7 +1630,7 @@ int main(int argc, char *argv[])
 		}
 		for (i = 0; i < 5; i++)
 		{
-			char file_pval0[300];
+			char file_pval0[ARGLEN];
 			strcpy(file_pval0, file_pval[i]);
 			char buf[10];
 			sprintf(buf, "%d", mot_p);
