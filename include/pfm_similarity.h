@@ -120,6 +120,11 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 	int i1, i2, j1, j2;
 	int len1=len-1;
 	int alphabet1=alphabet-1;	
+	int rel_mono[4] = { 3,2,1,0 };
+	int rel_di[16] = { 15,8,7,3, 14,10,6,2, 13,9,5,1, 3,8,4,0 };
+	int j, rel[16];
+	if (alphabet == 4)for (j = 0; j < 4; j++)rel[j] = rel_mono[j];
+	else for (j = 0; j < 16; j++)rel[j] = rel_di[j];
 	for(i1=0;i1<len;i1++)
 	{
 		i2=rand()%len1;
@@ -127,23 +132,34 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 		j1=rand()%alphabet;
 		j2=rand()%alphabet1;
 		if(j2==j1)j2++;
+		int x = rand() % 2;
+		if (x == 0) 
+		{ 
+			j1c = j1; 
+			j2c = j2; 
+		}
+		else 
+		{ 
+			j1c = rel[j1]; 
+			j2c = rel[j2]; 
+		}
 		int go_up=1, go_do=1;
-		if(pfm[i1][j1]==size && pfm[i2][j1]==size)go_up=0;
-		if(pfm[i1][j2]==size && pfm[i2][j2]==size)go_up=0;
-		if(pfm[i1][j1]==0 && pfm[i2][j1]==0)go_do=0;
-		if(pfm[i1][j2]==0 && pfm[i2][j2]==0)go_do=0;
+		if(pfm[i1][j1]==size && pfm[i2][j1c] == size)go_up=0;
+		if(pfm[i1][j2] == size && pfm[i2][j2c]==size)go_up=0;//
+		if(pfm[i1][j1] == 0 && pfm[i2][j1c]==0)go_do=0;//
+		if(pfm[i1][j2]==0 && pfm[i2][j2c] == 0)go_do=0;//
 		if(go_up==0 && go_do==0)continue;		
 		int up1,up2,up12=0,do1,do2,do12=0;
 		if(go_up==1)
 		{
-			up1=Min(size-pfm[i1][j1],size-pfm[i2][j2]);
-			up2=Min(pfm[i2][j1],pfm[i1][j2]);
+			up1=Min(size-pfm[i1][j1],size-pfm[i2][j2c]);
+			up2=Min(pfm[i2][j1c],pfm[i1][j2]);
 			up12=Min(up1,up2);		
 		}
 		if(go_do==1)
 		{
-			do1=Min(pfm[i1][j1],pfm[i2][j2]);
-			do2=Min(size-pfm[i2][j1],size-pfm[i1][j2]);
+			do1=Min(pfm[i1][j1],pfm[i2][j2c]);
+			do2=Min(size-pfm[i2][j1c],size-pfm[i1][j2]);
 			do12=Min(do1,do2);
 		}
 		int sum_up_do=up12+do12;
@@ -158,9 +174,9 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 		//printf("Do- First col %d,%d Second col %d,%d\n",pfm[i1][j1],pfm[i1][j2],pfm[i2][j1],pfm[i2][j2]);
 		pfm[i1][j1]+=delta;
 		pfm[i1][j2]-=delta;
-		pfm[i2][j1]-=delta;
-		pfm[i2][j2]+=delta;
-		if((pfm[i1][j1]>size || pfm[i1][j2]<0) || (pfm[i2][j1]<0 || pfm[i2][j2]>size))
+		pfm[i2][j1c]-=delta;
+		pfm[i2][j2c]+=delta;
+		if((pfm[i1][j1]>size || pfm[i1][j2]<0) || (pfm[i2][j1c]<0 || pfm[i2][j2c]>size))
 		{
 			int yy=0;
 		}
@@ -203,7 +219,7 @@ void PFM_compl(int pfm[][OLIGNUM], int pfmc[][OLIGNUM], int olen)
 		}
 	}	
 }
-double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap_min, int n_cycle_small, int n_cycle_large, double pval[2])//int measure_type
+double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap_min, int n_cycle_small, int n_cycle_large, double pval[2], int reini_permut)//int measure_type
 {	
 	//int ***pfm, ***pfmr, ***pfmc;	
 	int pfm[2][MATLEN][OLIGNUM];
@@ -524,7 +540,20 @@ double pfm_similarity(matrices *mat1, matrices *mat2, double granul, int overlap
 		}
 		for(i=0;i<n_track;i++)av[i]=sd[i]=0;
 		for(n=1;n<=n_cycle;n++)
-		{				
+		{
+			if (n % reini_permut == 0)
+			{
+				for (k = 0; k < 2; k++)
+				{
+					for (i = 0; i < olen[k]; i++)
+					{
+						for (j = 0; j < OLIGNUM; j++)
+						{
+							pfmr[k][i][j] = pfm[k][i][j];
+						}
+					}					
+				}
+			}
 			for(k=0;k<2;k++)Permute_columns(pfmr[k],olen[k],OLIGNUM,granul_back);		
 			if(k1==1) //vtoraya dlinnee k0=0 k1=1
 			{						
