@@ -2,7 +2,7 @@
 
 ## General description
 
-MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset ([Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800); [Levitsky et al., 2020](https://doi.org/10.3390/ijms21176023), [Levitsky et al., 2022](https://doi.org/10.3390/ijms23168981)). CEs detected by MCOT include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
+MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset ([Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800); [Levitsky et al., 2020](https://doi.org/10.3390/ijms21176023); [Levitsky et al., 2022](https://doi.org/10.3390/ijms23168981)). CEs detected by MCOT include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
 
 ## Implementation
 
