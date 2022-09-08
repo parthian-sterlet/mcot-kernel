@@ -120,11 +120,6 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 	int i1, i2, j1, j2;
 	int len1=len-1;
 	int alphabet1=alphabet-1;	
-	int rel_mono[4] = { 3,2,1,0 };
-	int rel_di[16] = { 15,8,7,3, 14,10,6,2, 13,9,5,1, 3,8,4,0 };
-	int j, rel[16];
-	if (alphabet == 4)for (j = 0; j < 4; j++)rel[j] = rel_mono[j];
-	else for (j = 0; j < 16; j++)rel[j] = rel_di[j];
 	for(i1=0;i1<len;i1++)
 	{
 		i2=rand()%len1;
@@ -132,17 +127,9 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 		j1=rand()%alphabet;
 		j2=rand()%alphabet1;
 		if(j2==j1)j2++;
-		int x = rand() % 2;
-		if (x == 0) 
-		{ 
-			j1c = j1; 
-			j2c = j2; 
-		}
-		else 
-		{ 
-			j1c = rel[j1]; 
-			j2c = rel[j2]; 
-		}
+		j1c = rand() % alphabet;
+		j2c = rand() % alphabet1;
+		if (j2c == j1c)j2c++;
 		int go_up=1, go_do=1;
 		if(pfm[i1][j1]==size && pfm[i2][j1c] == size)go_up=0;
 		if(pfm[i1][j2] == size && pfm[i2][j2c]==size)go_up=0;//
@@ -176,10 +163,10 @@ void Permute_columns(int pfm[][OLIGNUM], int len, int alphabet, int size)
 		pfm[i1][j2]-=delta;
 		pfm[i2][j1c]-=delta;
 		pfm[i2][j2c]+=delta;
-		if((pfm[i1][j1]>size || pfm[i1][j2]<0) || (pfm[i2][j1c]<0 || pfm[i2][j2c]>size))
+		/*if((pfm[i1][j1]>size || pfm[i1][j2]<0) || (pfm[i2][j1c]<0 || pfm[i2][j2c]>size))
 		{
 			int yy=0;
-		}
+		}*/
 		//printf("Po- First col %d,%d Second col %d,%d\n",pfm[i1][j1],pfm[i1][j2],pfm[i2][j1],pfm[i2][j2]);
 	}
 }
