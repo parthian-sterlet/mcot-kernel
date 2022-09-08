@@ -757,7 +757,7 @@ int main(int argc, char *argv[])
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
 	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
-	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000, reinit_permut = 25;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
+	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000, reinit_permut = 40;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
 	int shift_min = atoi(argv[4]); // minimal spacer length
 	int shift_max = atoi(argv[5]); // upper bound of spacer length
