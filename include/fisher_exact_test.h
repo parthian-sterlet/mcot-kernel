@@ -62,10 +62,10 @@ long double FicsherExact(int *x)
 	//printf("Internal %d\t%d\t%d\t%d\t\t%Lf\t%Lf\n", x[0],x[1],x[2],x[3],redo, ret);
 	return ret;
 }
-int fisher_exact_test(int a, int b, int c, int d, double &pvalue, int depletion_check)//int matrix_opt =1 int tail=0
+int fisher_exact_test(int a, int b, int c, int d, double &pvalue, double &fold, int depletion_check)//int matrix_opt =1 int tail=0
 {            
 	double limit=1E-300;
-	double fold=1;
+	fold=1;
 	//printf("Syntax %s: 1file_input 2file_output 3int mode(0 abcd=input, 1 a,a+b,c,c+d=input) 4int 2x2 optimization_column(1,0 yes,no stroki,kolonki) 5int report pvalue one-tailed test (1 enr -1 depl 0 two-tailed)", argv[0]);	
 	if(b==0 || d==0){pvalue=1;return 0;}
 	if(a<0 || b<0)return -1;
