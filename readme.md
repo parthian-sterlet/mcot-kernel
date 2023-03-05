@@ -308,10 +308,9 @@ Each line of output file contains data concerning one 2x2 contingency table, in 
 1 to 5 mean the change from the most stringent to the most permissive, see above); (2) four counts for 2x2 contingency table (see Table 1 above), 
 ‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) 
 and permuted (Rand) datasets. Finally, the table contains significance of CEs (p-values) computed by Fisher’s exact test for 25 cells of 5x5 tables 
-of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs, and 
-(b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs.
+of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs (lines 'Anchor', Partner'), significances of any asymmetrical CEs with more conserved either Anchor or Partner motifs (line 'Asymmetry'), significances of symmetrical CEs with the same  conservation of Anchor and Partner motifs (line 'Symmetry'), and (b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs, significances of asymmetry in CEs ‘Asymmetry vs. Symmetry with the positive/negative Fold respecting to the enrichment toward the Asymmetry/Symmetry in the motifs conservation. In these calculation points (a) and (b) imply counting of peaks and CEs, respectively. 
 
-Example, FOXA2 (Anchor) and HNF1B (Partner) motifs, Overlap computation flow.
+Example below shows FOXA2 (Anchor) and HNF1B (Partner) motifs for Overlap computation flow.
 
 Anchor Thr | Partner Thr |  | Real CE+ | Real Total | Rand CE+ | Rand Total | Fold | P-value
 |----------|-------------|--|----------|------------|----------|------------|------|-------|
@@ -346,8 +345,6 @@ Asymmetry |  |  | 399 | 1741 | 598 | 116647 | 44.704 | 1e-300
 Symmetry |  |  | 0 | 0 | 0 | 0 | 1.000 | 1
 Anchor_Partner |  |  | 280 | 1418 | 335 | 904 | 0.533 | 7.08806e-20
 Asym_Sym |  |  | 1418 | 1418 | 904 | 904 | 1.000 | 2
-
-
 
 
 * __Files <\*.best>, the list of predicted CEs__. 
@@ -385,6 +382,7 @@ where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed an
 |5.3..5.5|-4|-3|-2||-3||||||||
 |>5.5|4|2|-1|-2|-3||||||||
 
+The same calculations are performed for Anchor-Anchor CEs, in this case the enrichment of symmetrical vs. asymmetrical CEs are tested.
 
 ## References
 
