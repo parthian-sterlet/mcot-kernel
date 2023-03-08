@@ -2305,10 +2305,14 @@ int main(int argc, char *argv[])
 			else fprintf(out_pval_table, "\t0");
 			if (pv_spacer.equ.p != 0)fprintf(out_pval_table, "\t%.2f", pv_spacer.equ.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_overlap.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par.p);
-			else fprintf(out_pval_table, "\t0");
-			if (pv_spacer.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par.p);
-			else fprintf(out_pval_table, "\t0");
+			if (mot != 0)
+			{
+				if (pv_overlap.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par.p);
+				else fprintf(out_pval_table, "\t0");
+				if (pv_spacer.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par.p);
+				else fprintf(out_pval_table, "\t0");
+			}
+			else fprintf(out_pval_table, "\t\t");
 			if (pv_overlap.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.asy2.p);
 			else fprintf(out_pval_table, "\t0");
 			if (pv_spacer.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.asy2.p);
