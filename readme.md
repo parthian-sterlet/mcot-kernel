@@ -41,13 +41,13 @@ options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_
 The command line for one-partner option:
 
 
-`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters>`
+`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr>`
 
 
 The command line for many-partner option:
 
 
-`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters>`
+`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr>'
 
 
 
@@ -85,6 +85,9 @@ The command line for many-partner option:
 
 
 `<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
+
+
+'<pvalue>' = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
 
 
 The command line for anchor_pro option:
