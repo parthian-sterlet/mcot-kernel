@@ -859,11 +859,11 @@ int main(int argc, char *argv[])
 	char file_fpr[ARGLEN];
 	strcpy(file_fpr, "fpr_anchor.txt");
 
-	if (argc != 7)
+	if (argc != 8)
 	{
 		fprintf(stderr,"Error: %s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		//	printf ("4int height_permut 5int size_min_permut 6int size_max_permut 7double pvalue 8double pvalue_mult");
-		fprintf(stderr, " 2char anchor_motif 3char partner_db 4int spacer_min 5int spacer_max 6char path_genome\n");//9char mot_anchor 
+		fprintf(stderr, " 2char anchor_motif 3char partner_db 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -878,7 +878,7 @@ int main(int argc, char *argv[])
 	int thresh_num_min = 1, thresh_num_max = 5;	// 1 5    or 5 5
 	strcpy(file_fasta, argv[1]);
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25  parametry permutacii
-	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000005; // 0.0005 1.5 parametry dlya porogov matric
+	double pvalue_mult = 1.5, dpvalue = 0.0000005; // 0.0005 1.5 parametry dlya porogov matric
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database	
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for permutation(motif_comparison) min_length_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for permutation(motif_comparison) okruglenie 4astotnyh matric	
@@ -887,6 +887,15 @@ int main(int argc, char *argv[])
 	int shift_min = atoi(argv[4]); // minimal spacer length
 	int shift_max = atoi(argv[5]); // maximal spacer length
 	strcpy(mypath_data, argv[6]); // ./.../hs, mm, at
+	double pvalue = atof(argv[7]);
+	double pvalue_max_allowed = 0.002;
+	double pvalue_min_allowed = 0.0001;
+
+	if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
+	{
+		printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
+		exit(1);
+	}
 
 	strcpy(prom, mypath_data);
 	int nseq_genome, len_genome;
@@ -1122,7 +1131,7 @@ int main(int argc, char *argv[])
 
 	FILE *out_pval[5];
 	double pval_sim[4];
-	double thr_asy_min = 3.5, thr_asy_max = 5.5, dthr_asy = 0.2;
+	double dthr_asy = 0.2, thr_asy_min = 0.1 * ((int)(10 * (dthr_asy - log10(pvalue)))), thr_asy_max = thr_asy_min + 2;
 	int nthr_asy = (int)((thr_asy_max - thr_asy_min) / dthr_asy) + 2;
 	asy_plot real_plot, rand_plot;
 	real_plot.mem_in(nthr_asy, thr_asy_min, thr_asy_max, dthr_asy);
