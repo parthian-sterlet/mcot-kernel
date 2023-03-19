@@ -758,11 +758,11 @@ int main(int argc, char *argv[])
 	strcpy(file_fpr[0], "fpr_anchor.txt");
 	strcpy(file_fpr[1], "fpr_partner.txt");
 
-	if (argc != 7)
+	if (argc != 8)
 	{
 		fprintf(stderr,"Error: %s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		fprintf(stderr,"2 motif1 3motif2 ");
-		fprintf(stderr," 4int spacer_min 5int spacer_max 6char path_genome\n");//9char mot_anchor 
+		fprintf(stderr," 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -780,7 +780,8 @@ int main(int argc, char *argv[])
 	strcpy(file_pfm_anchor[1], argv[3]);
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
-	double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
+	//double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
+	double pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
@@ -788,7 +789,15 @@ int main(int argc, char *argv[])
 	int shift_max = atoi(argv[5]); // upper bound of spacer length
 	int nseq_genome, len_genome;
 	strcpy(mypath_data, argv[6]); //folder genome	.../hs, mm, at, mp	
+	double pvalue = atof(argv[7]);
+	double pvalue_max_allowed = 0.002;
+	double pvalue_min_allowed = 0.0001;
 
+	if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
+	{
+		printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
+		exit(1);
+	}
 	strcpy(prom, mypath_data);
 
 	if ((strstr(mypath_data, "hs") != NULL || strstr(mypath_data, "hg") != NULL) || (strstr(mypath_data, "HS") != NULL || strstr(mypath_data, "HG") != NULL))
@@ -999,7 +1008,7 @@ int main(int argc, char *argv[])
 	double *thr_all, *fp_rate;
 	double pwm_anchor[2][MATLEN][OLIGNUM];
 	int len_motif[2];
-	double thr_asy_min = 3.5, thr_asy_max = 5.5, dthr_asy = 0.2;
+	double dthr_asy = 0.2, thr_asy_min = 0.1*((int)(10*(dthr_asy-log10(pvalue)))), thr_asy_max = thr_asy_min+2;
 	int nthr_asy = (int)((thr_asy_max - thr_asy_min) / dthr_asy) + 2;
 	asy_plot real_plot, rand_plot;
 	real_plot.mem_in(nthr_asy, thr_asy_min, thr_asy_max, dthr_asy);
@@ -1281,6 +1290,28 @@ int main(int argc, char *argv[])
 				bonferroni_corr = pv_standard + log10(bonferroni_corr);
 				bonferroni_corr_ap = pv_standard + log10(bonferroni_corr_ap);
 				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
+			}
+			{
+				FILE* out_proj;
+				const char file_proj[] = "projoin.txt";
+				if (mot_a == mot_p)
+				{
+					if ((out_proj = fopen(file_proj, "wt")) == NULL)
+					{
+						printf("Input file %s can't be opened!\n", file_proj);
+						return -1;
+					}
+				}
+				else 
+				{
+					if ((out_proj = fopen(file_proj, "at")) == NULL)
+					{
+						printf("Input file %s can't be opened!\n", file_proj);
+						return -1;
+					}
+				}
+				fprintf(out_proj, "MotA\t%s\tMotP\t%s\tRealNseqBothMot\t%d\tRandNseqBothMot\t%d\tNseqReal\t%d\tNseqRand\t%d\n", file_pfm_anchor[mot_a], file_pfm_anchor[mot_p],nseq_two_sites_real, nseq_two_sites_rand,nseq_real,nseq_rand);
+				fclose(out_proj);
 			}
 			char modew[] = "wt", modea[] = "at";
 			char file_hist_one[ARGLEN];
