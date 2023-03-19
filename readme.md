@@ -47,7 +47,7 @@ The command line for one-partner option:
 The command line for many-partner option:
 
 
-`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr>'
+`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr>`
 
 
 
@@ -83,11 +83,10 @@ The command line for many-partner option:
 `<maximal spacer length>` = integer value from 0 to 100 (the default value 29)
 
 
-
 `<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
 
-'<pvalue>' = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
+`<pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
 
 
 The command line for anchor_pro option:
