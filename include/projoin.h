@@ -1,5 +1,5 @@
 int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min, int shift_max, int len_a, int len_p, int *thr_pre_err,
-			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot, int &nseq_two_sites)
+			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot, int &nseq_two_sites, double fold_asy)
 {	
 	int n, k,j, x,y;
 	char filebest[120], file_nsit_par[120], file_nsit_anc[120]; 
@@ -152,12 +152,12 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						if(pv_anc>=plot->max)a_karman=plot->n_karman;
 						else a_karman=1+(int)((pv_anc-plot->min)/plot->inter);
 					}
-					double r_dif=pv_anc-pv_par;
-					if(r_dif==0)join_sites_equ = 1;
+					double r_dif=pv_anc-pv_par, fr_dif = fabs(r_dif);
+					if(fr_dif <= fold_asy)join_sites_equ = 1;
 					else
 					{
 						join_sites_asy = 1;
-						if (r_dif > 0)join_sites_anc = 1;
+						if (r_dif > fold_asy)join_sites_anc = 1;
 						else join_sites_par = 1;
 					}
 					int ysta,yend;// start & end position of motif
@@ -185,11 +185,11 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						sam->sit.overlap++;
 						plot->full[a_karman][p_karman]++;
 						plot->overlap[a_karman][p_karman]++;
-						if (r_dif == 0)
+						if (fr_dif <= fold_asy)
 						{
 							sam->equ_sit.full++;
 							sam->equ_sit.overlap++;
-							if (r_dif > 0)
+							if (r_dif > fold_asy)
 							{
 								sam->anc_sit.full++;
 								sam->anc_sit.overlap++;
@@ -216,7 +216,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							sam->sit.overlap++;
 							plot->full[a_karman][p_karman]++;
 							plot->overlap[a_karman][p_karman]++;
-							if (r_dif == 0)
+							if (fr_dif <= fold_asy)
 							{
 								sam->equ_sit.full++;
 								sam->equ_sit.overlap++;
@@ -225,7 +225,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							{
 								sam->asy_sit.full++;
 								sam->asy_sit.overlap++;
-								if (r_dif > 0)
+								if (r_dif > fold_asy)
 								{
 									sam->anc_sit.full++;
 									sam->anc_sit.overlap++;
@@ -248,7 +248,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							sam->sit.partial++;
 							plot->partial[a_karman][p_karman]++;
 							plot->overlap[a_karman][p_karman]++;
-							if (r_dif == 0)
+							if (fr_dif <= fold_asy)
 							{
 								sam->equ_sit.partial++;
 								sam->equ_sit.overlap++;
@@ -257,7 +257,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							{
 								sam->asy_sit.partial++;
 								sam->asy_sit.overlap++;
-								if (r_dif > 0)
+								if (r_dif > fold_asy)
 								{
 									sam->anc_sit.partial++;
 									sam->anc_sit.overlap++;
@@ -279,7 +279,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								sam->sit.partial++;
 								plot->partial[a_karman][p_karman]++;
 								plot->overlap[a_karman][p_karman]++;
-								if (r_dif == 0)
+								if (fr_dif <= fold_asy)
 								{
 									sam->equ_sit.partial++;
 									sam->equ_sit.overlap++;
@@ -288,7 +288,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								{
 									sam->asy_sit.partial++;
 									sam->asy_sit.overlap++;
-									if (r_dif > 0)
+									if (r_dif > fold_asy)
 									{
 										sam->anc_sit.partial++;
 										sam->anc_sit.overlap++;
@@ -310,11 +310,11 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						{
 							take_distance = 1;//spacer
 							sam->sit.spacer++;
-							if (r_dif == 0)sam->equ_sit.spacer++;
+							if (fr_dif <= fold_asy)sam->equ_sit.spacer++;
 							else
 							{
 								sam->asy_sit.spacer++;
-								if (r_dif > 0)sam->anc_sit.spacer++;
+								if (r_dif > fold_asy)sam->anc_sit.spacer++;
 								else sam->par_sit.spacer++;
 							}
 							plot->spacer[a_karman][p_karman]++;
@@ -323,11 +323,11 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					if(take_distance==1)
 					{		
 						sam->sit.any++;
-						if (r_dif == 0)sam->equ_sit.any++;
+						if (fr_dif <= fold_asy)sam->equ_sit.any++;
 						else
 						{
 							sam->asy_sit.any++;
-							if (r_dif > 0)
+							if (r_dif > fold_asy)
 							{
 								sam->anc_sit.any++;
 								asym_anc = 1;
@@ -386,7 +386,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							}
 						}							
 						cepi_sit_one[ori_ce][cepi_pos]++;
-						if(r_dif==0)
+						if(fr_dif <= fold_asy)
 						{
 							if (cepi_pos<noveri)ce_full_eq=1;
 							else
@@ -403,7 +403,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								if (cepi_pos < nover)ce_part_asy = 1;
 								else ce_spac_asy++;
 							}
-							if(r_dif<0)
+							if(r_dif>fold_asy)
 							{
 								if (cepi_pos<noveri)ce_full_anc=1;
 								else
