@@ -907,16 +907,25 @@ int main(int argc, char* argv[])
 	double pvalue = atof(argv[7]);
 	double bonf_user = atof(argv[8]);
 	double fold_asy = log10(atof(argv[9]));//threshold for log10(frp) fold asymmentry
-	double pvalue_max_allowed = 0.002;
-	double pvalue_min_allowed = 0.0001;
-
-	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
-	if (bonf_user > 0)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
-
-	if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
 	{
-		printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
-		exit(1);
+		double fold_asy_max = 3;
+		double fold_asy_min = 0;
+		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
+		{
+			printf("Allowed fold range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
+			exit(1);
+		}
+	}
+	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
+	if (bonf_user > 0 && bonf_user < 100)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
+	{
+		double pvalue_max_allowed = 0.002;
+		double pvalue_min_allowed = 0.0001;
+		if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
+		{
+			printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
+			exit(1);
+		}
 	}
 
 	strcpy(prom, mypath_data);
@@ -1570,7 +1579,7 @@ int main(int argc, char* argv[])
 				fprintf(stderr, "Error: Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			if (bonf_user == 0)
+			if (bonf_user <= 0 || bonf_user >= 100)
 			{
 				bonferroni_corr = (double)nseq_two_sites_real * nseq_two_sites_rand;
 				bonferroni_corr *= 5;//potoki
