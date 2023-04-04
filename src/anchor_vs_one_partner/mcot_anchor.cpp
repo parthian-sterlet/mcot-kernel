@@ -816,9 +816,26 @@ int main(int argc, char *argv[])
 	double pvalue = atof(argv[7]);
 	double bonf_user = atof(argv[8]);
 	double fold_asy = log10(atof(argv[9]));//threshold for log10(frp) fold asymmentry
-
-	double pvalue_max_allowed = 0.002;
-	double pvalue_min_allowed = 0.0001;
+	{
+		double fold_asy_max = 3;
+		double fold_asy_min = 0;		
+		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
+		{
+			printf("Allowed fold range [%.3f; %.3f]\n", pow(10,fold_asy_min), pow(10,fold_asy_max));
+			exit(1);
+		}
+	}
+	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
+	if (bonf_user > 0 && bonf_user < 100)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
+	{
+		double pvalue_max_allowed = 0.002;
+		double pvalue_min_allowed = 0.0001;
+		if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
+		{
+			printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
+			exit(1);
+		}
+	}
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
 	//double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
@@ -827,13 +844,7 @@ int main(int argc, char *argv[])
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
 	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
 	int nseq_genome, len_genome;
-	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
-	if(bonf_user>0)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
-	if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
-	{
-		printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
-		exit(1);
-	}
+
 	strcpy(prom, mypath_data);
 
 	if ((strstr(mypath_data, "hs") != NULL || strstr(mypath_data, "hg") != NULL) || (strstr(mypath_data, "HS") != NULL || strstr(mypath_data, "HG") != NULL))
@@ -1323,7 +1334,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr,"Error: Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			if(bonf_user==0)
+			if(bonf_user<=0 || bonf_user >= 100)
 			{
 				double pv_standard = -log10(0.05);
 				bonferroni_corr = (double)nseq_two_sites_real*nseq_two_sites_rand;
