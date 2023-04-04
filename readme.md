@@ -90,7 +90,7 @@ The command line for many-partner option:
 
 `<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-<9 asymmetry_fold(-log10(FPR))> = the fold ratio fold_thr restricting FPR values of two motifs in asymmetrical CEs, e.g. if FPR1 & FPR2 are FPR of two motifs in CE, than fold = Max(FPR1,FPR2) / Min(FPR1,FPR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
+`<9 asymmetry_fold(-log10(FPR))>` = the fold ratio fold_thr restricting FPR values of two motifs in asymmetrical CEs, e.g. if FPR1 & FPR2 are FPR of two motifs in CE, than fold = Max(FPR1,FPR2) / Min(FPR1,FPR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
 
 The command line for anchor_pro option:
 
