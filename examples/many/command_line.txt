@@ -1,1 +1,1 @@
-anchor_vs_many GSE107719_ZNF341_hg19.seq znf341.motif hs_core 0 29 .../genomes/hs/ 0.0005 > ylog
+anchor_vs_many GSE107719_ZNF341_hg19.seq znf341.motif hs_core 0 29 .../genomes/hs/ 0.0005  5 > ylog
