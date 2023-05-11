@@ -1052,10 +1052,12 @@ int main(int argc, char *argv[])
 	//	fprintf(out_pval_table, "Any, Conservative OneMotif, -Log10[P-value]\t");
 	//	fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 		//fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Overlap, Sites Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Spacer, Sites Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Overlap, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Spacer, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Sites, Hetero. Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Sites Hetero. Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Sites Homo. Asymmetry/Symmetry, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Sites Homo. Asymmetry/Symmetry, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Sites Mixed Homo./Hetero., -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Sites Mixed Homo./Hetero., -Log10[P-value]\t");
 	//	fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 		fprintf(out_pval_table, "Bonferroni_CE\tBonferroni_CE(AncPar)\tBonferroni_Asym\n");
 		fclose(out_pval_table);
@@ -2138,6 +2140,20 @@ int main(int argc, char *argv[])
 			else fprintf(out_pval_table, "\t0");
 			if (pv_spacer.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.asy2.p);
 			else fprintf(out_pval_table, "\t0");
+			if (mot_a != mot_p)
+			{
+				if (pv_overlap.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par.p);
+				else fprintf(out_pval_table, "\t0");
+				if (pv_spacer.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par.p);
+				else fprintf(out_pval_table, "\t0");
+			}
+			else
+			{
+				if (pv_overlap.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.asy2.p);
+				else fprintf(out_pval_table, "\t0");
+				if (pv_spacer.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.asy2.p);
+				else fprintf(out_pval_table, "\t0");
+			}
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_asy);
