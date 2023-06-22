@@ -1,5 +1,5 @@
 int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min, int shift_max, int len_a, int len_p, int *thr_pre_err,
-			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot, int &nseq_two_sites)
+			int nseq, char ***seq, result *sam, combi *hist, int *peak_len, asy_plot *plot, int &nseq_two_sites, double fold_asy)
 {	
 	int n, k,j, x,y;
 	char filebest[120], file_nsit_par[120], file_nsit_anc[120]; 
@@ -10,7 +10,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	memset(filebest,'\0',sizeof(filebest));
 	strcpy(filebest,rera);//real or random
 	strcat(filebest,"_");
-	// strcat(filebest,motif);//hocomoco or dapseq
+//	strcat(filebest,motif);//hocomoco or dapseq
 	char buf[10];
 	sprintf(buf,"%d",prf_a.mot);
 	strcat(filebest,buf);
@@ -88,7 +88,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	int nseq_both = 0;//both motifs are present
 	for(n=0;n<nseq;n++)
 	{						
-		int join_sites[NUM_THR][NUM_THR], join_sites_anc=0, join_sites_par=0;		
+		int join_sites[NUM_THR][NUM_THR], join_sites_anc=0, join_sites_par=0, join_sites_asy=0, join_sites_equ = 0;
 		int asym_anc=0,asym_par=0;
 		if(prf_a.nsit[n]==0 || prf_p.nsit[n]==0)
 		{		
@@ -105,6 +105,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 		for(j=0;j<NUM_THR;j++)for(k=0;k<NUM_THR;k++)join_sites[j][k]=ce_full[j][k]=ce_part[j][k]=ce_spac[j][k]=0;		
 		int ce_full_anc = 0, ce_part_anc = 0, ce_spac_anc = 0;// no. of CE , anc
 		int ce_full_par = 0, ce_part_par = 0, ce_spac_par = 0;// no. of CE , par
+		int ce_full_asy = 0, ce_part_asy = 0, ce_spac_asy = 0;// no. of CE , par
 		int ce_full_eq = 0, ce_part_eq = 0, ce_spac_eq = 0;// no. of CE , equal
 		if(thr_pre_err[n]==0)
 		{				
@@ -151,9 +152,14 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						if(pv_anc>=plot->max)a_karman=plot->n_karman;
 						else a_karman=1+(int)((pv_anc-plot->min)/plot->inter);
 					}
-					double r_dif=pv_anc-pv_par;
-					if (r_dif > 0)join_sites_anc = 1;
-					else join_sites_par=1;					
+					double r_dif=pv_anc-pv_par, fr_dif = fabs(r_dif);
+					if(fr_dif <= fold_asy)join_sites_equ = 1;
+					else
+					{
+						join_sites_asy = 1;
+						if (r_dif > fold_asy)join_sites_anc = 1;
+						else join_sites_par = 1;
+					}
 					int ysta,yend;// start & end position of motif
 					ysta=prf_a.sta[n][y];												
 					yend=ysta+len_a-1;												
@@ -179,15 +185,25 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						sam->sit.overlap++;
 						plot->full[a_karman][p_karman]++;
 						plot->overlap[a_karman][p_karman]++;
-						if (r_dif > 0)
+						if (fr_dif <= fold_asy)
 						{
-							sam->anc_sit.full++;
-							sam->anc_sit.overlap++;
+							sam->equ_sit.full++;
+							sam->equ_sit.overlap++;
+							if (r_dif > fold_asy)
+							{
+								sam->anc_sit.full++;
+								sam->anc_sit.overlap++;
+							}
+							else
+							{
+								sam->par_sit.full++;
+								sam->par_sit.overlap++;
+							}
 						}
 						else
 						{
-							sam->par_sit.full++;
-							sam->par_sit.overlap++;
+							sam->asy_sit.full++;
+							sam->asy_sit.overlap++;
 						}
 					}
 					else
@@ -200,15 +216,25 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							sam->sit.overlap++;
 							plot->full[a_karman][p_karman]++;
 							plot->overlap[a_karman][p_karman]++;
-							if (r_dif > 0)
+							if (fr_dif <= fold_asy)
 							{
-								sam->anc_sit.full++;
-								sam->anc_sit.overlap++;
+								sam->equ_sit.full++;
+								sam->equ_sit.overlap++;
 							}
 							else
 							{
-								sam->par_sit.full++;
-								sam->par_sit.overlap++;
+								sam->asy_sit.full++;
+								sam->asy_sit.overlap++;
+								if (r_dif > fold_asy)
+								{
+									sam->anc_sit.full++;
+									sam->anc_sit.overlap++;
+								}
+								else
+								{
+									sam->par_sit.full++;
+									sam->par_sit.overlap++;
+								}
 							}
 						}
 					}
@@ -222,15 +248,25 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							sam->sit.partial++;
 							plot->partial[a_karman][p_karman]++;
 							plot->overlap[a_karman][p_karman]++;
-							if (r_dif > 0)
+							if (fr_dif <= fold_asy)
 							{
-								sam->anc_sit.partial++;
-								sam->anc_sit.overlap++;
+								sam->equ_sit.partial++;
+								sam->equ_sit.overlap++;
 							}
 							else
 							{
-								sam->par_sit.partial++;
-								sam->par_sit.overlap++;
+								sam->asy_sit.partial++;
+								sam->asy_sit.overlap++;
+								if (r_dif > fold_asy)
+								{
+									sam->anc_sit.partial++;
+									sam->anc_sit.overlap++;
+								}
+								else
+								{
+									sam->par_sit.partial++;
+									sam->par_sit.overlap++;
+								}
 							}
 						}
 						else 
@@ -243,15 +279,25 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 								sam->sit.partial++;
 								plot->partial[a_karman][p_karman]++;
 								plot->overlap[a_karman][p_karman]++;
-								if (r_dif > 0)
+								if (fr_dif <= fold_asy)
 								{
-									sam->anc_sit.partial++;
-									sam->anc_sit.overlap++;
+									sam->equ_sit.partial++;
+									sam->equ_sit.overlap++;
 								}
 								else
 								{
-									sam->par_sit.partial++;
-									sam->par_sit.overlap++;
+									sam->asy_sit.partial++;
+									sam->asy_sit.overlap++;
+									if (r_dif > fold_asy)
+									{
+										sam->anc_sit.partial++;
+										sam->anc_sit.overlap++;
+									}
+									else
+									{
+										sam->par_sit.partial++;
+										sam->par_sit.overlap++;
+									}
 								}
 							}
 						}
@@ -264,23 +310,33 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						{
 							take_distance = 1;//spacer
 							sam->sit.spacer++;
-							if (r_dif > 0)sam->anc_sit.spacer++;
-							else sam->par_sit.spacer++;
+							if (fr_dif <= fold_asy)sam->equ_sit.spacer++;
+							else
+							{
+								sam->asy_sit.spacer++;
+								if (r_dif > fold_asy)sam->anc_sit.spacer++;
+								else sam->par_sit.spacer++;
+							}
 							plot->spacer[a_karman][p_karman]++;
 						}
 					}					
 					if(take_distance==1)
 					{		
 						sam->sit.any++;
-						if (r_dif > 0)
+						if (fr_dif <= fold_asy)sam->equ_sit.any++;
+						else
 						{
-							sam->anc_sit.any++;
-							asym_anc=1;
-						}
-						else 
-						{
-							sam->par_sit.any++;
-							asym_par=1;
+							sam->asy_sit.any++;
+							if (r_dif > fold_asy)
+							{
+								sam->anc_sit.any++;
+								asym_anc = 1;
+							}
+							else
+							{
+								sam->par_sit.any++;
+								asym_par = 1;
+							}
 						}
 						plot->any[a_karman][p_karman]++;
 //						printf("2x=%d\t%d\t%d\t\t",x,xsta,xend);
@@ -330,7 +386,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 							}
 						}							
 						cepi_sit_one[ori_ce][cepi_pos]++;
-						if(r_dif==0)
+						if(fr_dif <= fold_asy)
 						{
 							if (cepi_pos<noveri)ce_full_eq=1;
 							else
@@ -341,7 +397,13 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 						}
 						else
 						{
-							if(r_dif<0)
+							if (cepi_pos < noveri)ce_full_asy = 1;
+							else
+							{
+								if (cepi_pos < nover)ce_part_asy = 1;
+								else ce_spac_asy++;
+							}
+							if(r_dif>fold_asy)
 							{
 								if (cepi_pos<noveri)ce_full_anc=1;
 								else
@@ -419,7 +481,7 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					}									
 				}
 			}
-			if(join_sites_anc==1 || join_sites_par==1)
+			if (join_sites_asy == 1 || join_sites_equ == 1)
 			{
 				for(j=0;j<NUM_THR;j++)
 				{
@@ -429,32 +491,56 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 					}
 				}
 			}
+			if (join_sites_equ == 1)
+			{
+				sam->equ.two_sites++;
+				if (ce_full_eq + ce_part_eq + ce_spac_eq > 0)
+				{
+					sam->equ.any++;
+					if (ce_full_eq + ce_part_eq > 0)sam->equ.overlap++;
+					if (ce_spac_eq > 0)sam->equ.spacer++;
+					if (ce_part_eq > 0)sam->equ.partial++;
+					if (ce_full_eq > 0)sam->equ.full++;
+				}
+			}
+			if (join_sites_asy == 1)
+			{				
+				sam->asy.two_sites++;
+				if (ce_full_asy + ce_part_asy + ce_spac_asy > 0)
+				{					
+					sam->asy.any++;
+					if (ce_full_asy + ce_part_asy > 0) sam->asy.overlap++; 
+					if (ce_spac_asy > 0) sam->asy.spacer++; 
+					if (ce_part_asy > 0) sam->asy.partial++; 
+					if (ce_full_asy > 0) sam->asy.full++; 
+
+				}
+			}
 			if(join_sites_anc==1)
 			{
-				sam->anc.two_sites++;
+				sam->anc.two_sites++;				
 				if(ce_full_anc+ce_part_anc+ce_spac_anc>0)
 				{
-					sam->anc.any++;
-					if(ce_full_anc+ce_part_anc>0)sam->anc.overlap++;
-					if(ce_spac_anc>0)sam->anc.spacer++;
-					if(ce_part_anc>0)sam->anc.partial++;
-					if(ce_full_anc>0)sam->anc.full++;
+					sam->anc.any++;					
+					if (ce_full_anc + ce_part_anc > 0) sam->anc.overlap++; 
+					if (ce_spac_anc > 0) sam->anc.spacer++;
+					if (ce_part_anc > 0) sam->anc.partial++;
+					if (ce_full_anc > 0) sam->anc.full++; 
 				}
 			}
 			if(join_sites_par==1)
 			{
-				sam->par.two_sites++;
-			//if(join_sites_eq==1)sam->eq.two_sites++;			
+				sam->par.two_sites++;						
 				if(ce_full_par+ce_part_par+ce_spac_par>0)
 				{
 					sam->par.any++;
-					if(ce_full_par+ce_part_par>0)sam->par.overlap++;
-					if(ce_spac_par>0)sam->par.spacer++;
-					if(ce_part_par>0)sam->par.partial++;
-					if(ce_full_par>0)sam->par.full++;
+					if (ce_full_anc + ce_part_anc > 0) sam->par.overlap++;
+					if (ce_spac_anc > 0) sam->par.spacer++;
+					if (ce_part_anc > 0) sam->par.partial++;
+					if (ce_full_anc > 0) sam->par.full++;
 				}
 			}
-			if (join_sites_anc == 1 || join_sites_par == 1)nseq_two_sites++;
+			if (join_sites_asy == 1 || join_sites_equ == 1)nseq_two_sites++;
 			/*if(ce_full_eq+ce_part_eq+ce_spac_eq>0)
 			{
 				sam->eq.any++;

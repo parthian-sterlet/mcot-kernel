@@ -59,10 +59,10 @@ int rec1(char *file_pro,int nseq_pro, profile *real)
 		{
 			real->sta[n][x] = atoi(str);
 			char s[30];
-			int test = UnderStol(str, 1, s, sep);
+			int test = UnderStol(str, 1, s, sizeof(s), sep);
 			if (test == -1) { printf("Wrong format %s\n", str); return -1;}
 			real->sco[n][x] = atof(s);
-			test = UnderStol(str, 2, s, sep);
+			test = UnderStol(str, 2, s, sizeof(s), sep);
 			if (test == -1) { printf("Wrong format %s\n", str); return -1;}
 			real->cep[n][x] = s[0];						
 			x++;

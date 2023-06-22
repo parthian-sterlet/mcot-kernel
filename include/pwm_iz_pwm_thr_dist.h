@@ -28,6 +28,16 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 	double p;
 	FILE *in;
 
+	for (i = 0; i < lenp; i++)
+	{
+		printf("%d ", i+1);
+		for (j = 0; j < 4; j++)
+		{
+			printf("\t%.15f", pwm_source[i][j]);
+		}
+		printf("\n");
+	}	
+
 	int nseq = 0;
 	int len1 = 0;
 	int word = 1;
@@ -53,6 +63,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 		DelChar(dp, '\n');
 		int len_pro1 = strlen(dp);
 		int len21 = len_pro1 - len1;
+
 		double thresh_min;
 		if (n == 0)thresh_min = score_min;//double thresh_min = Max(thr[nthr_max], score_min);
 		else
@@ -65,7 +76,7 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 				thresh_min = thr[n_check];
 			}
 		}
-		//	if (n % 50 == 0)printf("%5d %f\t%f\t%d\n", n, thresh_min, thr[nthr_max], count_val);
+//		if (n % 50 == 0)printf("%5d %f\t%f\t%d\n", n, thresh_min, thr[nthr_max], count_val);
 		int compl1;
 		for (compl1 = 0; compl1 < 2; compl1++)
 		{
@@ -163,6 +174,11 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 			thr_pred = thr[j];
 			fpr_pred = fpr;
 		}		
+											
+   
+							
+						 
+   
 	}
 	for (j = 0; j < nthr_dist; j++)
 	{

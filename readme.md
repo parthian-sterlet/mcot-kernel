@@ -41,20 +41,20 @@ options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_
 The command line for one-partner option:
 
 
-`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters>`
+`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(FPR))>`
 
 
 The command line for many-partner option:
 
 
-`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters>`
+`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(FPR))>`
 
 
 
-`<fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 200-300, the maximum number is not restricted, however 10000 or higher number of peaks requires higher computation time than several thousands of peaks. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
+`<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 200-300, the maximum number is not restricted, however 10000 or higher number of peaks requires higher computation time than several thousands of peaks. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
 
 
-`<anchor.motif>`, `<partner.motif>` = frequency matrices of motifs in standard format, e.g.  
+`<2 anchor.motif>`, `<3 partner.motif>` = frequency matrices of motifs in standard format, e.g.  
 
 \***
 
@@ -74,18 +74,23 @@ The command line for many-partner option:
 
 ```
 
-`<partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of 514 motifs from the [Plant Cistrome Database](http://neomorph.salk.edu/dap_web/pages/index.php) for *A.thaliana* motifs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
+`<3 partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of 514 motifs from the [Plant Cistrome Database](http://neomorph.salk.edu/dap_web/pages/index.php) for *A.thaliana* motifs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
 
 
-`<minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
+`<4 minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
 
-`<maximal spacer length>` = integer value from 0 to 100 (the default value 29)
+`<5 maximal spacer length>` = integer value from 0 to 100 (the default value 29)
 
 
+`<6 path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
-`<path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
+`<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
+
+`<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
+
+`<9 asymmetry_fold(-log10(FPR))>` = the fold ratio fold_thr restricting FPR values of two motifs in asymmetrical CEs, e.g. if FPR1 & FPR2 are FPR of two motifs in CE, than fold = Max(FPR1,FPR2) / Min(FPR1,FPR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
 
 The command line for anchor_pro option:
 
@@ -308,43 +313,43 @@ Each line of output file contains data concerning one 2x2 contingency table, in 
 1 to 5 mean the change from the most stringent to the most permissive, see above); (2) four counts for 2x2 contingency table (see Table 1 above), 
 ‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) 
 and permuted (Rand) datasets. Finally, the table contains significance of CEs (p-values) computed by Fisher’s exact test for 25 cells of 5x5 tables 
-of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs, and 
-(b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs.
+of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs (lines 'Anchor', Partner'), significances of any asymmetrical CEs with more conserved either Anchor or Partner motifs (line 'Asymmetry'), significances of symmetrical CEs with the same  conservation of Anchor and Partner motifs (line 'Symmetry'), and (b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs, significances of asymmetry in CEs ‘Asymmetry vs. Symmetry with the positive/negative Fold respecting to the enrichment toward the Asymmetry/Symmetry in the motifs conservation. In these calculation points (a) and (b) imply counting of peaks and CEs, respectively. 
 
-Example, FOXA2 (Anchor) and HNF1B (Partner) motifs, Overlap computation flow.
+Example below shows FOXA2 (Anchor) and HNF1B (Partner) motifs for Overlap computation flow.
 
-|Anchor Thr|Partner Thr|Real CE+|Real Total|Rand CE+|Rand Total|Fold|P-value|
-|----------|-----------|--------|----------|--------|----------|----|-------|
-|A 1|P 1|13|211|534|14137||0.13|
-|A 1|P 2|10|165|466|11055||0.31|
-|A 1|P 3|9|144|378|9648||0.25|
-|A 1|P 4|22|311|793|20837||0.0091|
-|A 1|P 5|32|359|935|24053||3.7E-05|
-|A 2|P 1|10|125|321|8375||0.045|
-|A 2|P 2|13|78|179|5226||6.3E-06|
-|A 2|P 3|10|89|199|5963||0.0016|
-|A 2|P 4|21|172|434|11524||5.6E-06|
-|A 2|P 5|23|190|507|12730||5.6E-06|
-|A 3|P 1|7|161|401|10787||0.81|
-|A 3|P 2|11|106|215|7102||0.0008|
-|A 3|P 3|15|108|235|7236||5.9E-06|
-|A 3|P 4|18|230|593|15410||0.0074|
-|A 3|P 5|23|263|680|17621||0.00051|
-|A 4|P 1|11|192|478|12864||0.22|
-|A 4|P 2|11|134|315|8978||0.014|
-|A 4|P 3|24|124|324|8308||3E-10|
-|A 4|P 4|36|305|823|20435||2.8E-08|
-|A 4|P 5|37|285|846|19095||1.6E-08|
-|A 5|P 1|17|168|425|11256||0.00046|
-|A 5|P 2|20|123|279|8241||2E-08|
-|A 5|P 3|80|152|423|10184||4.9E-65|
-|A 5|P 4|55|229|594|15343||1.2E-26|
-|A 5|P 5|53|249|623|16683||7.6E-24|
-|||||||||
-|Anchor||170|1389|3151|93063||8.9E-45|
-|Partner||125|1056|3567|70752||1.3E-17|
-|Anchor_Partner||306|1418|7519|14378|0.413|8.1E-114|
-
+Anchor Thr | Partner Thr |  | Real CE+ | Real Total | Rand CE+ | Rand Total | Fold | P-value
+|----------|-------------|--|----------|------------|----------|------------|------|-------|
+A 1 | P 1 |  | 13 | 211 | 20 | 14137 | 43.550 | 4.59308e-16
+A 1 | P 2 |  | 10 | 167 | 12 | 11189 | 55.833 | 2.00465e-13
+A 1 | P 3 |  | 9 | 142 | 18 | 9514 | 33.500 | 9.33201e-11
+A 1 | P 4 |  | 22 | 312 | 27 | 20904 | 54.593 | 7.98321e-28
+A 1 | P 5 |  | 32 | 359 | 38 | 24053 | 56.421 | 2.97654e-40
+A 2 | P 1 |  | 10 | 125 | 18 | 8375 | 37.222 | 3.45082e-12
+A 2 | P 2 |  | 13 | 78 | 8 | 5226 | 108.875 | 9.83765e-20
+A 2 | P 3 |  | 10 | 91 | 5 | 6097 | 134.000 | 8.07117e-16
+A 2 | P 4 |  | 21 | 172 | 23 | 11524 | 61.174 | 1.41932e-27
+A 2 | P 5 |  | 23 | 191 | 25 | 12797 | 61.640 | 4.1353e-30
+A 3 | P 1 |  | 7 | 160 | 18 | 10720 | 26.056 | 5.01905e-08
+A 3 | P 2 |  | 11 | 106 | 17 | 7102 | 43.353 | 7.15405e-14
+A 3 | P 3 |  | 15 | 107 | 18 | 7169 | 55.833 | 9.86635e-20
+A 3 | P 4 |  | 18 | 229 | 37 | 15343 | 32.595 | 4.69822e-20
+A 3 | P 5 |  | 23 | 263 | 32 | 17621 | 48.156 | 3.30391e-28
+A 4 | P 1 |  | 11 | 192 | 35 | 12864 | 21.057 | 4.44823e-11
+A 4 | P 2 |  | 11 | 133 | 13 | 8911 | 56.692 | 9.7153e-15
+A 4 | P 3 |  | 24 | 124 | 29 | 8308 | 55.448 | 5.57973e-31
+A 4 | P 4 |  | 36 | 303 | 58 | 20301 | 41.586 | 7.52749e-42
+A 4 | P 5 |  | 37 | 286 | 39 | 19162 | 63.564 | 5.87211e-48
+A 5 | P 1 |  | 17 | 171 | 13 | 11457 | 87.615 | 3.18051e-24
+A 5 | P 2 |  | 20 | 124 | 15 | 8308 | 89.333 | 1.23212e-28
+A 5 | P 3 |  | 80 | 151 | 59 | 10117 | 90.847 | 1.07118e-118
+A 5 | P 4 |  | 55 | 229 | 37 | 15343 | 99.595 | 7.19329e-79
+A 5 | P 5 |  | 53 | 250 | 33 | 16750 | 107.606 | 9.56812e-77
+Anchor |  |  | 170 | 1392 | 237 | 93264 | 48.059 | 1.76431e-199
+Partner |  |  | 95 | 1057 | 106 | 70819 | 60.047 | 3.61688e-118
+Asymmetry |  |  | 399 | 1741 | 598 | 116647 | 44.704 | 1e-300
+Symmetry |  |  | 0 | 0 | 0 | 0 | 1.000 | 1
+Anchor_Partner |  |  | 280 | 1418 | 335 | 904 | 0.533 | 7.08806e-20
+Asym_Sym |  |  | 1418 | 1418 | 904 | 904 | 1.000 | 2
 
 
 * __Files <\*.best>, the list of predicted CEs__. 
@@ -382,6 +387,7 @@ where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed an
 |5.3..5.5|-4|-3|-2||-3||||||||
 |>5.5|4|2|-1|-2|-3||||||||
 
+The same calculations are performed for Anchor-Anchor CEs, in this case the enrichment of symmetrical vs. asymmetrical CEs are tested.
 
 ## References
 

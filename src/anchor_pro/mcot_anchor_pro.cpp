@@ -12,7 +12,7 @@
 #define SEQLEN 12000
 #define MATLEN 110 //max matrix length
 #define SPACLEN 100 //max spacer length
-#define ARGLEN 300 //max argv length
+#define ARGLEN 500 //max argv length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
 
@@ -452,11 +452,15 @@ void count::ini(void)
 }
 struct result {
 	count cell[NUM_THR][NUM_THR];
-	count anc;
-	count par;
+	count anc;//toward anchor
+	count par;//toward partner
+	count asy;//toward anyone
+	count equ;//neither
 	count sit;
 	count anc_sit;
 	count par_sit;
+	count asy_sit;
+	count equ_sit;
 	void ini(void);
 } observed, expected;
 void result::ini(void)
@@ -465,11 +469,14 @@ void result::ini(void)
 	for (j = 0; j < NUM_THR; j++)for (k = 0; k < NUM_THR; k++)cell[j][k].ini();
 	anc.ini();
 	par.ini();
+	asy.ini();
+	equ.ini();
 	sit.ini();
 	anc_sit.ini();
 	par_sit.ini();
+	asy_sit.ini();
+	equ_sit.ini();
 }
-
 /*
 int i,j;
 */
@@ -479,17 +486,30 @@ double pvalue_f[NUM_THR][NUM_THR];
 double pvalue_s[NUM_THR][NUM_THR];
 double pvalue_o[NUM_THR][NUM_THR];
 
+double fold_a[NUM_THR][NUM_THR];
+double fold_p[NUM_THR][NUM_THR];
+double fold_f[NUM_THR][NUM_THR];
+double fold_s[NUM_THR][NUM_THR];
+double fold_o[NUM_THR][NUM_THR];
+
+struct pvfo
+{
+	double p;
+	double f;
+};
 struct pval {
-	double anchor;
-	double partner;
-	double anc_par;
-	double fold_anc_par;
+	pvfo anchor;
+	pvfo partner;
+	pvfo asy1;
+	pvfo asy2;
+	pvfo equ;
+	pvfo anc_par;
 	void ini(void);
 } pv_any, pv_full, pv_partial, pv_overlap, pv_spacer;
 void pval::ini(void)
 {
-	anchor = partner = anc_par = 1;
-	fold_anc_par = 1;
+	anchor.f = partner.f = anc_par.f = asy1.f = asy2.f = equ.f = 1;
+	anchor.p = partner.p = anc_par.p = asy1.p = asy2.p = equ.p = 1;
 }
 // dlya vyvoda histogram of CE distribution as fanction of mutual orientation and location of anchor/partner motifs
 struct combi {
@@ -675,11 +695,11 @@ int main(int argc, char *argv[])
 	strcpy(file_fpr[0], "fpr_anchor.txt");
 	strcpy(file_fpr[1], "fpr_partner.txt");
 
-	if (argc != 10)
+	if (argc != 13)
 	{
 		printf("%s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		printf("2 motif1.profile 3motif2.profile 4int motif1.length 5int motif1.length 6int motif1.table_thr_fpr 7int motif1.table_thr_fpr");
-		printf(" 8int spacer_min 9int spacer_max\n");//9char mot_anchor 
+		printf(" 8int spacer_min 9int spacer_max 10double pvalue_thr 11double -log10[p-value]_thr 12double asymmetry_fold(-log10(FPR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -705,9 +725,31 @@ int main(int argc, char *argv[])
 
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
-	double pvalue = 0.0005, pvalue_mult = 1.5;// , dpvalue = 0.0000005; // 0.0005 1.5
+	double pvalue_mult = 1.5;// , dpvalue = 0.0000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
-	
+	double pvalue = atof(argv[10]);//pvalue = 0.0005
+	double bonf_user = atof(argv[11]);
+	double fold_asy = log10(atof(argv[12]));//threshold for log10(frp) fold asymmentry
+	{
+		double fold_asy_max = 3;
+		double fold_asy_min = 0;
+		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
+		{
+			printf("Allowed fold range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
+			exit(1);
+		}
+	}
+	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
+	if (bonf_user > 0 && bonf_user < 100)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
+	{
+		double pvalue_max_allowed = 0.002;
+		double pvalue_min_allowed = 0.0001;
+		if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
+		{
+			printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
+			exit(1);
+		}
+	}
 	memset(name_fasta, '\0', sizeof(name_fasta));
 	{
 		k = 0;
@@ -723,7 +765,7 @@ int main(int argc, char *argv[])
 			name_fasta[k++] = cc;
 		}
 	}
-	for (i = 0; i < 2; i++)
+	/*for (i = 0; i < 2; i++)
 	{
 		memset(name[i], '\0', sizeof(name[i]));
 		int len = strlen(file_profile[i]);
@@ -747,8 +789,10 @@ int main(int argc, char *argv[])
 			}
 			name[i][k++] = cc;
 		}
-		TransStrBack(name[i]);
-	}
+		//TransStrBack(name[i]);
+	}*/
+	strcpy(name[0], "1st");
+	strcpy(name[1], "2nd");
 	strcpy(file_hist, name_fasta);
 	strcat(file_hist, "_");
 	strcat(file_hist, name[0]);
@@ -838,8 +882,7 @@ int main(int argc, char *argv[])
 	int nseq_rand = nseq_real * height_permut;
 	if (nseq_rand < size_min_permut)height_permut = size_min_permut / nseq_real;
 	if (nseq_rand > size_max_permut)height_permut = size_max_permut / nseq_real;
-	nseq_rand = nseq_real * height_permut;
-	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
+	nseq_rand = nseq_real * height_permut;	
 	for (j = 0; j < 2; j++)
 	{
 		rand_one[j].nseq = nseq_rand;
@@ -897,21 +940,28 @@ int main(int argc, char *argv[])
 		fprintf(out_pval_table, "\tSimilarity to Anchor, -Log10[P-value]");
 		fprintf(out_pval_table, "\tSimilarity to Anchor, SSD");
 		fprintf(out_pval_table, "\tSimilarity to Anchor, PCC\t");
-		fprintf(out_pval_table, "Full overlap, Conservative Anchor, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Partial overlap, Conservative Anchor, -Log10[P-value]\t");
+		//	fprintf(out_pval_table, "Full overlap, Conservative Anchor, -Log10[P-value]\t");
+		//	fprintf(out_pval_table, "Partial overlap, Conservative Anchor, -Log10[P-value]\t");
 		fprintf(out_pval_table, "Overlap, Conservative Anchor, -Log10[P-value]\t");
 		fprintf(out_pval_table, "Spacer, Conservative Anchor, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Any, Conservative Anchor, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Full overlap, Conservative Partner, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Partial overlap, Conservative Partner, -Log10[P-value]\t");
+		//fprintf(out_pval_table, "Any, Conservative Anchor, -Log10[P-value]\t");
+	//	fprintf(out_pval_table, "Full overlap, Conservative Partner, -Log10[P-value]\t");
+	//	fprintf(out_pval_table, "Partial overlap, Conservative Partner, -Log10[P-value]\t");
 		fprintf(out_pval_table, "Overlap, Conservative Partner, -Log10[P-value]\t");
 		fprintf(out_pval_table, "Spacer, Conservative Partner, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Any, Conservative Partner, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Spacer, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-		fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		//	fprintf(out_pval_table, "Any, Conservative Partner, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Conservative OneMotif, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Conservative OneMotif, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Equal Conservation, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Equal Conservation, -Log10[P-value]\t");
+		//	fprintf(out_pval_table, "Any, Conservative OneMotif, -Log10[P-value]\t");
+		//	fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+			//fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Sites Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Sites Anchor+/Partner-, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Overlap, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
+		fprintf(out_pval_table, "Spacer, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
+		//	fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 		fprintf(out_pval_table, "Bonferroni_CE\tBonferroni_CE(AncPar)\tBonferroni_Asym\n");
 		fclose(out_pval_table);
 	}
@@ -1234,8 +1284,8 @@ int main(int argc, char *argv[])
 					thr_err_rand[k++] = thr_err_real[i];
 				}
 			}
-			int nseq_two_sites_real = 0, nseq_two_sites_rand = 0;
-			int proj = projoin(xrand, name[mot_p], rand_hom_one, rand_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_rand, nseq_rand, seq, &expected, &hist_exp_one, peak_len_rand, &rand_plot, nseq_two_sites_rand);
+			int nseq_two_sites_real = 0, nseq_two_sites_rand = 0;			
+			int proj = projoin(xrand, name[mot_p], rand_hom_one, rand_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_rand, nseq_rand, seq, &expected, &hist_exp_one, peak_len_rand, &rand_plot, nseq_two_sites_rand, fold_asy);
 			if (proj == -1)
 			{
 				printf("Projoin Rand error Anc 0 Par %d\n", mot);
@@ -1248,12 +1298,13 @@ int main(int argc, char *argv[])
 			strcat(name_proj, name[mot_a]);
 			strcat(name_proj, "_");
 			strcat(name_proj, name[mot_p]);
-			proj = projoin(xreal, name_proj, real_one[0], real_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_real, nseq_real, seq, &observed, &hist_obs_one, peak_len_real, &real_plot, nseq_two_sites_real);
+			proj = projoin(xreal, name_proj, real_one[0], real_one[mot_p], shift_min, shift_max, len_anchor, len_partner, thr_err_real, nseq_real, seq, &observed, &hist_obs_one, peak_len_real, &real_plot, nseq_two_sites_real, fold_asy);
 			if (proj == -1)
 			{
 				printf("Projoin Real error Anc 0 Par %d\n", mot);
 				return -1;
 			}
+			if (bonf_user <= 0 || bonf_user >= 100)
 			{
 				double pv_standard = -log10(0.05);
 				bonferroni_corr = (double)nseq_two_sites_real*nseq_two_sites_rand;
@@ -1493,34 +1544,34 @@ int main(int argc, char *argv[])
 			for (k = 0; k < NUM_THR; k++)
 			{
 				//printf("Mot %d J %d K %d\n",mot,j+1,k+1);								
-				int fisher = fisher_exact_test(observed.cell[j][k].any, observed.cell[j][k].two_sites, expected.cell[j][k].any, expected.cell[j][k].two_sites, pvalue_a[j][k], 0);
+				int fisher = fisher_exact_test(observed.cell[j][k].any, observed.cell[j][k].two_sites, expected.cell[j][k].any, expected.cell[j][k].two_sites, pvalue_a[j][k], fold_a[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher = fisher_exact_test(observed.cell[j][k].full, observed.cell[j][k].two_sites, expected.cell[j][k].full, expected.cell[j][k].two_sites, pvalue_f[j][k], 0);
+				fisher = fisher_exact_test(observed.cell[j][k].full, observed.cell[j][k].two_sites, expected.cell[j][k].full, expected.cell[j][k].two_sites, pvalue_f[j][k], fold_f[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher = fisher_exact_test(observed.cell[j][k].partial, observed.cell[j][k].two_sites, expected.cell[j][k].partial, expected.cell[j][k].two_sites, pvalue_p[j][k], 0);
+				fisher = fisher_exact_test(observed.cell[j][k].partial, observed.cell[j][k].two_sites, expected.cell[j][k].partial, expected.cell[j][k].two_sites, pvalue_p[j][k], fold_p[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher = fisher_exact_test(observed.cell[j][k].overlap, observed.cell[j][k].two_sites, expected.cell[j][k].overlap, expected.cell[j][k].two_sites, pvalue_o[j][k], 0);
+				fisher = fisher_exact_test(observed.cell[j][k].overlap, observed.cell[j][k].two_sites, expected.cell[j][k].overlap, expected.cell[j][k].two_sites, pvalue_o[j][k], fold_o[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
-				fisher = fisher_exact_test(observed.cell[j][k].spacer, observed.cell[j][k].two_sites, expected.cell[j][k].spacer, expected.cell[j][k].two_sites, pvalue_s[j][k], 0);
+				fisher = fisher_exact_test(observed.cell[j][k].spacer, observed.cell[j][k].two_sites, expected.cell[j][k].spacer, expected.cell[j][k].two_sites, pvalue_s[j][k], fold_s[j][k], 0);
 				if (fisher == -1)
 				{
-					printf("Fisher test error Anc 0 Par %d\n", mot);
+					fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 					return -1;
 				}
 			}
@@ -1533,98 +1584,188 @@ int main(int argc, char *argv[])
 			pv_spacer.ini();
 			//any
 			int fisher;
-			fisher = fisher_exact_test(observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor, 0);
+			fisher = fisher_exact_test(observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor.p, pv_any.anchor.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner, 0);
+			fisher = fisher_exact_test(observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner.p, pv_any.partner.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.anc_sit.any, observed.sit.any, expected.anc_sit.any, expected.sit.any, pv_any.anc_par, 1);
+			fisher = fisher_exact_test(observed.asy.any, observed.asy.two_sites, expected.asy.any, expected.asy.two_sites, pv_any.asy1.p, pv_any.asy1.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.equ.any, observed.equ.two_sites, expected.equ.any, expected.equ.two_sites, pv_any.equ.p, pv_any.equ.f, 0);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc_sit.any, observed.sit.any, expected.anc_sit.any, expected.sit.any, pv_any.anc_par.p, pv_any.anc_par.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.asy_sit.any, observed.sit.any, expected.asy_sit.any, expected.sit.any, pv_any.asy2.p, pv_any.asy2.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//full
-			fisher = fisher_exact_test(observed.anc.full, observed.anc.two_sites, expected.anc.full, expected.anc.two_sites, pv_full.anchor, 0);
+			fisher = fisher_exact_test(observed.anc.full, observed.anc.two_sites, expected.anc.full, expected.anc.two_sites, pv_full.anchor.p, pv_full.anchor.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.par.full, observed.par.two_sites, expected.par.full, expected.par.two_sites, pv_full.partner, 0);
+			fisher = fisher_exact_test(observed.par.full, observed.par.two_sites, expected.par.full, expected.par.two_sites, pv_full.partner.p, pv_full.partner.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.anc_sit.full, observed.sit.full, expected.anc_sit.full, expected.sit.full, pv_full.anc_par, 1);
+			fisher = fisher_exact_test(observed.asy.full, observed.asy.two_sites, expected.asy.full, expected.asy.two_sites, pv_full.asy1.p, pv_full.asy1.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.equ.full, observed.equ.two_sites, expected.equ.full, expected.equ.two_sites, pv_full.equ.p, pv_full.equ.f, 0);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc_sit.full, observed.sit.full, expected.anc_sit.full, expected.sit.full, pv_full.anc_par.p, pv_full.anc_par.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.asy_sit.full, observed.sit.full, expected.asy_sit.full, expected.sit.full, pv_full.asy2.p, pv_full.asy2.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//partial
-			fisher = fisher_exact_test(observed.anc.partial, observed.anc.two_sites, expected.anc.partial, expected.anc.two_sites, pv_partial.anchor, 0);
+			fisher = fisher_exact_test(observed.anc.partial, observed.anc.two_sites, expected.anc.partial, expected.anc.two_sites, pv_partial.anchor.p, pv_partial.anchor.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.par.partial, observed.par.two_sites, expected.par.partial, expected.par.two_sites, pv_partial.partner, 0);
+			fisher = fisher_exact_test(observed.par.partial, observed.par.two_sites, expected.par.partial, expected.par.two_sites, pv_partial.partner.p, pv_partial.partner.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.anc_sit.partial, observed.sit.partial, expected.anc_sit.partial, expected.sit.partial, pv_partial.anc_par, 1);
+			fisher = fisher_exact_test(observed.asy.partial, observed.asy.two_sites, expected.asy.partial, expected.asy.two_sites, pv_partial.asy1.p, pv_partial.asy1.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.equ.partial, observed.equ.two_sites, expected.equ.partial, expected.equ.two_sites, pv_partial.equ.p, pv_partial.equ.f, 0);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc_sit.partial, observed.sit.partial, expected.anc_sit.partial, expected.sit.partial, pv_partial.anc_par.p, pv_partial.anc_par.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.asy_sit.partial, observed.sit.partial, expected.asy_sit.partial, expected.sit.partial, pv_partial.asy2.p, pv_partial.asy2.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//overlap
-			fisher = fisher_exact_test(observed.anc.overlap, observed.anc.two_sites, expected.anc.overlap, expected.anc.two_sites, pv_overlap.anchor, 0);
+			fisher = fisher_exact_test(observed.anc.overlap, observed.anc.two_sites, expected.anc.overlap, expected.anc.two_sites, pv_overlap.anchor.p, pv_overlap.anchor.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.par.overlap, observed.par.two_sites, expected.par.overlap, expected.par.two_sites, pv_overlap.partner, 0);
+			fisher = fisher_exact_test(observed.par.overlap, observed.par.two_sites, expected.par.overlap, expected.par.two_sites, pv_overlap.partner.p, pv_overlap.partner.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.anc_sit.overlap, observed.sit.overlap, expected.anc_sit.overlap, expected.sit.overlap, pv_overlap.anc_par, 1);
+			fisher = fisher_exact_test(observed.asy.overlap, observed.asy.two_sites, expected.asy.overlap, expected.asy.two_sites, pv_overlap.asy1.p, pv_overlap.asy1.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.equ.overlap, observed.equ.two_sites, expected.equ.overlap, expected.equ.two_sites, pv_overlap.equ.p, pv_overlap.equ.f, 0);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc_sit.overlap, observed.sit.overlap, expected.anc_sit.overlap, expected.sit.overlap, pv_overlap.anc_par.p, pv_overlap.anc_par.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.asy_sit.overlap, observed.sit.overlap, expected.asy_sit.overlap, expected.sit.overlap, pv_overlap.asy2.p, pv_overlap.asy2.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 			//spacer
-			fisher = fisher_exact_test(observed.anc.spacer, observed.anc.two_sites, expected.anc.spacer, expected.anc.two_sites, pv_spacer.anchor, 0);
+			fisher = fisher_exact_test(observed.anc.spacer, observed.anc.two_sites, expected.anc.spacer, expected.anc.two_sites, pv_spacer.anchor.p, pv_spacer.anchor.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.par.spacer, observed.par.two_sites, expected.par.spacer, expected.par.two_sites, pv_spacer.partner, 0);
+			fisher = fisher_exact_test(observed.par.spacer, observed.par.two_sites, expected.par.spacer, expected.par.two_sites, pv_spacer.partner.p, pv_spacer.partner.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
-			fisher = fisher_exact_test(observed.anc_sit.spacer, observed.sit.spacer, expected.anc_sit.spacer, expected.sit.spacer, pv_spacer.anc_par, 1);
+			fisher = fisher_exact_test(observed.asy.spacer, observed.asy.two_sites, expected.asy.spacer, expected.asy.two_sites, pv_spacer.asy1.p, pv_spacer.asy1.f, 0);
 			if (fisher == -1)
 			{
-				printf("Fisher test error Anc 0 Par %d\n", mot);
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.equ.spacer, observed.equ.two_sites, expected.equ.spacer, expected.equ.two_sites, pv_spacer.equ.p, pv_spacer.equ.f, 0);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.anc_sit.spacer, observed.sit.spacer, expected.anc_sit.spacer, expected.sit.spacer, pv_spacer.anc_par.p, pv_spacer.anc_par.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
+				return -1;
+			}
+			fisher = fisher_exact_test(observed.asy_sit.spacer, observed.sit.spacer, expected.asy_sit.spacer, expected.sit.spacer, pv_spacer.asy2.p, pv_spacer.asy2.f, 1);
+			if (fisher == -1)
+			{
+				fprintf(stderr, "Error: Fisher test error Anc 0 Par %d\n", mot);
 				return -1;
 			}
 		}
@@ -1654,53 +1795,47 @@ int main(int argc, char *argv[])
 				fprintf(out_pval[4], "%d\t%d\t%d\t%d\t\t%g\n", observed.cell[j][k].spacer, observed.cell[j][k].two_sites, expected.cell[j][k].spacer, expected.cell[j][k].two_sites, pvalue_s[j][k]);
 			}
 		}
-		double rat_a, rat_p;
 		for (i = 0; i < 5; i++)fprintf(out_pval[i], "\n");
 		//any vs rand
-		fprintf(out_pval[0], "Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor);
-		fprintf(out_pval[0], "Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner);
+		fprintf(out_pval[0], "Anchor\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc.any, observed.anc.two_sites, expected.anc.any, expected.anc.two_sites, pv_any.anchor.f, pv_any.anchor.p);
+		fprintf(out_pval[0], "Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.par.any, observed.par.two_sites, expected.par.any, expected.par.two_sites, pv_any.partner.f, pv_any.partner.p);
+		fprintf(out_pval[0], "Asymmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy.any, observed.asy.two_sites, expected.asy.any, expected.asy.two_sites, pv_any.asy1.f, pv_any.asy1.p);
+		fprintf(out_pval[0], "Symmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.equ.any, observed.equ.two_sites, expected.equ.any, expected.equ.two_sites, pv_any.equ.f, pv_any.equ.p);
 		//any vs real
-		rat_a = (double)observed.anc_sit.any / observed.sit.any;
-		rat_p = (double)expected.anc_sit.any / expected.sit.any;
-		if (rat_p == 0)pv_any.fold_anc_par = 1000;
-		else pv_any.fold_anc_par = rat_a / rat_p;
-		fprintf(out_pval[0], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.any, observed.sit.any, expected.anc_sit.any, expected.sit.any, pv_any.fold_anc_par, pv_any.anc_par);
+		fprintf(out_pval[0], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.any, observed.sit.any, expected.anc_sit.any, expected.sit.any, pv_any.anc_par.f, pv_any.anc_par.p);
+		fprintf(out_pval[0], "Asym_Sym\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy_sit.any, observed.sit.any, expected.asy_sit.any, expected.sit.any, pv_any.asy2.f, pv_any.asy2.p);
 		//full vs rand		
-		fprintf(out_pval[1], "Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.anc.full, observed.anc.two_sites, expected.anc.full, expected.anc.two_sites, pv_full.anchor);
-		fprintf(out_pval[1], "Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.par.full, observed.par.two_sites, expected.par.full, expected.par.two_sites, pv_full.partner);
+		fprintf(out_pval[1], "Anchor\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc.full, observed.anc.two_sites, expected.anc.full, expected.anc.two_sites, pv_full.anchor.f, pv_full.anchor.p);
+		fprintf(out_pval[1], "Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.par.full, observed.par.two_sites, expected.par.full, expected.par.two_sites, pv_full.partner.f, pv_full.partner.p);
+		fprintf(out_pval[1], "Asymmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy.full, observed.asy.two_sites, expected.asy.full, expected.asy.two_sites, pv_full.asy1.f, pv_full.asy1.p);
+		fprintf(out_pval[1], "Symmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.equ.full, observed.equ.two_sites, expected.equ.full, expected.equ.two_sites, pv_full.equ.f, pv_full.equ.p);
 		//full vs real
-		rat_a = (double)observed.anc_sit.full / (observed.anc_sit.full + observed.par_sit.full);
-		rat_p = (double)expected.anc_sit.full / (expected.anc_sit.full + expected.par_sit.full);
-		if (rat_p == 0)pv_full.fold_anc_par = 1000;
-		else pv_full.fold_anc_par = rat_a / rat_p;
-		fprintf(out_pval[1], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.full, observed.sit.full, expected.anc_sit.full, expected.sit.full, pv_full.fold_anc_par, pv_full.anc_par);
+		fprintf(out_pval[1], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.full, observed.sit.full, expected.anc_sit.full, expected.sit.full, pv_full.anc_par.f, pv_full.anc_par.p);
+		fprintf(out_pval[1], "Asym_Sym\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy_sit.full, observed.sit.full, expected.asy_sit.full, expected.sit.full, pv_full.asy2.f, pv_full.asy2.p);
 		//partial vs rand
-		fprintf(out_pval[2], "Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.anc.partial, observed.anc.two_sites, expected.anc.partial, expected.anc.two_sites, pv_partial.anchor);
-		fprintf(out_pval[2], "Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.par.partial, observed.par.two_sites, expected.par.partial, expected.par.two_sites, pv_partial.partner);
+		fprintf(out_pval[2], "Anchor\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc.partial, observed.anc.two_sites, expected.anc.partial, expected.anc.two_sites, pv_partial.anchor.p, pv_partial.anchor.p);
+		fprintf(out_pval[2], "Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.par.partial, observed.par.two_sites, expected.par.partial, expected.par.two_sites, pv_partial.partner.f, pv_partial.partner.p);
+		fprintf(out_pval[2], "Asymmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy.partial, observed.asy.two_sites, expected.asy.partial, expected.asy.two_sites, pv_partial.asy1.f, pv_partial.asy1.p);
+		fprintf(out_pval[2], "Symmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.equ.partial, observed.equ.two_sites, expected.equ.partial, expected.equ.two_sites, pv_partial.equ.f, pv_partial.equ.p);
 		//partial vs real
-		rat_a = (double)observed.anc_sit.partial / observed.sit.partial;
-		rat_p = (double)expected.anc_sit.partial / expected.sit.partial;
-		if (rat_p == 0)pv_partial.fold_anc_par = 1000;
-		else pv_partial.fold_anc_par = rat_a / rat_p;
-		fprintf(out_pval[2], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.partial, observed.sit.partial, expected.anc_sit.partial, expected.sit.partial, pv_partial.fold_anc_par, pv_partial.anc_par);
+		fprintf(out_pval[2], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.partial, observed.sit.partial, expected.anc_sit.partial, expected.sit.partial, pv_partial.anc_par.f, pv_partial.anc_par.p);
+		fprintf(out_pval[2], "Asym_Sym\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy_sit.partial, observed.sit.partial, expected.asy_sit.partial, expected.sit.partial, pv_partial.asy2.f, pv_partial.asy2.p);
 		//overlap vs rand
-		fprintf(out_pval[3], "Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.anc.overlap, observed.anc.two_sites, expected.anc.overlap, expected.anc.two_sites, pv_overlap.anchor);
-		fprintf(out_pval[3], "Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.par.overlap, observed.par.two_sites, expected.par.overlap, expected.par.two_sites, pv_overlap.partner);
+		fprintf(out_pval[3], "Anchor\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc.overlap, observed.anc.two_sites, expected.anc.overlap, expected.anc.two_sites, pv_overlap.anchor.f, pv_overlap.anchor.p);
+		fprintf(out_pval[3], "Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.par.overlap, observed.par.two_sites, expected.par.overlap, expected.par.two_sites, pv_overlap.partner.f, pv_overlap.partner.p);
+		fprintf(out_pval[3], "Asymmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy.overlap, observed.asy.two_sites, expected.asy.overlap, expected.asy.two_sites, pv_overlap.asy1.f, pv_overlap.asy1.p);
+		fprintf(out_pval[3], "Symmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.equ.overlap, observed.equ.two_sites, expected.equ.overlap, expected.equ.two_sites, pv_overlap.equ.f, pv_overlap.equ.p);
 		//overlap vs real
-		rat_a = (double)observed.anc_sit.overlap / observed.sit.overlap;
-		rat_p = (double)expected.anc_sit.overlap / expected.sit.overlap;
-		if (rat_p == 0)pv_overlap.fold_anc_par = 1000;
-		else pv_overlap.fold_anc_par = rat_a / rat_p;
-		fprintf(out_pval[3], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.overlap, observed.sit.overlap, expected.anc_sit.overlap, expected.sit.overlap, pv_overlap.fold_anc_par, pv_overlap.anc_par);
+		fprintf(out_pval[3], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.overlap, observed.sit.overlap, expected.anc_sit.overlap, expected.sit.overlap, pv_overlap.anc_par.f, pv_overlap.anc_par.p);
+		fprintf(out_pval[3], "Asym_Sym\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy_sit.overlap, observed.sit.overlap, expected.asy_sit.overlap, expected.sit.overlap, pv_overlap.asy2.f, pv_overlap.asy2.p);
 		//spacer vs rand
-		fprintf(out_pval[4], "Anchor\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.anc.spacer, observed.anc.two_sites, expected.anc.spacer, expected.anc.two_sites, pv_spacer.anchor);
-		fprintf(out_pval[4], "Partner\t\t\t%d\t%d\t%d\t%d\t\t%g\n", observed.par.spacer, observed.par.two_sites, expected.par.spacer, expected.par.two_sites, pv_spacer.partner);
+		fprintf(out_pval[4], "Anchor\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc.spacer, observed.anc.two_sites, expected.anc.spacer, expected.anc.two_sites, pv_spacer.anchor.f, pv_spacer.anchor.p);
+		fprintf(out_pval[4], "Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.par.spacer, observed.par.two_sites, expected.par.spacer, expected.par.two_sites, pv_spacer.partner.f, pv_spacer.partner.p);
+		fprintf(out_pval[4], "Asymmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy.spacer, observed.asy.two_sites, expected.asy.spacer, expected.asy.two_sites, pv_spacer.asy1.f, pv_spacer.asy1.p);
+		fprintf(out_pval[4], "Symmetry\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.equ.spacer, observed.equ.two_sites, expected.equ.spacer, expected.equ.two_sites, pv_spacer.equ.f, pv_spacer.equ.p);
 		//spacer vs real
-		rat_a = (double)observed.anc_sit.spacer / observed.sit.spacer;
-		rat_p = (double)expected.anc_sit.spacer / expected.sit.spacer;
-		if (rat_p == 0)pv_spacer.fold_anc_par = 1000;
-		else pv_spacer.fold_anc_par = rat_a / rat_p;
-		fprintf(out_pval[4], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.spacer, observed.sit.spacer, expected.anc_sit.spacer, expected.sit.spacer, pv_spacer.fold_anc_par, pv_spacer.anc_par);
+		fprintf(out_pval[4], "Anchor_Partner\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.anc_sit.spacer, observed.sit.spacer, expected.anc_sit.spacer, expected.sit.spacer, pv_spacer.anc_par.f, pv_spacer.anc_par.p);
+		fprintf(out_pval[4], "Asym_Sym\t\t\t%d\t%d\t%d\t%d\t%.3f\t%g\n", observed.asy_sit.spacer, observed.sit.spacer, expected.asy_sit.spacer, expected.sit.spacer, pv_spacer.asy2.f, pv_spacer.asy2.p);
 		for (i = 0; i < 5; i++)fclose(out_pval[i]);
 
 		double pval_tot_min[5] = { 0, 0, 0, 0, 0 };
@@ -1759,36 +1894,68 @@ int main(int argc, char *argv[])
 			}
 		}
 		{
-			pv_any.anc_par = -log10(pv_any.anc_par);
-			pv_full.anc_par = -log10(pv_full.anc_par);
-			pv_partial.anc_par = -log10(pv_partial.anc_par);
-			pv_overlap.anc_par = -log10(pv_overlap.anc_par);
-			pv_spacer.anc_par = -log10(pv_spacer.anc_par);
-			if (pv_any.anc_par > bonferroni_corr_asy)
+			pv_any.anc_par.p = -log10(pv_any.anc_par.p);
+			pv_full.anc_par.p = -log10(pv_full.anc_par.p);
+			pv_partial.anc_par.p = -log10(pv_partial.anc_par.p);
+			pv_overlap.anc_par.p = -log10(pv_overlap.anc_par.p);
+			pv_spacer.anc_par.p = -log10(pv_spacer.anc_par.p);
+			if (pv_any.anc_par.p > bonferroni_corr_asy)
 			{
-				if (pv_any.fold_anc_par < 1)pv_any.anc_par *= -1;
+				if (pv_any.anc_par.f < 1)pv_any.anc_par.p *= -1;
 			}
-			else pv_any.anc_par = 0;
-			if (pv_full.anc_par > bonferroni_corr_asy)
+			else pv_any.anc_par.p = 0;
+			if (pv_full.anc_par.p > bonferroni_corr_asy)
 			{
-				if (pv_full.fold_anc_par < 1)pv_full.anc_par *= -1;
+				if (pv_full.anc_par.f < 1)pv_full.anc_par.p *= -1;
 			}
-			else pv_full.anc_par = 0;
-			if (pv_partial.anc_par > bonferroni_corr_asy)
+			else pv_full.anc_par.p = 0;
+			if (pv_partial.anc_par.p > bonferroni_corr_asy)
 			{
-				if (pv_partial.fold_anc_par < 1)pv_partial.anc_par *= -1;
+				if (pv_partial.anc_par.f < 1)pv_partial.anc_par.p *= -1;
 			}
-			else pv_partial.anc_par = 0;
-			if (pv_overlap.anc_par > bonferroni_corr_asy)
+			else pv_partial.anc_par.p = 0;
+			if (pv_overlap.anc_par.p > bonferroni_corr_asy)
 			{
-				if (pv_overlap.fold_anc_par < 1)pv_overlap.anc_par *= -1;
+				if (pv_overlap.anc_par.f < 1)pv_overlap.anc_par.p *= -1;
 			}
-			else pv_overlap.anc_par = 0;
-			if (pv_spacer.anc_par > bonferroni_corr_asy)
+			else pv_overlap.anc_par.p = 0;
+			if (pv_spacer.anc_par.p > bonferroni_corr_asy)
 			{
-				if (pv_spacer.fold_anc_par < 1)pv_spacer.anc_par *= -1;
+				if (pv_spacer.anc_par.f < 1)pv_spacer.anc_par.p *= -1;
 			}
-			else pv_spacer.anc_par = 0;
+			else pv_spacer.anc_par.p = 0;
+		}
+		{
+			pv_any.asy2.p = -log10(pv_any.asy2.p);
+			pv_full.asy2.p = -log10(pv_full.asy2.p);
+			pv_partial.asy2.p = -log10(pv_partial.asy2.p);
+			pv_overlap.asy2.p = -log10(pv_overlap.asy2.p);
+			pv_spacer.asy2.p = -log10(pv_spacer.asy2.p);
+			if (pv_any.asy2.p > bonferroni_corr_asy)
+			{
+				if (pv_any.asy2.f < 1)pv_any.asy2.p *= -1;
+			}
+			else pv_any.asy2.p = 0;
+			if (pv_full.asy2.p > bonferroni_corr_asy)
+			{
+				if (pv_full.asy2.f < 1)pv_full.asy2.p *= -1;
+			}
+			else pv_full.asy2.p = 0;
+			if (pv_partial.asy2.p > bonferroni_corr_asy)
+			{
+				if (pv_partial.asy2.f < 1)pv_partial.asy2.p *= -1;
+			}
+			else pv_partial.asy2.p = 0;
+			if (pv_overlap.asy2.p > bonferroni_corr_asy)
+			{
+				if (pv_overlap.asy2.f < 1)pv_overlap.asy2.p *= -1;
+			}
+			else pv_overlap.asy2.p = 0;
+			if (pv_spacer.asy2.p > bonferroni_corr_asy)
+			{
+				if (pv_spacer.asy2.f < 1)pv_spacer.asy2.p *= -1;
+			}
+			else pv_spacer.asy2.p = 0;
 		}
 		if ((out_pval_table = fopen(file_pval_table, "at")) == NULL)
 		{
@@ -1806,60 +1973,62 @@ int main(int argc, char *argv[])
 		}
 		if (pval_tot_min[0] > bonferroni_corr)fprintf(out_pval_table, "\t%.2f", pval_tot_min[0]);
 		else fprintf(out_pval_table, "\t0");				
-		if (mot_a != mot_p)
+		//if (mot_a != mot_p)
 		{
-			pv_full.anchor = -log10(pv_full.anchor);
-			pv_full.partner = -log10(pv_full.partner);
-			pv_partial.anchor = -log10(pv_partial.anchor);
-			pv_partial.partner = -log10(pv_partial.partner);
-			pv_overlap.anchor = -log10(pv_overlap.anchor);
-			pv_overlap.partner = -log10(pv_overlap.partner);
-			pv_spacer.anchor = -log10(pv_spacer.anchor);
-			pv_spacer.partner = -log10(pv_spacer.partner);
-			pv_any.anchor = -log10(pv_any.anchor);
-			pv_any.partner = -log10(pv_any.partner);
+			pv_full.anchor.p = -log10(pv_full.anchor.p);
+			pv_full.partner.p = -log10(pv_full.partner.p);
+			pv_full.asy1.p = -log10(pv_full.asy1.p);
+			pv_full.equ.p = -log10(pv_full.equ.p);
+			pv_partial.anchor.p = -log10(pv_partial.anchor.p);
+			pv_partial.partner.p = -log10(pv_partial.partner.p);
+			pv_partial.asy1.p = -log10(pv_partial.asy1.p);
+			pv_partial.equ.p = -log10(pv_partial.equ.p);
+			pv_overlap.anchor.p = -log10(pv_overlap.anchor.p);
+			pv_overlap.partner.p = -log10(pv_overlap.partner.p);
+			pv_overlap.asy1.p = -log10(pv_overlap.asy1.p);
+			pv_overlap.equ.p = -log10(pv_overlap.equ.p);
+			pv_spacer.anchor.p = -log10(pv_spacer.anchor.p);
+			pv_spacer.partner.p = -log10(pv_spacer.partner.p);
+			pv_spacer.asy1.p = -log10(pv_spacer.asy1.p);
+			pv_spacer.equ.p = -log10(pv_spacer.equ.p);
+			pv_any.anchor.p = -log10(pv_any.anchor.p);
+			pv_any.partner.p = -log10(pv_any.partner.p);
+			pv_any.asy1.p = -log10(pv_any.asy1.p);
+			pv_any.equ.p = -log10(pv_any.equ.p);
 			//pvalue_similarity_tot = pfm_similarity(&matrix[mot_a], &matrix[mot_p], s_granul, s_overlap_min, s_ncycle_small, s_ncycle_large, pval_sim);
 			//fprintf(out_pval_table,"\t%+.2f\t%+.2f\t%+.2f",pv_full.anc_par,pv_overlap.anc_par,pv_any.anc_par);
 			fprintf(out_pval_table, "\t\t\t");
-			if (pv_full.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.anchor);
+			if (pv_overlap.anchor.p > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_partial.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.anchor);
+			if (pv_spacer.anchor.p > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_overlap.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.anchor);
+			if (pv_overlap.partner.p > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_spacer.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.anchor);
+			if (pv_spacer.partner.p > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_any.anchor > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.anchor);
+			if (pv_overlap.asy1.p != 0)fprintf(out_pval_table, "\t%.2f", pv_overlap.asy1.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_full.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_full.partner);
+			if (pv_spacer.asy1.p != 0)fprintf(out_pval_table, "\t%.2f", pv_spacer.asy1.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_partial.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_partial.partner);
+			if (pv_overlap.equ.p != 0)fprintf(out_pval_table, "\t%.2f", pv_overlap.equ.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_overlap.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_overlap.partner);
+			if (pv_spacer.equ.p != 0)fprintf(out_pval_table, "\t%.2f", pv_spacer.equ.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_spacer.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_spacer.partner);
+			if (mot_a != mot_p)
+			{
+				if (pv_overlap.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par.p);
+				else fprintf(out_pval_table, "\t0");
+				if (pv_spacer.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par.p);
+				else fprintf(out_pval_table, "\t0");
+			}
+			else fprintf(out_pval_table, "\t\t");
+			if (pv_overlap.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.asy2.p);
 			else fprintf(out_pval_table, "\t0");
-			if (pv_any.partner > bonferroni_corr_ap)fprintf(out_pval_table, "\t%.2f", pv_any.partner);
-			else fprintf(out_pval_table, "\t0");
-			if (pv_full.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_full.anc_par);
-			else fprintf(out_pval_table, "\t0");
-			if (pv_partial.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_partial.anc_par);
-			else fprintf(out_pval_table, "\t0");
-			if (pv_overlap.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par);
-			else fprintf(out_pval_table, "\t0");
-			if (pv_spacer.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par);
-			else fprintf(out_pval_table, "\t0");
-			if (pv_any.anc_par != 0)fprintf(out_pval_table, "\t%+.2f", pv_any.anc_par);
+			if (pv_spacer.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.asy2.p);
 			else fprintf(out_pval_table, "\t0");
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_asy);
-		}
-		else
-		{
-			char slash = '/';
-			for (i = 0; i < 18; i++)fprintf(out_pval_table, "\tn%ca", slash);
-			fprintf(out_pval_table, "\t%.2f\t\t", bonferroni_corr);
 		}
 		fprintf(out_pval_table, "\n");
 		fclose(out_pval_table);
