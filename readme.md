@@ -85,7 +85,6 @@ The command line for many-partner option:
 
 `<6 path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
-
 `<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
 
 `<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
@@ -94,7 +93,7 @@ The command line for many-partner option:
 
 The command line for anchor_pro option:
 
-`./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_fpr> <7 int motif1.table_thr_fpr> <8 int spacer_min> <9 int spacer_max>`
+`./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_fpr> <7 int motif1.table_thr_fpr> <8 int spacer_min> <9 int spacer_max> <10double pvalue_thr> <11double -log10[p-value]_thr> <12double asymmetry_fold(-log10(FPR))>`
 
 
 `<1 file_fasta>` = DNA sequences of ChIP-seq peaks in fasta format
@@ -123,6 +122,11 @@ The command line for anchor_pro option:
 
 `<9 int spacer_max>` = integer value from 0 to 100 (the default value 29)
 
+`<10 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
+
+`<11 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
+
+`<12 asymmetry_fold(-log10(FPR))>` = the fold ratio fold_thr restricting FPR values of two motifs in asymmetrical CEs, e.g. if FPR1 & FPR2 are FPR of two motifs in CE, than fold = Max(FPR1,FPR2) / Min(FPR1,FPR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
 
 ## Input data
 
