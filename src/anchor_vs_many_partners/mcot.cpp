@@ -1608,7 +1608,7 @@ int main(int argc, char* argv[])
 			strcat(file_hist_one, buf);
 			hist_obs_one.fprintf_all(file_hist, mot, name_partner, len_anchor, len_partner, shift_max, modea,1);
 			//if(mot==0)
-			hist_obs_one.fprintf_all(file_hist_one, mot, name_partner, len_anchor, len_partner, shift_max, modew,0);
+			hist_obs_one.fprintf_all(file_hist_one, mot, name_partner, len_anchor, len_partner, shift_max, modew,1);
 			hist_exp_one.fprintf_all(file_hist_rand, mot, name_partner, len_anchor, len_partner, shift_max, modea,1);
 			real_plot.sum();
 			rand_plot.sum();
