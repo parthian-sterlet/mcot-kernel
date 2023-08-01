@@ -1379,13 +1379,14 @@ int main(int argc, char* argv[])
 			char file_hist_one[ARGLEN];
 			strcpy(file_hist_one, file_hist);
 			char buf[4];
-			//memset(buf, '\0', sizeof(buf));
-			//sprintf(buf, "%d", mot_p);
+			memset(buf, '\0', sizeof(buf));
+			sprintf(buf, "%d", mot_p);
 			//strcat(file_hist_one, buf);
 			strcat(file_hist_one, "_");
 			strcat(file_hist_one, namef[mot_p]);
 			hist_obs_one.fprintf_all(file_hist, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modea, 1);
-			if (mot_p == 0)hist_obs_one.fprintf_all(file_hist_one, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modew, 0); //modew
+			//if (mot_p == 0)
+			hist_obs_one.fprintf_all(file_hist_one, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modew, 0); //modew
 			hist_exp_one.fprintf_all(file_hist_rand, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modea, 1);
 			real_plot.sum();
 			rand_plot.sum();
