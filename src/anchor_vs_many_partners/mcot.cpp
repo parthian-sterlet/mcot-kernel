@@ -1604,6 +1604,7 @@ int main(int argc, char* argv[])
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
 			sprintf(buf, "%d", mot);
+			strcat(file_hist_one, "_");
 			strcat(file_hist_one, buf);
 			hist_obs_one.fprintf_all(file_hist, mot, name_partner, len_anchor, len_partner, shift_max, modea,1);
 			if(mot==0)hist_obs_one.fprintf_all(file_hist_one, mot, name_partner, len_anchor, len_partner, shift_max, modew,0);
