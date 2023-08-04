@@ -2,12 +2,11 @@
 
 ## General description
 
-MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset ([Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800);[Levitsky et al., 2020](https://doi.org/10.3390/ijms21176023)). CEs detected by MCOT include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
+MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset ([Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800); [Levitsky et al., 2020](https://doi.org/10.3390/ijms21176023)). CEs detected by MCOT include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
 
 ## Implementation
 
-MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding 
-source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver) [(Siebert and Söding, 2016)](https://doi.org/10.1093/nar/gkw521), and [SiteGA](https://github.com/parthian-sterlet/sitega)) [Tsukanov et al., 2022](https://doi.org/10.3389/fpls.2022.938545)
+MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver) [(Siebert and Söding, 2016)](https://doi.org/10.1093/nar/gkw521), and [SiteGA](https://github.com/parthian-sterlet/sitega)) [Tsukanov et al., 2022](https://doi.org/10.3389/fpls.2022.938545)
 
 ## Installation
 (Linux) Run in terminal (Packages “build-essential” and “cmake” 
@@ -121,15 +120,18 @@ MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner mot
 
 MCOT have two options for definition of the partner motif:
 
-* User defines a matrix of partner motif (one-partner option);
+* a matrix of partner motif (one-partner option);
 
-* User points to a library of known motifs (many partners option).
-
-MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
+* a library of known motifs (many partners option).
 
 `<anchor_pro>` requires input files [**Table Threshold vs. ERR**]((https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist) for both models. 
 For a PWM model the respictive file can be taken as the output files of runs with `<anchor_vs_one>` or `<anchor_vs_many>` options, respecting to the anchor motif <err\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) [(Tsukanov et al., 2022)](https://doi.org/10.3389/fpls.2022.938545) tool has a special option to compute the required table
 
+Advanced options include: 
+* the minimal and maximal spacer lengths restricting the search of spaced locations of motifs The default range of spacer length is [0; 29] nt. MCOT allows the variation of the upper limit of spacer length up to 100 base pairs;
+* Expected Recognition Rate (ERR), the frequency of motifs occurrence is required to set the recognition thresholds for motifs, default value 5E-4;
+* CE enrichment, threshold –Log10(p-value(CE)) for CE enrichment, default value 5;
+* Asymmetry ratio, for two value ERR1 and ERR2 for certain CE means Max{-log10(ERR1), -log10(ERR2)} / Min{-log10(ERR1), -log10(ERR2)}
 
 ## Motifs recognition
 
