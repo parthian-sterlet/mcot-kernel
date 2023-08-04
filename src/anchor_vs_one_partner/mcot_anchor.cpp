@@ -787,14 +787,14 @@ int main(int argc, char* argv[])
 	char name[2][50];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
 	char file_fpr[2][ARGLEN];
-	strcpy(file_fpr[0], "fpr_anchor.txt");
-	strcpy(file_fpr[1], "fpr_partner.txt");
+	strcpy(file_fpr[0], "err_anchor.txt");
+	strcpy(file_fpr[1], "err_partner.txt");
 
 	if (argc != 10)
 	{
 		fprintf(stderr, "Error: %s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		fprintf(stderr, "2 motif1 3motif2 ");
-		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_fold(-log10(FPR)) in CE\n");//9char mot_anchor 
+		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_fold(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
