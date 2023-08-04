@@ -2,7 +2,7 @@
 
 ## General description
 
-MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset ([Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800); [Levitsky et al., 2020]((https://doi.org/10.3390/ijms21176023))). CEs detected by MCOT include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
+MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of composite elements (CEs) in a single ChIP-seq dataset ([Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800);[Levitsky et al., 2020](https://doi.org/10.3390/ijms21176023)). CEs detected by MCOT include two potential binding sites of transcription factors (TFs) in all possible mutual orientations. MCOT considers CEs with a full/partial overlap of motifs or with a spacer in a certain range. Each potential CE recognized by MCOT contains the motif of immunoprecipitated TF in respective ChIP-seq experiment (anchor motif) and another motif (partner). Identical/distinct anchor and partner motifs imply the search for CEs of homotypic or eterotypic type (respectively).
 
 ## Implementation
 
@@ -53,7 +53,7 @@ The command line for many-partner option:
 `<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, a minimum recommended number of peaks is about 300-500, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks, hence about 1000-2000 peaks are enough. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
 
 
-`<2 anchor.motif>`, `<3 partner.motif>` = frequency matrices of the first and second motifs motifs in the standard format, e.g.  
+`<2 anchor.motif>`, `<3 partner.motif>` = frequency matrices of the first and second motifs motifs in [the standard format](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/jun.motif), e.g.  
 
 \***
 
@@ -93,17 +93,17 @@ The command line for anchor_pro option:
 
 `<1 file_fasta>` = DNA sequences of ChIP-seq peaks in fasta format
 
-`<2 motif1.profile>` = Profile for the first model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<2 motif1.profile>` = Profile for the first model, see [example profile of model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49__pwm)
 
-`<3 motif2.profile>` = Profile for the second model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<3 motif2.profile>` = Profile for the second model, see [example profile of model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49__sga)
 
 `<4 int motif1.length>` = integer value, length of the first model
 
 `<5 int motif1.length>` = integer value, length of the second model
 
-`<6 int motif1.table_thr_err>` = Table **Threshold vs. ERR** for the first motif, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<6 int motif1.table_thr_err>` = Table **Threshold vs. ERR** for the first motif, see [example of distribution for model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist)
 
-`<7 int motif2.table_thr_err>` = Table **Threshold vs. ERR** for the second motif, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
+`<7 int motif2.table_thr_err>` = Table **Threshold vs. ERR** for the second motif, see [example of distribution for model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_sga.dist)
 
 `<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
