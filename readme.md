@@ -117,7 +117,7 @@ The command line for anchor_pro option:
 
 ## Input data
 
-MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) to define the anchor motif. 
+MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and [STREME](https://meme-suite.org/meme/tools/streme) ([Bailey et al., 2021](https://doi.org/10.1093/bioinformatics/btab203)) to define an anchor motif. 
 
 MCOT have two options for definition of the partner motif:
 
@@ -138,7 +138,7 @@ e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special
 ## Motifs recognition
 
 MCOT with options one\_partner, many\_partners applies the recognition model of PWM for mapping motifs in peaks, otherwise for option anchor\_pro MCOT takes ready mapping of predicted hits from a file. 
-For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
+For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, e.g. {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif. Note that the change of the recognition threshold of motifs (it is measured in the logarithmic scale -log10(ERR)) defines the fifth threshold (default value 5E-4) and proportionally shifts the rest four thresholds.
 
 
 ## Composite elements search and annotation
@@ -381,6 +381,7 @@ where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed an
 The same calculations are performed for Anchor-Anchor CEs, in this case the enrichment of symmetrical vs. asymmetrical CEs are tested.
 
 ## References
+[Bailey, TL. (2021) STREME: accurate and versatile sequence motif discovery. Bioinformatics. 37, 2834–40](https://doi.org/10.1093/bioinformatics/btab203)
 
 [Levitsky,V., Zemlyanskaya,E., Oshchepkov,D., Podkolodnaya,O., Ignatieva,E., Grosse,I., Mironova,V., Merkulova,T.  (2019) A single ChIP-seq dataset is sufficient for comprehensive analysis of motifs co-occurrence with MCOT package. Nucleic Acids Res. 47, e139.](https://doi.org/10.1093/nar/gkz800)
 
