@@ -50,7 +50,7 @@ The command line for many-partner option:
 `./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(ERR))>`
 
 
-`<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 300-350, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
+`<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, a minimum recommended number of peaks is about 300-500, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks, hence about 1000-2000 peaks are enough. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
 
 
 `<2 anchor.motif>`, `<3 partner.motif>` = frequency matrices of motifs in standard format, e.g.  
