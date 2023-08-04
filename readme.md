@@ -85,7 +85,7 @@ The command line for many-partner option:
 
 `<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-`<9 asymmetry_fold(-log10(ERR))>` = the fold ratio fold_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. if ERR1 & ERR2 are ERR of two motifs in CE, than fold = Max(ERR1,ERR2) / Min(ERR1,ERR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
+`<9 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetrical and symmetrical CEs, respectively.
 
 The command line for anchor_pro option:
 
