@@ -41,17 +41,16 @@ options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_
 The command line for one-partner option:
 
 
-`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(FPR))>`
+`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(ERR))>`
 
 
 The command line for many-partner option:
 
 
-`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(FPR))>`
+`./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(ERR))>`
 
 
-
-`<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 200-300, the maximum number is not restricted, however 10000 or higher number of peaks requires higher computation time than several thousands of peaks. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
+`<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, the minimum recommended number of peaks is about 300-350, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
 
 
 `<2 anchor.motif>`, `<3 partner.motif>` = frequency matrices of motifs in standard format, e.g.  
@@ -76,57 +75,45 @@ The command line for many-partner option:
 
 `<3 partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of 514 motifs from the [Plant Cistrome Database](http://neomorph.salk.edu/dap_web/pages/index.php) for *A.thaliana* motifs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
 
-
 `<4 minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
-
 
 `<5 maximal spacer length>` = integer value from 0 to 100 (the default value 29)
 
-
 `<6 path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
-`<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
+`<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(ERR) scale of Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set o promoters of protein-coding genes, default value 0.0005
 
 `<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-`<9 asymmetry_fold(-log10(FPR))>` = the fold ratio fold_thr restricting FPR values of two motifs in asymmetrical CEs, e.g. if FPR1 & FPR2 are FPR of two motifs in CE, than fold = Max(FPR1,FPR2) / Min(FPR1,FPR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
+`<9 asymmetry_fold(-log10(ERR))>` = the fold ratio fold_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. if ERR1 & ERR2 are ERR of two motifs in CE, than fold = Max(ERR1,ERR2) / Min(ERR1,ERR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
 
 The command line for anchor_pro option:
 
-`./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_fpr> <7 int motif1.table_thr_fpr> <8 int spacer_min> <9 int spacer_max> <10double pvalue_thr> <11double -log10[p-value]_thr> <12double asymmetry_fold(-log10(FPR))>`
-
+`./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_err> <7 int motif1.table_thr_err> <8 int spacer_min> <9 int spacer_max> <10double pvalue_thr> <11double -log10[p-value]_thr> <12double asymmetry_fold(-log10(ERR))>`
 
 `<1 file_fasta>` = DNA sequences of ChIP-seq peaks in fasta format
 
-
 `<2 motif1.profile>` = Profile for the first model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
-
 
 `<3 motif2.profile>` = Profile for the second model, see below example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
-
 `<4 int motif1.length>` = integer value, length of the first model
-
 
 `<5 int motif1.length>` = integer value, length of the second model
 
+`<6 int motif1.table_thr_err>` = Table **Threshold vs. ERR** for the first motif, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
-`<6 int motif1.table_thr_fpr>` = Table **Threshold vs. FPR** (False Positive Rate) for the first model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
-
-
-`<7 int motif1.table_thr_fpr>` = Table **Threshold vs. FPR** for the second model, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
-
+`<7 int motif2.table_thr_err>` = Table **Threshold vs. ERR** for the second motif, see below an example of format in the [Output data](https://gitlab.sysbio.cytogen.ru/levitsky/mcot-kernel/-/blob/master/readme.md#output-data) section
 
 `<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
-
 `<9 int spacer_max>` = integer value from 0 to 100 (the default value 29)
 
-`<10 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(err) scale of expected recognition rate (err), default value 0.0005
+`<10 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic scale, -log10(ERR), default value 0.0005
 
 `<11 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-`<12 asymmetry_fold(-log10(FPR))>` = the fold ratio fold_thr restricting FPR values of two motifs in asymmetrical CEs, e.g. if FPR1 & FPR2 are FPR of two motifs in CE, than fold = Max(FPR1,FPR2) / Min(FPR1,FPR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
+`<12 asymmetry_fold(-log10(ERR))>` = the fold ratio fold_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. if ERR1 & ERR2 are ERR of two motifs in CE, than fold = Max(ERR1,ERR2) / Min(ERR1,ERR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
 
 ## Input data
 
@@ -141,9 +128,9 @@ MCOT have two options for definition of the partner motif:
 
 MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
 
-`<anchor_pro>` requires input files **Table Threshold vs. FPR** for each of two models. 
+`<anchor_pro>` requires input files **Table Threshold vs. ERR** for each of two models. 
 For a PWM model the respictive file can be taken as the output files of runs with `<anchor_vs_one>` or `<anchor_vs_many>` options,
-respecting to the anchor motif <fpr\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile 
+respecting to the anchor motif <err\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile 
 of potential hits for the whole genome dataset of promoters of protein-coding genes, 
 e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
 
@@ -151,7 +138,7 @@ e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special
 ## Motifs recognition
 
 MCOT with options one\_partner, many\_partners applies the recognition model of PWM for mapping motifs in peaks, otherwise for option anchor\_pro MCOT takes ready mapping of predicted hits from a file. 
-For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of FPRs for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
+For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif.
 
 
 ## Composite elements search and annotation
@@ -159,7 +146,7 @@ For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unifie
 MCOT classifies CEs structure according to the following criteria:
 * _Orientation_. Four types of distinct mutual orientations are considered: in the same DNA strand (Direct Anchor/Partner and Direct Partner/Anchor), in opposite strands (Everted and Inverted);
 * _Overlap or Spacer_. There are three distinct cases of mutual locations: Full overlap (one motif located entirely within another one); Partial overlap; and Spacer. To describe each case MCOT uses the following characteristics: the distance between nearest borders of two motifs (Full); the length of overlapped region (Partial); and the length of spacer;
-* _Asymmetry of сonservation_.  All predicted CEs are subdivided into two classes: those with more conservative anchor and partner motifs. The conservation of motif hit is estimated as -Log10(FPR), where FPR is computed by the respective score of recognition model
+* _Asymmetry of сonservation_.  All predicted CEs are subdivided into two classes: those with more conservative anchor and partner motifs. The conservation of motif hit is estimated as -Log10(ERR), where ERR is computed by the respective score of recognition model
 
 For each of 25 combinations of motifs conservation and each computation flow MCOT compiles the 2x2 contingency table (Table 1) and compute the significance of Fisher’s exact test p-value(CE) that compares the content of CEs in ChIP-seq peaks with that for background model.
 
@@ -177,7 +164,7 @@ Fisher’s exact test computes the CE enrichment for each of 5x5 combinations of
 
 Finally, MCOT estimates the similarity of anchor and partner motifs with the motifs similarity p-value. MCOT used matrix column similarities measures PCC ([Pearson Correlation Coefficient, Pietrokovski, 1996](https://academic.oup.com/nar/article/24/19/3836/2384639)) and SSD ([Sum of Squared Distances, Sandelin and Wasserman, 2004](https://doi.org/10.1016/j.jmb.2004.02.048)) to compute two p-values. If maximum among them was less than 0.05, then pair of motifs had the significant similarity. Hence, a respective CE may be a possible false positive prediction.
 
-Additionally, MCOT computed significance of CEs with more conserved anchor motif and more conserved partner motif. These calculations are performed according to scheme represented above in Table 1, but MCOT counts either CEs with more conserved Anchor or Partner motifs, i.e. either -Log10[FPR(Anchor)] > -Log10[FPR(Partner)] or -Log10[FPR(Anchor)] ≤ -Log10[FPR(Partner)].
+Additionally, MCOT computed significance of CEs with more conserved anchor motif and more conserved partner motif. These calculations are performed according to scheme represented above in Table 1, but MCOT counts either CEs with more conserved Anchor or Partner motifs, i.e. either -Log10[ERR(Anchor)] > -Log10[ERR(Partner)] or -Log10[ERR(Anchor)] ≤ -Log10[ERR(Partner)].
 
 Finally, to estimate the asymmetry of CE, MCOT partitions all CEs on those with more conserved Anchor or Partner motifs and compute the significance of asymmetry with Fisher’s exact test (Table 2). The asymmetry significance -Log10[P-value] is printed as positive (with sign ‘+’) in the case of enrichment toward the Anchor motif, otherwise, MCOT sign ‘-’ (negative value) denotes the enrichment toward the Partner motif.  These calculation yielded for each computation flow one p-value(CE, Asymmetry).
 
@@ -203,7 +190,7 @@ Nflow = 5 designates the number of MCOT computation flows and Nthr = 5 means the
 MCOT gives the following output data:
 
 
-* __Files <\*\_thr5>, recognition profiles of motifs__ . Each file respects to one motif. A file has fasta-like format, i.e. for each peak the header line starts with ‘>’ symbol. Next, each subsequent line represents one hit in a peak, particularly it position, respective conservation value -Log10(FPR) and DNA strand.
+* __Files <\*\_thr5>, recognition profiles of motifs__ . Each file respects to one motif. A file has fasta-like format, i.e. for each peak the header line starts with ‘>’ symbol. Next, each subsequent line represents one hit in a peak, particularly it position, respective conservation value -Log10(ERR) and DNA strand.
 
 ```
 Example
@@ -218,7 +205,7 @@ Example
 Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β ([Wederell et al., 2008](https://doi.org/10.1093/nar/gkn382)) illustrate MCOT application. The anchor FoxA2 motif we deduced from de novo search [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and the partner HNF1β motif we took from the mouse Hocomoco core collection ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)).
 
 
-* __Files <fpr\*\.txt>, Table Threshold vs. FPR (False Positive Rate)__ . File contains two columns: threshold and FPR estimated as the site density for the whole genome dataset of protein-coding genes
+* __Files <err\*\.txt>, Table Threshold vs. ERR (Expected Recognition Rate)__ . File contains two columns: threshold and ERR estimated as the site density for the whole genome dataset of protein-coding genes
 
 ```
 Example
@@ -360,7 +347,7 @@ Asym_Sym |  |  | 1418 | 1418 | 904 | 904 | 1.000 | 2
 For each recognized CE MCOT provides (1) the header of a peak, (2) the start and the end positions of each motif in a peak, (3) mutual location (Full / Partial / Spacer types and the respective base pair measures, see above), (4) the strands of the Anchor/Partner motifs in a peak and the mutual orientation of the motifs (one of four types), (5) conservation scores and DNA sequences of the motifs. To provide detailed information on asymmetry ‘Anchor vs. Partner’ in comparison of peaks and permuted sequences MCOT provides files <real*.best> and rand*.best> that show the lists of predicted CE for peaks and permuted sequences.
 
 
-|#Seq|Anchor start|Anchor end|Partner start|Partner end|Mutual Loc|Loc Type|Strands|Mutual Ori|Anchor hit conservation, -Log10(FPR)|Partner hit conservation, -Log10(FPR)|Anchor seq|Partner seq|
+|#Seq|Anchor start|Anchor end|Partner start|Partner end|Mutual Loc|Loc Type|Strands|Mutual Ori|Anchor hit conservation, -Log10(ERR)|Partner hit conservation, -Log10(ERR)|Anchor seq|Partner seq|
 |----|------------|----------|-------------|-----------|----------|--------|-------|----------|------------------------------------|-------------------------------------|----------|-----------|
 |Seq 18|271|282|268|282|0F|Full|-+|Inverted|3.365|3.447|tgtttatctttc|agtgaaagataaaca|
 |Seq 23|565|576|569|583|8P|Partial|-+|Everted|3.457|4.506|tattgacttacc|agtcaataagttaca|
@@ -369,7 +356,7 @@ For each recognized CE MCOT provides (1) the header of a peak, (2) the start and
 
 
 * __Files <plot\_\*>, heatmaps that show the CE asymmetry, i.e. the abundance of CEs with various ratios of conservation of Anchor and Partner motifs__ 
-For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one heatmap is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(FPR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(FPR) of Anchor and Partner motifs. This conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
+For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one heatmap is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(ERR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(ERR) of Anchor and Partner motifs. This conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
 
 $`{1000*OBS_{i,j}/N(OBS)}`$ and $`{1000*EXP_{i,j}/N(EXP)}`$, 
 
