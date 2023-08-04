@@ -7,7 +7,7 @@ MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of compos
 ## Implementation
 
 MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding 
-source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver), [InMode](https://www.jstacs.de/index.php/InMoDe) and [SiteGA](https://github.com/parthian-sterlet/sitega)).
+source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver) [(Siebert and Söding, 2016)](https://doi.org/10.1093/nar/gkw521), and [SiteGA](https://github.com/parthian-sterlet/sitega)).
 
 ## Installation
 (Linux) Run in terminal (Packages “build-essential” and “cmake” 
@@ -128,7 +128,7 @@ MCOT have two options for definition of the partner motif:
 MCOT allows the variation of the upper limit of spacer length from zero to 100 base pairs.
 
 `<anchor_pro>` requires input files **Table Threshold vs. ERR** for each of two models. 
-For a PWM model the respictive file can be taken as the output files of runs with `<anchor_vs_one>` or `<anchor_vs_many>` options, respecting to the anchor motif <err\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) tool has a special option to compute the required table
+For a PWM model the respictive file can be taken as the output files of runs with `<anchor_vs_one>` or `<anchor_vs_many>` options, respecting to the anchor motif <err\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) [(Tsukanov et al., 2022)](https://doi.org/10.3389/fpls.2022.938545) tool has a special option to compute the required table
 
 
 ## Motifs recognition
@@ -352,7 +352,7 @@ For each recognized CE MCOT provides (1) the header of a peak, (2) the start and
 
 
 * __Files <plot\_\*>, heatmaps that show the CE asymmetry, i.e. the abundance of CEs with various ratios of conservation of Anchor and Partner motifs__ 
-For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one heatmap is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(ERR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(ERR) of Anchor and Partner motifs. This conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
+For each of five computation flows (Full, Partial, Overlap, Spacer and Any) one heatmap is computed. For foreground and background data (peaks and sequences with permuted hits) the respective list of predicted CEs are subdivided on two fractions: those with more conserved Anchor and Partner motifs. The conservation of a hit is estimated with the respective -Log10(ERR) value. The minimal conservation value is equal to -Log10(5E-4) ~ 3.3. Next, MCOT computes two matrices {OBSi,j} and {EXPi,j} of absolute frequencies of conservation of Anchor and Partner motifs for observed and expected data. Here indices i and j imply the conservation -Log10(ERR) of Anchor and Partner motifs. E.g., for ERR = 5E-4 (-Log10(5E-4) ~ 3.30) this conservation is falling within the ranges [<3.5], [3.5..3.7], [3.7..3.9] etc. up to [5.3..5.5] and [>5.5]. Finally, the per mille measure transforms the absolute frequencies to relative ones as follow:
 
 $`{1000*OBS_{i,j}/N(OBS)}`$ and $`{1000*EXP_{i,j}/N(EXP)}`$, 
 
@@ -392,5 +392,9 @@ The same calculations are performed for Anchor-Anchor CEs, in this case the enri
 [Pietrokovski,S. (1996) Searching databases of conserved sequence regions by aligning protein multiple-alignments. Nucleic Acids Res., 24, 3836-3845.](https://academic.oup.com/nar/article/24/19/3836/2384639)
 
 [Sandelin,A., Wasserman,W.W. (2004) Constrained binding site diversity within families of transcription factors enhances pattern discovery bioinformatics. J Mol Biol., 338, 207-215.](https://doi.org/10.1016/j.jmb.2004.02.048)
+
+[Siebert, M., & Söding, J. (2016). Bayesian Markov models consistently outperform PWMs at predicting motifs in nucleotide sequences. Nucleic Acids Res., 44, 6055–69.](https://doi.org/10.1093/nar/gkw521)
+
+[Tsukanov, A. V., Mironova, V. V., Levitsky, V. G. (2022). Motif models proposing independent and interdependent impacts of nucleotides are related to high and low affinity transcription factor binding sites in Arabidopsis. Front Plant Sci., 13, 938545.](https://doi.org/10.3389/fpls.2022.938545)
 
 [Wederell,E.D., Bilenky,M., Cullum,R., Thiessen,N., Dagpinar,M., Delaney,A., Varhol R, Zhao Y, Zeng T, Bernier B, et al. (2008). Global analysis of in vivo Foxa2-binding sites in mouse adult liver using massively parallel sequencing. Nucleic Acids Res., 36, 4549-4564.](https://doi.org/10.1093/nar/gkn382) 
