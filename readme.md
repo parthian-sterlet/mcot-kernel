@@ -73,7 +73,7 @@ The command line for many-partner option:
 
 ```
 
-`<3 partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to libraries of the [Hocomoco](http://hocomoco11.autosome.ru/) human/mouse core (396/353) and full (747/509) collections of motifs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of 514 motifs from the [Plant Cistrome Database](http://neomorph.salk.edu/dap_web/pages/index.php) for *A.thaliana* motifs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
+`<3 partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to the libraries of derived from ChIP-seq data [Hocomoco](http://hocomoco11.autosome.ru/) core (396/353) and full (747/509) collections of motifs for human/murine TFs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of motifs derived from DAP-seq data [Plant Cistrome](http://neomorph.salk.edu/dap_web/pages/index.php) collection of 514 motifs for *A.thaliana* TFs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
 
 `<4 minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
@@ -120,7 +120,6 @@ The command line for anchor_pro option:
 MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and [STREME](https://meme-suite.org/meme/tools/streme) ([Bailey et al., 2021](https://doi.org/10.1093/bioinformatics/btab203)) to define an anchor motif. 
 
 MCOT have two options for definition of the partner motif:
-
 
 * User defines a matrix of partner motif (one-partner option);
 
