@@ -113,7 +113,7 @@ The command line for anchor_pro option:
 
 `<11 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-`<12 asymmetry_fold(-log10(ERR))>` = the fold ratio fold_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. if ERR1 & ERR2 are ERR of two motifs in CE, than fold = Max(ERR1,ERR2) / Min(ERR1,ERR2), and fold > fold_thr and fold < fold_thr mean asymmetrical and symmetrical CEs, respectively.
+`<12 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetrical and symmetrical CEs, respectively.
 
 ## Input data
 
@@ -134,7 +134,7 @@ For a PWM model the respictive file can be taken as the output files of runs wit
 ## Motifs recognition
 
 MCOT with options one\_partner, many\_partners applies the recognition model of PWM for mapping motifs in peaks, otherwise for option anchor\_pro MCOT takes ready mapping of predicted hits from a file. 
-For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, e.g. {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif. Note that the change of the recognition threshold of motifs (it is measured in the logarithmic scale -log10(ERR)) defines the fifth threshold (default value 5E-4) and proportionally shifts the rest four thresholds.
+For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, e.g. for the option of command line `<pvalue_thr>` = 5E-4, five ERRs are equal to {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif. Note that the change of the recognition threshold `<pvalue_thr>` defines the fifth threshold (default value 5E-4) and proportionally shifts the rest four thresholds.
 
 
 ## Composite elements search and annotation
