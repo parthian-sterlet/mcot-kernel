@@ -6,7 +6,7 @@ MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of compos
 
 ## Implementation
 
-MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones (e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver) [(Siebert and Söding, 2016)](https://doi.org/10.1093/nar/gkw521), and [SiteGA](https://github.com/parthian-sterlet/sitega)) [Tsukanov et al., 2022](https://doi.org/10.3389/fpls.2022.938545)
+MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones, e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver) [(Siebert and Söding, 2016)](https://doi.org/10.1093/nar/gkw521), and [SiteGA](https://github.com/parthian-sterlet/sitega) [Tsukanov et al., 2022](https://doi.org/10.3389/fpls.2022.938545)
 
 ## Installation
 (Linux) Run in terminal (Packages “build-essential” and “cmake” 
