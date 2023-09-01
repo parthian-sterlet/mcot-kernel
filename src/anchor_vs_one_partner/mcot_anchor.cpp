@@ -926,8 +926,8 @@ int main(int argc, char* argv[])
 			namef[i][k++] = cc;
 		}		
 	}*/
-	strcat(file_pval_table, "_");
-	strcat(file_pval_table, namef[0]);
+//	strcat(file_pval_table, "_");
+//	strcat(file_pval_table, namef[0]);
 	double pvalue_equal = 0.01;
 	int length_fasta_max = 0, nseq_real = 0;
 	seq = NULL;
