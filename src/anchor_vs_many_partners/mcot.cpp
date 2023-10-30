@@ -875,12 +875,12 @@ int main(int argc, char* argv[])
 	char name_anchor[ARGLEN], name_partner[ARGLEN];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
 	char file_fpr[ARGLEN];
-	strcpy(file_fpr, "fpr_anchor.txt");
+	strcpy(file_fpr, "err_anchor.txt");
 
 	if (argc != 10)
 	{
 		fprintf(stderr, "Error: %s 1file_fasta 2char anchor_motif 3char partner_db 4int spacer_min 5int spacer_max ", argv[0]);//1int thresh_num_min 2int thresh_num_max
-		fprintf(stderr, "6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_fold(-log10(FPR)) in CE\n");//9char mot_anchor 
+		fprintf(stderr, "6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_fold(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -1151,12 +1151,10 @@ int main(int argc, char* argv[])
 	//	fprintf(out_pval_table, "Any, Conservative OneMotif, -Log10[P-value]\t");
 	//	fprintf(out_pval_table, "Full overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 		//fprintf(out_pval_table, "Partial overlap, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Overlap, Sites, Hetero. Anchor+/Partner-, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Spacer, Sites Hetero. Anchor+/Partner-, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Overlap, Sites Homo. Asymmetry/Symmetry, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Spacer, Sites Homo. Asymmetry/Symmetry, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Overlap, Sites Mixed Homo./Hetero., -Log10[P-value]\t");
-	fprintf(out_pval_table, "Spacer, Sites Mixed Homo./Hetero., -Log10[P-value]\t");
+	fprintf(out_pval_table, "Overlap, Sites Anchor+/Partner-, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Spacer, Sites Anchor+/Partner-, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Overlap, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
+	fprintf(out_pval_table, "Spacer, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
 	//	fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Bonferroni_CE\tBonferroni_CE(AncPar)\tBonferroni_Asym\n");
 	fclose(out_pval_table);
@@ -1604,10 +1602,12 @@ int main(int argc, char* argv[])
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
 			sprintf(buf, "%d", mot);
+			strcat(file_hist_one, "_");
 			strcat(file_hist_one, buf);
-			hist_obs_one.fprintf_all(file_hist, mot, name_partner, len_anchor, len_partner, shift_max, modea,1);
-			if(mot==0)hist_obs_one.fprintf_all(file_hist_one, mot, name_partner, len_anchor, len_partner, shift_max, modew,0);
-			hist_exp_one.fprintf_all(file_hist_rand, mot, name_partner, len_anchor, len_partner, shift_max, modea,1);
+			hist_obs_one.fprintf_all(file_hist, mot, name_partner, len_anchor, len_partner, shift_max, modea, 1);
+			//if (mot == 0)
+			hist_obs_one.fprintf_all(file_hist_one, mot, name_partner, len_anchor, len_partner, shift_max, modew, 1);
+			hist_exp_one.fprintf_all(file_hist_rand, mot, name_partner, len_anchor, len_partner, shift_max, modea, 1);
 			real_plot.sum();
 			rand_plot.sum();
 			//printf("Mot %d Enter plot\n",mot);
@@ -2359,20 +2359,6 @@ int main(int argc, char* argv[])
 			else fprintf(out_pval_table, "\t0");
 			if (pv_spacer.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.asy2.p);
 			else fprintf(out_pval_table, "\t0");
-			if (mot != 0)
-			{
-				if (pv_overlap.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.anc_par.p);
-				else fprintf(out_pval_table, "\t0");
-				if (pv_spacer.anc_par.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.anc_par.p);
-				else fprintf(out_pval_table, "\t0");
-			}
-			else
-			{
-				if (pv_overlap.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_overlap.asy2.p);
-				else fprintf(out_pval_table, "\t0");
-				if (pv_spacer.asy2.p != 0)fprintf(out_pval_table, "\t%+.2f", pv_spacer.asy2.p);
-				else fprintf(out_pval_table, "\t0");
-			}
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_ap);
 			fprintf(out_pval_table, "\t%.2f", bonferroni_corr_asy);

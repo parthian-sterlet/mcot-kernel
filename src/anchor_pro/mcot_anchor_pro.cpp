@@ -692,14 +692,14 @@ int main(int argc, char *argv[])
 	char name[2][ARGLEN], name_fasta[ARGLEN];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
 	char file_fpr[2][ARGLEN];
-	strcpy(file_fpr[0], "fpr_anchor.txt");
-	strcpy(file_fpr[1], "fpr_partner.txt");
+	strcpy(file_fpr[0], "err_anchor.txt");
+	strcpy(file_fpr[1], "err_partner.txt");
 
 	if (argc != 13)
 	{
 		printf("%s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		printf("2 motif1.profile 3motif2.profile 4int motif1.length 5int motif1.length 6int motif1.table_thr_fpr 7int motif1.table_thr_fpr");
-		printf(" 8int spacer_min 9int spacer_max 10double pvalue_thr 11double -log10[p-value]_thr 12double asymmetry_fold(-log10(FPR)) in CE\n");//9char mot_anchor 
+		printf(" 8int spacer_min 9int spacer_max 10double pvalue_thr 11double -log10[p-value]_thr 12double asymmetry_fold(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
