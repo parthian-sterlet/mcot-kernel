@@ -835,7 +835,7 @@ int main(int argc, char* argv[])
 	{
 		fprintf(stderr, "Error: %s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		fprintf(stderr, "2 motif1 3motif2 ");
-		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_fold(-log10(ERR)) in CE\n");//9char mot_anchor 
+		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_ratio(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -862,7 +862,7 @@ int main(int argc, char* argv[])
 		double fold_asy_min = 0;
 		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
 		{
-			printf("Allowed fold range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
+			printf("Allowed asymmetry ratio range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
 			exit(1);
 		}
 	}
