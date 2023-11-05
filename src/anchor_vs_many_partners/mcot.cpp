@@ -921,7 +921,7 @@ int main(int argc, char* argv[])
 	if (argc != 10)
 	{
 		fprintf(stderr, "Error: %s 1file_fasta 2char anchor_motif 3char partner_db 4int spacer_min 5int spacer_max ", argv[0]);//1int thresh_num_min 2int thresh_num_max
-		fprintf(stderr, "6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_fold(-log10(ERR)) in CE\n");//9char mot_anchor 
+		fprintf(stderr, "6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_ratio(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -950,10 +950,10 @@ int main(int argc, char* argv[])
 	double fold_asy = log10(atof(argv[9]));//threshold for log10(frp) fold asymmentry
 	{
 		double fold_asy_max = 5;
-		double fold_asy_min = 0;
+		double fold_asy_min = 1.01;
 		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
 		{
-			printf("Allowed fold range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
+			printf("Allowed asymmetry ratio range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
 			exit(1);
 		}
 	}
