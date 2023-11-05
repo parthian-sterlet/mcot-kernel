@@ -950,7 +950,7 @@ int main(int argc, char* argv[])
 	double fold_asy = log10(atof(argv[9]));//threshold for log10(frp) fold asymmentry
 	{
 		double fold_asy_max = 5;
-		double fold_asy_min = 1.01;
+		double fold_asy_min = 0;
 		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
 		{
 			printf("Allowed asymmetry ratio range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
