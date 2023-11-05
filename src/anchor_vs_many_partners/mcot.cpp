@@ -681,9 +681,9 @@ struct combi {
 	double freqc[MATLEN + SPACLEN];// sum of all orientation
 	//	void ini(int len_a, int len_p, int len_sp);
 	//	void mem_out(void);
-	int fprintf_all(char* file, int mot, char* motif, int len_a, int len_p, int len_sp, char* mode, int print_over);
+	int fprintf_all(char* file, char* files, int mot, char* motif, int len_a, int len_p, int len_sp, char* mode);
 };
-int combi::fprintf_all(char* file, int mot, char* motif, int len_a, int len_p, int len_sp, char* mode, int print_over)
+int combi::fprintf_all(char* file, char* files, int mot, char* motif, int len_a, int len_p, int len_sp, char* mode)
 {
 	char head[6][12];
 	strcpy(head[5], "Cumulative");
@@ -709,24 +709,20 @@ int combi::fprintf_all(char* file, int mot, char* motif, int len_a, int len_p, i
 		return -1;
 	}
 	int i, j;
-	if (print_over == 1)
 	{
 		fprintf(out, "%d\t%s\t", mot, motif);
 		for (j = n_full; j >= 1; j--)fprintf(out, "\t%d%c", j - 1, in);
 		for (j = n_partial; j >= 1; j--)fprintf(out, "\t%d%c", j, bo);
-	}
-	{
 		for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
 		fprintf(out, "\n");
 	}
 	int jsta;
-	if (print_over == 1)jsta = 0;
-	else jsta = n_full + n_partial;
+	jsta = 0;
 	if (mot > 0)
 	{
 		for (i = 3; i >= 0; i--)
 		{
-			if (print_over == 1)fprintf(out, "\t\t");
+			fprintf(out, "\t\t");
 			fprintf(out, "%s", head[i]);
 			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
@@ -736,7 +732,7 @@ int combi::fprintf_all(char* file, int mot, char* motif, int len_a, int len_p, i
 	{
 		for (i = 3; i >= 1; i--)
 		{
-			if (print_over == 1)fprintf(out, "\t\t");
+			fprintf(out, "\t\t");
 			if (i != 1)
 			{
 				fprintf(out, "%s", head[i]);
@@ -746,7 +742,52 @@ int combi::fprintf_all(char* file, int mot, char* motif, int len_a, int len_p, i
 			fprintf(out, "\n");
 		}
 	}
-	if (print_over == 1)
+	{
+		fprintf(out, "\t\t");
+		fprintf(out, "%s", head[4]);
+		for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqa[j]);
+		fprintf(out, "\n");
+		fprintf(out, "\t\t");
+		fprintf(out, "%s", head[5]);
+		for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqc[j]);
+		fprintf(out, "\n");
+	}
+	fclose(out);
+	if ((out = fopen(files, mode)) == NULL)
+	{
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", files);
+		return -1;
+	}
+	{
+		fprintf(out, "%d\t%s\t", mot, motif);
+		for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
+		fprintf(out, "\n");
+	}
+	jsta = n_full + n_partial;
+	if (mot > 0)
+	{
+		for (i = 3; i >= 0; i--)
+		{
+			fprintf(out, "\t\t");
+			fprintf(out, "%s", head[i]);
+			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			fprintf(out, "\n");
+		}
+	}
+	else
+	{
+		for (i = 3; i >= 1; i--)
+		{
+			fprintf(out, "\t\t");
+			if (i != 1)
+			{
+				fprintf(out, "%s", head[i]);
+			}
+			else fprintf(out, "%s", head0);
+			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			fprintf(out, "\n");
+		}
+	}
 	{
 		fprintf(out, "\t\t");
 		fprintf(out, "%s", head[4]);
@@ -871,7 +912,7 @@ int main(int argc, char* argv[])
 	char file_fasta[ARGLEN], mot_db[30], mypath_data[ARGLEN], prom[ARGLEN], partner_db[30], file_pfm_anchor[ARGLEN];
 	char*** seq;// peaks
 
-	char file_hist[ARGLEN], file_hist_rand[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN];
+	char file_hist[ARGLEN], file_hist_rand[ARGLEN], file_hist_spacer[ARGLEN], file_hist_rand_spacer[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN];
 	char name_anchor[ARGLEN], name_partner[ARGLEN];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
 	char file_fpr[ARGLEN];
@@ -933,6 +974,9 @@ int main(int argc, char* argv[])
 
 	strcpy(file_hist, "out_hist");
 	strcpy(file_hist_rand, "out_hist_rand");
+	strcpy(file_hist_spacer, "out_hist_spacer");
+	strcpy(file_hist_rand, "out_hist_rand");
+	strcpy(file_hist_rand_spacer, "out_hist_rand_spacer");
 	strcpy(file_pval[0], "fisher_any_mot");
 	strcpy(file_pval[1], "fisher_full_mot");
 	strcpy(file_pval[2], "fisher_part_mot");
@@ -1105,7 +1149,7 @@ int main(int argc, char* argv[])
 	thr_err_rand = new int[nseq_rand];
 	if (thr_err_rand == NULL) { fprintf(stderr, "Error: Out of memory..."); return -1; }
 
-	FILE* out_hist, * out_hist_rand;
+	FILE *out_hist, *out_hist_rand, *out_hist_spacer, *out_hist_rand_spacer;
 	if ((out_hist = fopen(file_hist, "wt")) == NULL)
 	{
 		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist);
@@ -1117,7 +1161,19 @@ int main(int argc, char* argv[])
 		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist_rand);
 		return -1;
 	}
-	fclose(out_hist_rand);
+	fclose(out_hist_rand);	
+	if ((out_hist_spacer = fopen(file_hist_spacer, "wt")) == NULL)
+	{
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist_spacer);
+		return -1;
+	}
+	fclose(out_hist_spacer);
+	if ((out_hist_rand_spacer = fopen(file_hist_rand_spacer, "wt")) == NULL)
+	{
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist_rand_spacer);
+		return -1;
+	}
+	fclose(out_hist_rand_spacer);
 	FILE* out_pval_table;
 	if ((out_pval_table = fopen(file_pval_table, "wt")) == NULL)
 	{
@@ -1597,17 +1653,20 @@ int main(int argc, char* argv[])
 
 			//printf("Mot %d Enter hist\n",mot);
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[ARGLEN];
+			char file_hist_one[ARGLEN], file_hist_one_spacer[ARGLEN];
 			strcpy(file_hist_one, file_hist);
+			strcpy(file_hist_one_spacer, file_hist_spacer);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
 			sprintf(buf, "%d", mot);
 			strcat(file_hist_one, "_");
 			strcat(file_hist_one, buf);
-			hist_obs_one.fprintf_all(file_hist, mot, name_partner, len_anchor, len_partner, shift_max, modea, 1);
+			strcat(file_hist_one_spacer, "_");
+			strcat(file_hist_one_spacer, buf);
+			hist_obs_one.fprintf_all(file_hist, file_hist_spacer,mot, name_partner, len_anchor, len_partner, shift_max, modea);
 			//if (mot == 0)
-			hist_obs_one.fprintf_all(file_hist_one, mot, name_partner, len_anchor, len_partner, shift_max, modew, 1);
-			hist_exp_one.fprintf_all(file_hist_rand, mot, name_partner, len_anchor, len_partner, shift_max, modea, 1);
+			hist_obs_one.fprintf_all(file_hist_one, file_hist_one_spacer, mot, name_partner, len_anchor, len_partner, shift_max, modew);
+			hist_exp_one.fprintf_all(file_hist_rand, file_hist_rand_spacer,mot, name_partner, len_anchor, len_partner, shift_max, modea);
 			real_plot.sum();
 			rand_plot.sum();
 			//printf("Mot %d Enter plot\n",mot);
