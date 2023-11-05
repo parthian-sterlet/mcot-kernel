@@ -521,9 +521,9 @@ struct combi {
 	double freqc[MATLEN + SPACLEN];// sum of all orientation
 	//	void ini(int len_a, int len_p, int len_sp);
 	//	void mem_out(void);
-	int fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode);
+	int fprintf_all(char *file, char* files, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode);
 };
-int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, int len_sp, char *mode)
+int combi::fprintf_all(char* file, char* files, int mot, char* motif, int len_a, int len_p, int len_sp, char* mode)
 {
 	char head[6][12];
 	strcpy(head[5], "Cumulative");
@@ -531,7 +531,7 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	strcpy(head[0], "DirectAP");
 	strcpy(head[1], "DirectPA");
 	strcpy(head[2], "Inverted");
-	strcpy(head[3], "Everted");	
+	strcpy(head[3], "Everted");
 	char head0[10];
 	strcpy(head0, "DirectAA");
 	int n_partial;
@@ -542,24 +542,29 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	char sp = 'S';//spacer
 	char bo = 'P';//partial
 	char in = 'F';//full
-	FILE *out;
+	FILE* out;
 	if ((out = fopen(file, mode)) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file);
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file);
 		return -1;
 	}
-	fprintf(out, "%d\t%s\t", mot, motif);
 	int i, j;
-	for (j = n_full; j >= 1; j--)fprintf(out, "\t%d%c", j - 1, in);
-	for (j = n_partial; j >= 1; j--)fprintf(out, "\t%d%c", j, bo);
-	for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
-	fprintf(out, "\n");
+	{
+		fprintf(out, "%d\t%s\t", mot, motif);
+		for (j = n_full; j >= 1; j--)fprintf(out, "\t%d%c", j - 1, in);
+		for (j = n_partial; j >= 1; j--)fprintf(out, "\t%d%c", j, bo);
+		for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
+		fprintf(out, "\n");
+	}
+	int jsta;
+	jsta = 0;
 	if (mot > 0)
 	{
 		for (i = 3; i >= 0; i--)
 		{
-			fprintf(out, "\t\t%s", head[i]);
-			for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			fprintf(out, "\t\t");
+			fprintf(out, "%s", head[i]);
+			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
 		}
 	}
@@ -567,18 +572,72 @@ int combi::fprintf_all(char *file, int mot, char *motif, int len_a, int len_p, i
 	{
 		for (i = 3; i >= 1; i--)
 		{
-			if (i != 1)fprintf(out, "\t\t%s", head[i]);
-			else fprintf(out, "\t\t%s", head0);
-			for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			fprintf(out, "\t\t");
+			if (i != 1)
+			{
+				fprintf(out, "%s", head[i]);
+			}
+			else fprintf(out, "%s", head0);
+			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
 			fprintf(out, "\n");
 		}
 	}
-	fprintf(out, "\t\t%s", head[4]);
-	for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqa[j]);
-	fprintf(out, "\n");
-	fprintf(out, "\t\t%s", head[5]);
-	for (j = 0; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqc[j]);
-	fprintf(out, "\n");
+	{
+		fprintf(out, "\t\t");
+		fprintf(out, "%s", head[4]);
+		for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqa[j]);
+		fprintf(out, "\n");
+		fprintf(out, "\t\t");
+		fprintf(out, "%s", head[5]);
+		for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqc[j]);
+		fprintf(out, "\n");
+	}
+	fclose(out);
+	if ((out = fopen(files, mode)) == NULL)
+	{
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", files);
+		return -1;
+	}
+	{
+		fprintf(out, "%d\t%s\t", mot, motif);
+		for (j = 0; j <= len_sp; j++)fprintf(out, "\t%d%c", j, sp);
+		fprintf(out, "\n");
+	}
+	jsta = n_full + n_partial;
+	if (mot > 0)
+	{
+		for (i = 3; i >= 0; i--)
+		{
+			fprintf(out, "\t\t");
+			fprintf(out, "%s", head[i]);
+			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			fprintf(out, "\n");
+		}
+	}
+	else
+	{
+		for (i = 3; i >= 1; i--)
+		{
+			fprintf(out, "\t\t");
+			if (i != 1)
+			{
+				fprintf(out, "%s", head[i]);
+			}
+			else fprintf(out, "%s", head0);
+			for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freq[i][j]);
+			fprintf(out, "\n");
+		}
+	}
+	{
+		fprintf(out, "\t\t");
+		fprintf(out, "%s", head[4]);
+		for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqa[j]);
+		fprintf(out, "\n");
+		fprintf(out, "\t\t");
+		fprintf(out, "%s", head[5]);
+		for (j = jsta; j < n_tot; j++)fprintf(out, "\t%f", 100 * freqc[j]);
+		fprintf(out, "\n");
+	}
 	fclose(out);
 	return 1;
 }
@@ -688,7 +747,7 @@ int main(int argc, char *argv[])
 	int i, j, k, m, mot;
 	char file_fasta[ARGLEN], file_profile[2][ARGLEN], file_table[2][ARGLEN];
 	char ***seq;// peaks
-	char file_hist[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN], file_hist_rand[ARGLEN];
+	char file_hist[ARGLEN], file_hist_rand[ARGLEN], file_hist_spacer[ARGLEN], file_hist_rand_spacer[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN];
 	char name[2][ARGLEN], name_fasta[ARGLEN];
 	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
 	char file_fpr[2][ARGLEN];
@@ -699,7 +758,7 @@ int main(int argc, char *argv[])
 	{
 		printf("%s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		printf("2 motif1.profile 3motif2.profile 4int motif1.length 5int motif1.length 6int motif1.table_thr_fpr 7int motif1.table_thr_fpr");
-		printf(" 8int spacer_min 9int spacer_max 10double pvalue_thr 11double -log10[p-value]_thr 12double asymmetry_fold(-log10(ERR)) in CE\n");//9char mot_anchor 
+		printf(" 8int spacer_min 9int spacer_max 10double pvalue_thr 11double -log10[p-value]_thr 12double asymmetry_ratio(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -731,19 +790,19 @@ int main(int argc, char *argv[])
 	double bonf_user = atof(argv[11]);
 	double fold_asy = log10(atof(argv[12]));//threshold for log10(frp) fold asymmentry
 	{
-		double fold_asy_max = 3;
+		double fold_asy_max = 5;
 		double fold_asy_min = 0;
 		if (fold_asy <= fold_asy_min || fold_asy > fold_asy_max)
 		{
-			printf("Allowed fold range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
+			printf("Allowed asymmetry ratio range [%.3f; %.3f]\n", pow(10, fold_asy_min), pow(10, fold_asy_max));
 			exit(1);
 		}
 	}
 	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
 	if (bonf_user > 0 && bonf_user < 100)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
 	{
-		double pvalue_max_allowed = 0.002;
-		double pvalue_min_allowed = 0.0001;
+		double pvalue_max_allowed = 0.001;
+		double pvalue_min_allowed = 0.0002;
 		if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
 		{
 			printf("Allowed pvalue range [%.3f; %.3f]\n", pvalue_min_allowed, pvalue_max_allowed);
@@ -800,6 +859,8 @@ int main(int argc, char *argv[])
 	strcat(file_hist, name[1]);
 	strcat(file_hist, "_");
 	strcat(file_hist, "out_hist");
+	strcpy(file_hist_spacer, file_hist);
+	strcat(file_hist_spacer, "_spacer");
 	for (i = 0; i < 5; i++)
 	{
 		strcpy(file_pval[i], name_fasta);
@@ -830,6 +891,8 @@ int main(int argc, char *argv[])
 	strcat(file_hist_rand, name[1]);
 	strcat(file_hist_rand, "_");
 	strcat(file_hist_rand, "out_hist_rand");
+	strcpy(file_hist_rand_spacer, file_hist_rand);
+	strcat(file_hist_rand_spacer, "_spacer");
 	
 	int length_fasta_max = 0, nseq_real = 0;
 	seq = NULL;
@@ -910,19 +973,32 @@ int main(int argc, char *argv[])
 	thr_err_rand = new int[nseq_rand];
 	if (thr_err_rand == NULL) { puts("Out of memory..."); return -1; }
 
-	FILE *out_hist, *out_hist_rand;
+	FILE* out_hist, * out_hist_rand, * out_hist_spacer, * out_hist_rand_spacer;
 	if ((out_hist = fopen(file_hist, "wt")) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file_hist);
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist);
 		return -1;
 	}
 	fclose(out_hist);
 	if ((out_hist_rand = fopen(file_hist_rand, "wt")) == NULL)
 	{
-		printf("Input file %s can't be opened!\n", file_hist_rand);
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist_rand);
 		return -1;
 	}
 	fclose(out_hist_rand);
+	if ((out_hist_spacer = fopen(file_hist_spacer, "wt")) == NULL)
+	{
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist_spacer);
+		return -1;
+	}
+	fclose(out_hist_spacer);
+	if ((out_hist_rand_spacer = fopen(file_hist_rand_spacer, "wt")) == NULL)
+	{
+		fprintf(stderr, "Error: Input file %s can't be opened!\n", file_hist_rand_spacer);
+		return -1;
+	}
+	fclose(out_hist_rand_spacer);
+
 	FILE *out_pval_table;
 	if ((out_pval_table = fopen(file_pval_table, "wt")) == NULL)
 	{
@@ -1319,15 +1395,19 @@ int main(int argc, char *argv[])
 				bonferroni_corr_asy = pv_standard + log10(bonferroni_corr_asy);
 			}
 			char modew[] = "wt", modea[] = "at";
-			char file_hist_one[ARGLEN];
+			char file_hist_one[ARGLEN], file_hist_one_spacer[ARGLEN];
 			strcpy(file_hist_one, file_hist);
+			strcpy(file_hist_one_spacer, file_hist_spacer);
 			char buf[4];
 			memset(buf, '\0', sizeof(buf));
 			sprintf(buf, "%d", mot_p);
+			strcat(file_hist_one, "_");
 			strcat(file_hist_one, buf);
-			hist_obs_one.fprintf_all(file_hist, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modea);
-			hist_obs_one.fprintf_all(file_hist_one, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modew);
-			hist_exp_one.fprintf_all(file_hist_rand, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modea);
+			strcat(file_hist_one_spacer, "_");
+			strcat(file_hist_one_spacer, buf);
+			hist_obs_one.fprintf_all(file_hist, file_hist_spacer,mot_p, name[mot_p], len_anchor, len_partner, shift_max, modea);
+			hist_obs_one.fprintf_all(file_hist_one, file_hist_one_spacer, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modew);
+			hist_exp_one.fprintf_all(file_hist_rand, file_hist_rand_spacer, mot_p, name[mot_p], len_anchor, len_partner, shift_max, modea);
 			real_plot.sum();
 			rand_plot.sum();
 			if (mot_p != 0)
