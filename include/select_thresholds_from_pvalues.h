@@ -1,4 +1,4 @@
-int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double *fp_rate, double pvalue_large, double *fpr_select_i,
+int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double *fp_rate, double *fpr_select_i,
 								   double *fpr_select_o, double *thr_select, int index[NUM_THR])
 {
     int i, j;
