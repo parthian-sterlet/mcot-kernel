@@ -387,7 +387,8 @@ The same calculations are performed for Anchor-Anchor CEs, in this case the enri
 [Levitsky, V., Oshchepkov, D., Zemlyanskaya, E., Merkulova, T. (2020) Asymmetric conservation within pairs of co-occurred motifs mediates weak direct transcription factor binding in ChIP-seq data. Int J Mol Sci. 21, 6023.](https://doi.org/10.3390/ijms21176023)
 
 [Levitsky, V.G., Mukhin, A.M., Oshchepkov, D.Y., Zemlyanskaya, E.V., Lashin, S.A. (2022) Web-MCOT Server for Motif Co-Occurrence Search in ChIP-Seq Data. Int. J. Mol. Sci., 23, 8981.](https://doi.org/10.3390/ijms23168981)
-[Levitsky, V.G.; Raditsa, V.V.; Tsukanov, A.; Mukhin, A.M.; Merkulova, T.I. (2023) Asymmetry of Motifs Conservation within Homotypic Composite Elements Differentiates DNA-Binding Domains of Target Transcription Factors in ChIP-Seq Data. Preprints 2023111617.]( https://doi.org/10.20944/preprints202311.1617.v1)
+
+[Levitsky, V.G., Raditsa, V.V., Tsukanov, A., Mukhin, A.M., Merkulova, T.I. (2023) Asymmetry of Motifs Conservation within Homotypic Composite Elements Differentiates DNA-Binding Domains of Target Transcription Factors in ChIP-Seq Data. Preprints 2023111617.]( https://doi.org/10.20944/preprints202311.1617.v1)
 
 [Heinz, S., Benner, C., Spann, N., Bertolino, E., Lin, Y.C., Laslo, P., et al. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.](https://doi.org/10.1016/j.molcel.2010.05.004)
 
