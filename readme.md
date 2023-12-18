@@ -142,10 +142,10 @@ For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unifie
 ## Composite elements search and annotation
 
 MCOT classifies CEs structure according to the following attributes:
-* _Homotypic_ and _Heterotypic_ respect the same or distinct motif models. This means very CEs of binding sites of structurally similar or differnt transcription factors.
-* _Orientation_. Four types of distinct mutual orientations are considered: in the same DNA strand (Direct Anchor/Partner and Direct Partner/Anchor), in opposite strands (Everted and Inverted);
-* _Overlap or Spacer_. There are three distinct cases of mutual locations: Full overlap (one motif located entirely within another one); Partial overlap; and Spacer. To describe each case MCOT uses the following characteristics: the distance between nearest borders of two motifs (Full); the length of overlapped region (Partial); and the length of spacer;
-* _Asymmetry of сonservation_.  All predicted CEs are subdivided into two classes: those with more conservative anchor and partner motifs. The conservation of motif hit is estimated as -Log10(ERR), where ERR is computed by the respective score of recognition model
+* _Homotypic_ and _Heterotypic_ CEs respect the same or distinct motif models. This means very CEs of binding sites of structurally similar or differnt transcription factors.
+* _Orientation_. Four types of distinct mutual orientations of two sites in CEs are considered: in the same DNA strand (Direct Anchor/Partner and Direct Partner/Anchor), in opposite strands (Everted and Inverted);
+* _Overlap or Spacer_. There are three distinct cases of mutual locations of two sites within a CE: Full overlap (one motif located entirely within another one); Partial overlap; and Spacer. To describe each case MCOT uses the following characteristics: the distance between nearest borders of two motifs (Full); the length of overlapped region (Partial); and the length of spacer;
+* _Asymmetry of сonservation_. All predicted CEs are subdivided into two types: those with more notable or less notable difference in conservation of two motifs, these types are called asymmetric and symmetric. Heterotypic asymmetric CEs are further subdivided into those with more conserved anchor and partner motifs. The conservation of a site is estimated as -Log10(ERR), where ERR is computed by the respective score of recognition model.
 
 For each of 25 combinations of motifs conservation and each computation flow MCOT compiles the 2x2 contingency table (Table 1) and compute the significance of Fisher’s exact test p-value(CE) that compares the content of CEs in ChIP-seq peaks with that for background model.
 
