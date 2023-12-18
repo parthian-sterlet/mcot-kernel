@@ -1259,7 +1259,7 @@ int main(int argc, char* argv[])
 		matrix[ap].norm();
 		int index[NUM_THR];
 		double fpr_select_o[NUM_THR];
-		int stfp = select_thresholds_from_pvalues(nthr_dist, thr_all, fp_rate, pvalue, fpr_select_i, fpr_select_o, thr, index);
+		int stfp = select_thresholds_from_pvalues(nthr_dist, thr_all, fp_rate, fpr_select_i, fpr_select_o, thr, index);
 		if (stfp == -1)
 		{
 			fprintf(stderr, "Error: Bad input matrix of %d motif\n", mot);
