@@ -49,7 +49,7 @@ The command line for many-partner option:
 `./anchor_vs_many <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_ratio(-log10(ERR))>`
 
 
-`<1 fasta>` = DNA sequences of ChIP-seq peaks in fasta format, a minimum recommended number of peaks is about 300-500, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks, hence about 1000-2000 peaks are enough. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
+`<1 fasta>` = DNA sequences of peaks in FASTA format, a minimum recommended number of peaks is about 300-500, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks, hence about 1000-2000 peaks are enough. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
 
 
 `<2 anchor.motif>`, `<3 partner.motif>` = frequency matrices of the first and second motifs motifs in [the standard format](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/jun.motif), e.g.  
@@ -80,7 +80,7 @@ The command line for many-partner option:
 
 `<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters, three files in folders “hs”, “mm” and “at” imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
-`<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(ERR) scale of Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set o promoters of protein-coding genes, default value 0.0005, for anchor_vs_many the maximal allowable value is 0.0025.
+`<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(ERR) scale of Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set o promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.0025.
 
 `<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
@@ -90,7 +90,7 @@ The command line for anchor_pro option:
 
 `./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_err> <7 int motif1.table_thr_err> <8 int spacer_min> <9 int spacer_max> <10double pvalue_thr> <11double -log10[p-value]_thr> <12double asymmetry_ratio(-log10(ERR))>`
 
-`<1 file_fasta>` = DNA sequences of ChIP-seq peaks in fasta format
+`<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
 
 `<2 motif1.profile>` = Profile for the first model, see [example profile of model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49__pwm)
 
@@ -124,7 +124,7 @@ MCOT have two options for definition of the partner motif:
 
 * a library of known motifs (many partners option).
 
-`<anchor_pro>` requires input files [**Table Threshold vs. ERR**](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist) for both models. 
+`<anchor_pro>` requires input files [**Table Threshold vs. ERR**](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist) for both models. This file contains the list of pairs {Threshold, -Log10(ERR)} values.
 For a PWM model the respictive file can be taken as the output files of runs with `<anchor_vs_one>` or `<anchor_vs_many>` options, respecting to the anchor motif <err\*\.txt>. For a non-PWM model, the corresponding table should be deduced from the recognition profile of potential hits for the whole genome dataset of promoters of protein-coding genes, e.g. the [SiteGA](https://github.com/parthian-sterlet/sitega) [(Tsukanov et al., 2022)](https://doi.org/10.3389/fpls.2022.938545) tool has a special option to compute the required table
 
 Advanced options include: 
@@ -136,12 +136,13 @@ Advanced options include:
 ## Motifs recognition
 
 MCOT with options one\_partner, many\_partners applies the recognition model of PWM for mapping motifs in peaks, otherwise for option anchor\_pro MCOT takes ready mapping of predicted hits from a file. 
-For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, e.g. for the option of command line `<pvalue_thr>` = 5E-4, five ERRs are equal to {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif. Note that the change of the recognition threshold `<pvalue_thr>` defines the fifth threshold (default value 5E-4) and proportionally shifts the rest four thresholds.
+For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, e.g. for the option of command line `<pvalue_thr>` = 5E-4, five ERRs are equal to {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif. Note that the change of the recognition threshold `<pvalue_thr>` defines the most mild (the fifth) threshold and proportionally shifts the rest four thresholds. The next thresholds (ERR[3] ... ERR[0]) are defined as follows: k[4]= 1.5, {ERR[i]=ERR[i+1]/k[i+1], k[i] = 1 + k[i+1]/2}. If ERR[4] = 5E-4 than {ERR[3], ERR[2], ERR[1], ERR[0]} = {3.33E-4, 1.9E-4, 1.02E-04, 5.24E-5}. If ERR[4] = 1E-3 than {ERR[3], ERR[2], ERR[1], ERR[0]} = {6.67E-4, 3.81E-4, 2.03E-04, 1.05E-4}.
 
 
 ## Composite elements search and annotation
 
-MCOT classifies CEs structure according to the following criteria:
+MCOT classifies CEs structure according to the following attributes:
+* _Homotypic_ and _Heterotypic_ respect the same or distinct motif models. This means very CEs of binding sites of structurally similar or differnt transcription factors.
 * _Orientation_. Four types of distinct mutual orientations are considered: in the same DNA strand (Direct Anchor/Partner and Direct Partner/Anchor), in opposite strands (Everted and Inverted);
 * _Overlap or Spacer_. There are three distinct cases of mutual locations: Full overlap (one motif located entirely within another one); Partial overlap; and Spacer. To describe each case MCOT uses the following characteristics: the distance between nearest borders of two motifs (Full); the length of overlapped region (Partial); and the length of spacer;
 * _Asymmetry of сonservation_.  All predicted CEs are subdivided into two classes: those with more conservative anchor and partner motifs. The conservation of motif hit is estimated as -Log10(ERR), where ERR is computed by the respective score of recognition model
@@ -207,13 +208,13 @@ Here and below ChIP-seq data for mouse FoxA2 and CE FoxA2-HNF1β ([Wederell et a
 
 ```
 Example
-0.99745670	1.63517e-07
-0.99660894	1.88674e-07
-0.99612450	4.02504e-07
-...
-0.81195753	0.0179257
-0.81191716	0.0179369
-0.81187679	0.0179517
+0.99745670	6.786437089
+0.99660894	6.724287943
+0.99612450	6.395229799
+...	
+0.81195753	1.746523876
+0.81191716	1.746252613
+0.81187679	1.745894418
 ```
 
 * __File <rec_pos.txt>, the detailed recognition statistics__. For each motif and each recognition threshold MCOT provides (1) the number and the name of the motif (anchor motif is designated as ‘Anchor’; numbers 1,2, ... belong to partner motifs), (2) the number and the value of the threshold; (3) the percentage of peaks containing at least one hit of the motif, the number of peaks with recognized motif and the total number of peaks, (4) the number of recognized hits per base pair, the number of recognized hits and the total number of available locations for the motif.
