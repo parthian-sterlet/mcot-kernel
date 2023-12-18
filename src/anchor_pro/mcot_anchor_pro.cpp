@@ -784,9 +784,8 @@ int main(int argc, char *argv[])
 
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
-	double pvalue_mult = 1.5;// , dpvalue = 0.0000005; // 0.0005 1.5
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
-	double pvalue = atof(argv[10]);//pvalue = 0.0005
+	double pvalue = atof(argv[10]);//pvalue = 0.0005	
 	double bonf_user = atof(argv[11]);
 	double fold_asy = log10(atof(argv[12]));//threshold for log10(frp) fold asymmentry
 	{
@@ -798,10 +797,21 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	}
+	double pvalue_mult = 1.5, fpr_select_i[NUM_THR]; // 0.0005 1.5
+	{
+		double ratio_cur = pvalue_mult;
+		fpr_select_i[NUM_THR - 1] = pvalue;
+		for (i = NUM_THR - 2; i >= 0; i--)
+		{
+			fpr_select_i[i] = fpr_select_i[i + 1] / ratio_cur;
+			ratio_cur = 1 + ratio_cur / 2;
+		}
+	}
+	for (i = 0; i < NUM_THR; i++)fpr_select_i[i] = -log10(fpr_select_i[i]);
 	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
 	if (bonf_user > 0 && bonf_user < 100)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
 	{
-		double pvalue_max_allowed = 0.001;
+		double pvalue_max_allowed = 0.0025;
 		double pvalue_min_allowed = 0.0002;
 		if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
 		{
@@ -809,6 +819,7 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	}
+	pvalue = -log10(pvalue);
 	memset(name_fasta, '\0', sizeof(name_fasta));
 	{
 		k = 0;
@@ -1096,7 +1107,7 @@ int main(int argc, char *argv[])
 				if (test == -1) { printf("Wrong format %s\n", d); exit(1); }
 				n_thresh++;
 				double fprx = atof(s);
-				if (fprx > pvalue)break;				
+				if (fprx < pvalue)break;
 			}
 		}
 		rewind(in_tab);
@@ -1117,15 +1128,15 @@ int main(int argc, char *argv[])
 				if (test == -1) { printf("Wrong format %s\n", d); exit(1); }
 				thr_all[k] = atof(d);
 				fp_rate[k] = atof(s);
-				if (fp_rate[k] > pvalue)break;
+				if (fp_rate[k] < pvalue)break;
 				k++;
 			}
 		}
 		fclose(in_tab);
-		double fpr_select[NUM_THR];
+		double fpr_select_o[NUM_THR];
 		int index[NUM_THR];
-		{
-			int stfp = select_thresholds_from_pvalues(n_thresh, thr_all, fp_rate, pvalue, pvalue_mult, fpr_select, thr[mot], index);
+		{			
+			int stfp = select_thresholds_from_pvalues(n_thresh, thr_all, fp_rate, fpr_select_i, fpr_select_o, thr[mot], index);
 			if (stfp == -1)
 			{
 				printf("Threshold selection of %d motif is wrong\n", mot);
@@ -1182,7 +1193,7 @@ int main(int argc, char *argv[])
 			for (i = 0; i < NUM_THR; i++)
 			{
 				fprintf(out_stat, "%d\t%s\t%d\t", mot, file_profile[mot],i+1);
-				fprintf(out_stat, "%.12f\t%.13g\t",thr[mot][i], fpr_select[i]);
+				fprintf(out_stat, "%.12f\t%.13g\t",thr[mot][i], fpr_select_o[i]);
 				fprintf(out_stat, "%.6f\t%d\t%d\t%d\t%g\t%d\n",100*(double)npeaks[i] / nseq_real, npeaks[i], nseq_real, nhits[i], (double)nhits[i] / all_pos, all_pos);
 			}
 		}
