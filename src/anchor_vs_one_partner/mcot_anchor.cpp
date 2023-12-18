@@ -822,7 +822,7 @@ void asy_plot::mem_out(void)
 int main(int argc, char* argv[])
 {
 	int i, j, k, m, mot;
-	char file_fasta[ARGLEN], mypath_data[ARGLEN], prom[ARGLEN], file_pfm_anchor[2][ARGLEN];
+	char file_fasta[ARGLEN], genome_promoters[ARGLEN], file_pfm_anchor[2][ARGLEN];
 	char*** seq;// peaks
 	char file_hist[ARGLEN], file_hist_rand[ARGLEN], file_hist_spacer[ARGLEN], file_hist_rand_spacer[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN];
 	char name[2][50];
@@ -835,7 +835,7 @@ int main(int argc, char* argv[])
 	{
 		fprintf(stderr, "Error: %s 1file_fasta", argv[0]);//1int thresh_num_min 2int thresh_num_max
 		fprintf(stderr, "2 motif1 3motif2 ");
-		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char path_genome 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_ratio(-log10(ERR)) in CE\n");//9char mot_anchor 
+		fprintf(stderr, " 4int spacer_min 5int spacer_max 6char genome_fasta 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_ratio(-log10(ERR)) in CE\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
@@ -853,8 +853,8 @@ int main(int argc, char* argv[])
 	strcpy(file_pfm_anchor[1], argv[3]);
 	int shift_min = atoi(argv[4]); // minimal spacer length
 	int shift_max = atoi(argv[5]); // upper bound of spacer length
-	strcpy(mypath_data, argv[6]); //folder genome	.../hs, mm, at, mp	
-	double pvalue = atof(argv[7]);
+	strcpy(genome_promoters, argv[6]); //folder genome	.../hs, mm, at, mp	
+	double pvalue = atof(argv[7]); //expected recogntion rate
 	double bonf_user = atof(argv[8]);
 	double fold_asy = log10(atof(argv[9]));//threshold for log10(frp) fold asymmentry
 	{
@@ -869,7 +869,7 @@ int main(int argc, char* argv[])
 	double bonferroni_corr, bonferroni_corr_ap, bonferroni_corr_asy;
 	if (bonf_user > 0 && bonf_user < 100)bonferroni_corr = bonferroni_corr_ap = bonferroni_corr_asy = bonf_user;
 	{
-		double pvalue_max_allowed = 0.001;
+		double pvalue_max_allowed = 0.0025;
 		double pvalue_min_allowed = 0.0002;
 		if (pvalue > pvalue_max_allowed || pvalue < pvalue_min_allowed)
 		{
@@ -880,54 +880,21 @@ int main(int argc, char* argv[])
 	int height_permut = 100, size_min_permut = 200000, size_max_permut = 300000; //50000 150000 25
 	//	int height_permut = 10, size_min_permut = 200, size_max_permut = 300; //50000 150000 25
 	//double pvalue = 0.0005, pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
-	double pvalue_mult = 1.5, dpvalue = 0.0000000005; // 0.0005 1.5
+	double pvalue_mult = 1.5, fpr_select_i[NUM_THR], dpvalue = 0.0000005; // 0.0005 1.5
+	{	
+		double ratio_cur = pvalue_mult;
+		fpr_select_i[NUM_THR - 1] = pvalue;
+		for (i = NUM_THR - 2; i >= 0; i--)
+		{
+			fpr_select_i[i] = fpr_select_i[i + 1] / ratio_cur;
+			ratio_cur = 1 + ratio_cur / 2;
+		}
+	}
+	for (i = 0; i < NUM_THR; i++)fpr_select_i[i] = -log10(fpr_select_i[i]);
 	int mot_anchor = 0;// 0 = pwm from file >0 pwm from pre-computed database
 	int s_overlap_min = 6, s_ncycle_small = 1000, s_ncycle_large = 10000;//for similarity min_size_of_alignment, no. of permutation (test & detailed)
-	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric	
-	int nseq_genome, len_genome;
+	double s_granul = 0.001;//for similarity okruglenie 4astotnyh matric		
 
-	strcpy(prom, mypath_data);
-
-	if ((strstr(mypath_data, "hs") != NULL || strstr(mypath_data, "hg") != NULL) || (strstr(mypath_data, "HS") != NULL || strstr(mypath_data, "HG") != NULL))
-	{
-		//strcat(prom, "ups2kb.plaintest");
-		strcat(prom, "ups2kb.plain");
-		len_genome = 2000;
-		nseq_genome = 19795;
-		//nseq_genome = 1000;
-	}
-	else
-	{
-		if (strstr(mypath_data, "mm") != NULL || strstr(mypath_data, "MM") != NULL)
-		{
-			strcat(prom, "ups2kb.plain");
-			len_genome = 2000;
-			nseq_genome = 19991;
-		}
-		else
-		{
-			if (strstr(mypath_data, "at") != NULL || strstr(mypath_data, "AT") != NULL)
-			{
-				strcat(prom, "ups1500.plain");
-				len_genome = 1500;
-				nseq_genome = 27193;
-			}
-			else
-			{
-				if (strstr(mypath_data, "mp") != NULL || strstr(mypath_data, "MP") != NULL) //Marchantia polymorpha
-				{
-					strcat(prom, "ups1500.plain");
-					len_genome = 1500;
-					nseq_genome = 18274;
-				}
-				else
-				{
-					fprintf(stderr, "Error: Species %s\n", mypath_data);
-					return -1;
-				}
-			}
-		}
-	}
 	strcpy(file_hist, "out_hist");
 	strcpy(file_hist_spacer, "out_hist_spacer");
 	strcpy(file_hist_rand, "out_hist_rand");
@@ -1130,6 +1097,16 @@ int main(int argc, char* argv[])
 	real_plot.mem_in(nthr_asy, thr_asy_min, thr_asy_max, dthr_asy);
 	rand_plot.mem_in(nthr_asy, thr_asy_min, thr_asy_max, dthr_asy);
 
+	int all_pos_genome = 0, nseq_genome=0, len_genome=0;
+	{
+		int motif_len_min = 6;
+		ftp = fasta_to_plain_genome(genome_promoters, motif_len_min, all_pos_genome, nseq_genome, len_genome);
+		if (ftp == -1)
+		{
+			fprintf(stderr, "Error: Genome Fasta file %s error\n", genome_promoters);
+			return -1;
+		}
+	}
 	FILE* out_stat;
 	if ((out_stat = fopen("rec_pos.txt", "wt")) == NULL)
 	{
@@ -1137,7 +1114,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	fprintf(out_stat, "# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
-	int all_pos_rec = int(2 * pvalue * nseq_genome * len_genome);
+	int all_pos_rec = int(pvalue * all_pos_genome);
 	thr_all = new double[all_pos_rec];
 	if (thr_all == NULL) { fprintf(stderr, "Error: Not of memory..."); return -1; }
 	fp_rate = new double[all_pos_rec];
@@ -1153,13 +1130,22 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "Error: PFM to PWM conversion error, file %s\n", file_pfm_anchor[mot]);
 			return -1;
 		}
-		int nthr_dist = 0;
-		int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor[mot], length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue, dpvalue);
-		//	int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor, length, prom, all_pos_rec, nthr_dist, thr_all, fp_rate, mypath_data, nseq_genome, len_genome, pvalue);
+		int nthr_dist = 0;		
+		int piptd = pwm_iz_pwm_thr_dist0(pwm_anchor[mot], length, genome_promoters, all_pos_rec, nthr_dist, thr_all, fp_rate, genome_promoters, nseq_genome, len_genome, pvalue, dpvalue);		
 		if (piptd == -1)
 		{
 			fprintf(stderr, "Error: FP rate table error\n");
 			return -1;
+		}
+		double fpr_select_o[NUM_THR];
+		int index[NUM_THR];
+		{
+			int stfp = select_thresholds_from_pvalues(nthr_dist, thr_all, fp_rate, pvalue, fpr_select_i, fpr_select_o, thr[mot], index);
+			if (stfp == -1)
+			{
+				fprintf(stderr, "Error: Bad input matrix of %d motif\n", mot);
+				return -1;
+			}
 		}
 		FILE* out_fpr;
 		if ((out_fpr = fopen(file_fpr[mot], "wt")) == NULL)
@@ -1167,18 +1153,9 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "Error: Output file %s can't be opened!\n", file_fpr[mot]);
 			return -1;
 		}
+		//	fprintf(out_fpr,"%d\n", all_prom_pos);
 		for (i = 0; i < nthr_dist; i++)fprintf(out_fpr, "%.18f\t%.18g\n", thr_all[i], fp_rate[i]);
 		fclose(out_fpr);
-		double fpr_select[NUM_THR];
-		int index[NUM_THR];
-		{
-			int stfp = select_thresholds_from_pvalues(nthr_dist, thr_all, fp_rate, pvalue, pvalue_mult, fpr_select, thr[mot], index);
-			if (stfp == -1)
-			{
-				fprintf(stderr, "Error: Bad input matrix of %d motif\n", mot);
-				return -1;
-			}
-		}
 		matrix[mot].norm();
 
 		//int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, profile *real)  count all sites
@@ -1233,7 +1210,7 @@ int main(int argc, char* argv[])
 				{
 					if (thr_all[j + 1] <= sco && thr_all[j] >= sco)
 					{
-						pv_sc = -log10(fp_rate[j]);
+						pv_sc = fp_rate[j];
 						break;
 					}
 				}
@@ -1940,7 +1917,7 @@ int main(int argc, char* argv[])
 			char buf[10];
 			sprintf(buf, "%d", mot_p);
 			strcat(file_pval0, buf);
-			if ((out_pval[i] = fopen(file_pval0, "at")) == NULL)
+			if ((out_pval[i] = fopen(file_pval0, "wt")) == NULL)
 			{
 				fprintf(stderr, "Error: Input file %s can't be opened!\n", file_pval0);
 				return -1;
