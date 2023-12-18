@@ -84,11 +84,11 @@ The command line for many-partner option:
 
 `<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-`<9 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetrical and symmetrical CEs, respectively.
+`<9 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetric CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetric and symmetric CEs, respectively.
 
 The command line for anchor_pro option:
 
-`./anchor_pro <1 file_fasta> <2 motif1.profile> <3 motif2.profile> <4 int motif1.length> <5 int motif1.length> <6 int motif1.table_thr_err> <7 int motif1.table_thr_err> <8 int spacer_min> <9 int spacer_max> <10double pvalue_thr> <11double -log10[p-value]_thr> <12double asymmetry_ratio(-log10(ERR))>`
+`./anchor_pro <1 file_fasta> <2 motif_model1.profile> <3 motif_model2.profile> <4 int motif_model1.length> <5 int motif_model2.length> <6 int motif_model1.table_thr_err> <7 int motif_model2.table_thr_err> <8 int spacer_min> <9 int spacer_max> <10double pvalue_thr> <11double -log10[p-value]_thr> <12double asymmetry_ratio(-log10(ERR))>`
 
 `<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
 
@@ -96,13 +96,13 @@ The command line for anchor_pro option:
 
 `<3 motif2.profile>` = Profile for the second model, see [example profile of model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49__sga)
 
-`<4 int motif1.length>` = integer value, length of the first model
+`<4 int motif_model1.length>` = integer value, length of the first model
 
-`<5 int motif1.length>` = integer value, length of the second model
+`<5 int motif_model2.length>` = integer value, length of the second model
 
-`<6 int motif1.table_thr_err>` = Table **Threshold vs. ERR** for the first motif, see [example of distribution for model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist)
+`<6 int motif_model1.table_thr_err>` = Table **Threshold vs. ERR** for the first motif, see [example of distribution for model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist)
 
-`<7 int motif2.table_thr_err>` = Table **Threshold vs. ERR** for the second motif, see [example of distribution for model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_sga.dist)
+`<7 int motif_model2.table_thr_err>` = Table **Threshold vs. ERR** for the second motif, see [example of distribution for model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_sga.dist)
 
 `<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
@@ -112,7 +112,7 @@ The command line for anchor_pro option:
 
 `<11 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
 
-`<12 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetrical CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetrical and symmetrical CEs, respectively.
+`<12 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetric CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetric and symmetric CEs, respectively.
 
 ## Input data
 
@@ -145,7 +145,7 @@ MCOT classifies CEs structure according to the following attributes:
 * _Homotypic_ and _Heterotypic_ CEs respect the same or distinct motif models. This means very CEs of binding sites of structurally similar or differnt transcription factors.
 * _Orientation_. Four types of distinct mutual orientations of two sites in CEs are considered: in the same DNA strand (Direct Anchor/Partner and Direct Partner/Anchor), in opposite strands (Everted and Inverted);
 * _Overlap or Spacer_. There are three distinct cases of mutual locations of two sites within a CE: Full overlap (one motif located entirely within another one); Partial overlap; and Spacer. To describe each case MCOT uses the following characteristics: the distance between nearest borders of two motifs (Full); the length of overlapped region (Partial); and the length of spacer;
-* _Asymmetry of сonservation_. All predicted CEs are subdivided into two types: those with more notable or less notable difference in conservation of two motifs, these types are called asymmetric and symmetric. Heterotypic asymmetric CEs are further subdivided into those with more conserved anchor and partner motifs. The conservation of a site is estimated as -Log10(ERR), where ERR is computed by the respective score of recognition model.
+* _Asymmetry of сonservation_. All predicted CEs are subdivided into two types: those with more notable or less notable difference in conservation of two motifs, these types are called asymmetric and symmetric. Heterotypic asymmetric CEs are further subdivided into those with more conserved anchor and partner motifs. The conservation of a site is estimated as -Log10(ERR), where ERR is computed by the respective score of recognition model. See principal explanation of asymmetry within CE in [Levitsky et al. (2023)](https://doi.org/10.20944/preprints202311.1617.v1)
 
 For each of 25 combinations of motifs conservation and each computation flow MCOT compiles the 2x2 contingency table (Table 1) and compute the significance of Fisher’s exact test p-value(CE) that compares the content of CEs in ChIP-seq peaks with that for background model.
 
@@ -303,7 +303,7 @@ Each line of output file contains data concerning one 2x2 contingency table, in 
 1 to 5 mean the change from the most stringent to the most permissive, see above); (2) four counts for 2x2 contingency table (see Table 1 above), 
 ‘the number of peaks containing at least one CE (CE+) & ‘the number of peaks containing at least one hit of each motif (Total)’ for peaks (Real) 
 and permuted (Rand) datasets. Finally, the table contains significance of CEs (p-values) computed by Fisher’s exact test for 25 cells of 5x5 tables 
-of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs (lines 'Anchor', Partner'), significances of any asymmetrical CEs with more conserved either Anchor or Partner motifs (line 'Asymmetry'), significances of symmetrical CEs with the same  conservation of Anchor and Partner motifs (line 'Symmetry'), and (b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs, significances of asymmetry in CEs ‘Asymmetry vs. Symmetry with the positive/negative Fold respecting to the enrichment toward the Asymmetry/Symmetry in the motifs conservation. In these calculation points (a) and (b) imply counting of peaks and CEs, respectively. 
+of combinations of thresholds. Next, the respective data are shown for (a) significances of CEs with more conserved Anchor and Partner motifs (lines 'Anchor', Partner'), significances of any asymmetric CEs with more conserved either Anchor or Partner motifs (line 'Asymmetry'), significances of symmetric CEs with the same  conservation of Anchor and Partner motifs (line 'Symmetry'), and (b) significances of asymmetry in CEs ‘Anchor vs. Partner’ with the positive/negative Fold respecting to the enrichment toward the Anchor/Partner motifs, significances of asymmetry in CEs ‘Asymmetry vs. Symmetry with the positive/negative Fold respecting to the enrichment toward the Asymmetry/Symmetry in the motifs conservation. In these calculation points (a) and (b) imply counting of peaks and CEs, respectively. 
 
 Example below shows FOXA2 (Anchor) and HNF1B (Partner) motifs for Overlap computation flow.
 
@@ -377,7 +377,7 @@ where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed an
 |5.3..5.5|-4|-3|-2||-3||||||||
 |>5.5|4|2|-1|-2|-3||||||||
 
-The same calculations are performed for Anchor-Anchor CEs, in this case the enrichment of symmetrical vs. asymmetrical CEs are tested.
+The same calculations are performed for Anchor-Anchor CEs, in this case the enrichment of symmetric vs. asymmetric CEs are tested.
 
 ## References
 [Bailey, T.L. (2021) STREME: accurate and versatile sequence motif discovery. Bioinformatics. 37, 2834–40](https://doi.org/10.1093/bioinformatics/btab203)
@@ -387,6 +387,7 @@ The same calculations are performed for Anchor-Anchor CEs, in this case the enri
 [Levitsky, V., Oshchepkov, D., Zemlyanskaya, E., Merkulova, T. (2020) Asymmetric conservation within pairs of co-occurred motifs mediates weak direct transcription factor binding in ChIP-seq data. Int J Mol Sci. 21, 6023.](https://doi.org/10.3390/ijms21176023)
 
 [Levitsky, V.G., Mukhin, A.M., Oshchepkov, D.Y., Zemlyanskaya, E.V., Lashin, S.A. (2022) Web-MCOT Server for Motif Co-Occurrence Search in ChIP-Seq Data. Int. J. Mol. Sci., 23, 8981.](https://doi.org/10.3390/ijms23168981)
+[Levitsky, V.G.; Raditsa, V.V.; Tsukanov, A.; Mukhin, A.M.; Merkulova, T.I. (2023) Asymmetry of Motifs Conservation within Homotypic Composite Elements Differentiates DNA-Binding Domains of Target Transcription Factors in ChIP-Seq Data. Preprints 2023111617.]( https://doi.org/10.20944/preprints202311.1617.v1)
 
 [Heinz, S., Benner, C., Spann, N., Bertolino, E., Lin, Y.C., Laslo, P., et al. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.](https://doi.org/10.1016/j.molcel.2010.05.004)
 
