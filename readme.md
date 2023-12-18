@@ -40,7 +40,7 @@ options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_
 The command line for one-partner option:
 
 
-`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(ERR))>`
+`./anchor_vs_one <1 fasta> <2 anchor.motif> <3 partner.motif> <4 minimal spacer length> <5 maximal spacer length> <6 file of whole-genome promoters with its path> <7 pvalue_thr> <8 -log10[p-value]_thr> <9 asymmetry_fold(-log10(ERR))>`
 
 
 The command line for many-partner option:
@@ -72,13 +72,13 @@ The command line for many-partner option:
 
 ```
 
-`<3 partners.library>` = for this parameter five options are available: “hs_core”, “mm_core”, “hs_full”, “mm_full” and “dapseq”. These values respect to the libraries of derived from ChIP-seq data [Hocomoco](http://hocomoco11.autosome.ru/) core (396/353) and full (747/509) collections of motifs for human/murine TFs ([Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of motifs derived from DAP-seq data [Plant Cistrome](http://neomorph.salk.edu/dap_web/pages/index.php) collection of 514 motifs for *A.thaliana* TFs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)).
+`<3 partners.library>` = for this parameter five options are available: “hocomoco12_hs_core”, “hocomoco12_mm_core”, “hocomoco11_hs_core”, “hocomoco11_mm_core” and “dapseq”. These values respect to the libraries of derived from _in vivo_ and _in vitro_ data version 12 [Hocomoco](http://hocomoco12.autosome.ru/) (1400/1100) and version 11 (401/346) collections of motifs for human/murine TFs [Vorontsov et al., 2024](https://doi.org/10.1093/nar/gkad1077), [Kulakovskiy et al., 2018](https://doi.org/10.1093/nar/gkx1106)); and the library of motifs derived from DAP-seq data [Plant Cistrome](http://neomorph.salk.edu/dap_web/pages/index.php) collection of 510 motifs for *A.thaliana* TFs ([O’Malley et al., 2016](https://doi.org/10.1016/j.cell.2016.08.063)). See lists of motifs for five collections [here](https://github.com/parthian-sterlet/mcot-kernel/blob/master/include/pfm_list.h) Position frequency matrices (PFM), position weight matrices (PWM), and thresholds for partner motifs for various ERRs are preliminary computed in binary files, see [include](https://github.com/parthian-sterlet/mcot-kernel/blob/master/include/) folder, e.g. [h11core_hg38.binary](https://github.com/parthian-sterlet/mcot-kernel/blob/master/include/h11core_hg38.binary)
 
 `<4 minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
 `<5 maximal spacer length>` = integer value from 0 to 100 (the default value 29)
 
-`<6 path to whole-genome promoters>` =  a path to the whole-genome dataset of promoters, three folders “hs”, “mm” and “at” that imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
+`<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters, three files in folders “hs”, “mm” and “at” imply application of *H.sapiens*, *M.musculus* and *A.thaliana* promoter datasets for setting of thresholds for input motifs.
 
 `<7 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic -log10(ERR) scale of Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set o promoters of protein-coding genes, default value 0.0005
 
