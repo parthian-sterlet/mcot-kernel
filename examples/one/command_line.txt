@@ -1,1 +1,2 @@
-anchor_vs_one GSM935411_hg19_k562_no_ifn.seq jun.motif usf1.motif 0 29 .../genomes/hs/ 0.0005 5 1.5 > ylog
+cd examples/one
+../src/anchor_vs_one GSM935411_hg19_k562_no_ifn.seq jun.motif usf1.motif 0 29 .../genomes/hs/ups2kb.seq 0.0005 5 1.5 > ylog
