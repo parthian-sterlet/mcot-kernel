@@ -19,6 +19,13 @@ cmake ..
 make
 ```
 
+```
+git clone https://github.com/parthian-sterlet/mcot-kernel
+cd mcot-kernel/run
+chmod a+x build.sh
+./build.sh
+```
+
 All executable files for one-partner, many-partners and anchor-pro options will be in src/anchor\_vs\_one, src/anchor\_vs\_many and src/anchor\_pro
 
 (Windows) Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
