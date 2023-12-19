@@ -903,7 +903,7 @@ int main(int argc, char* argv[])
 	int motif_library = -1;
 	{
 		char library_tag[5][30] = { "h12core_hg38" , "h12core_mm10" , "h11core_hg38" , "h11core_mm10" , "dapseq" };		
-		int motif_count_library[5] = { 1,1,391,346,510 };
+		int motif_count_library[5] = { 1420,1142,391,346,510 };
 		for (i = 0; i < 5; i++)
 		{
 			if (strstr(partner_db, library_tag[i]) != NULL)
