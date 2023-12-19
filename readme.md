@@ -21,7 +21,7 @@ make
 
 ```
 git clone https://github.com/parthian-sterlet/mcot-kernel
-cd mcot-kernel/run
+cd mcot_kernel/run
 chmod a+x build.sh
 ./build.sh
 ```
