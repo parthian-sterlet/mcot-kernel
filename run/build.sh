@@ -1,5 +1,3 @@
-cd run
-
 chmod a+x command_line_one
 chmod a+x command_line_many
 chmod a+x command_line_pro
