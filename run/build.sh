@@ -10,7 +10,7 @@ chmod a+x mcot_anchor_pro.exe
 chmod a+x mcot_anchor.exe
 chmod a+x mcot.exe
 
-cd ../include
+cd ../partners
 cat h12core_hg38.binary.tar.gz.part* > h12core_hg38.binary.tar.gz
 cat h12core_mm10.binary.tar.gz.part* > h12core_mm10.binary.tar.gz
 cat dapseq_at10.binary.tar.gz.part* > dapseq_at10.binary.tar.gz
