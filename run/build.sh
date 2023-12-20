@@ -20,11 +20,9 @@ tar -xvzf dapseq_at10.binary.tar.gz
 
 cd ../genomes
 cd at
-tar -xvzf ups1500.seq.tar.gz
-cd ../mm
-tar -xvzf mm_ups2kb.seq.tar.gz
-cd ../hs
-tar -xvzf hs_ups2kb.seq.tar.gz
+tar -xvzf ups1500_at10.seq.tar.gz
+tar -xvzf ups2kb_mm10.seq.tar.gz
+tar -xvzf ups2kb_hg38.seq.tar.gz
 cd ..
 cd ..
 
