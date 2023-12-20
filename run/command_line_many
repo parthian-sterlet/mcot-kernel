@@ -1,2 +1,2 @@
 cd ../examples/many
-../../run/mcot.exe wederell_foxa2_liver_mm8.seq foxa2.motif ../partners/h11core_mm10.binary 0 29 ../../genomes/ups2kb_mm10.seq 0.0005  5 1.5 > ylog
+../../run/mcot.exe wederell_foxa2_liver_mm8.seq foxa2.motif ../../partners/h11core_mm10.binary 0 29 ../../genomes/ups2kb_mm10.seq 0.0005  5 1.5 > ylog
