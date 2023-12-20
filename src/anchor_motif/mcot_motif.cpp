@@ -49,6 +49,7 @@ int UnderStol(char *str, int nstol, char *ret, size_t size, char sep)
 	{
 		p2 = StrNStr(str, sep, 1);
 		if (p2 == -1)p2 = strlen(str);
+		if(p2 == 0) return -1;
 		strncpy(ret, str, p2);
 		ret[p2] = '\0';
 		return 1;
@@ -60,8 +61,9 @@ int UnderStol(char *str, int nstol, char *ret, size_t size, char sep)
 		if (p2 == -1)
 		{
 			p2 = strlen(str);
+			if(p2 == 0) return -1;
 		}
-		if (p1 == -1 || p2 == -1) return 0;
+		if (p1 == -1 || p2 == -1) return -1;
 		len = p2 - p1 - 1;
 		strncpy(ret, &str[p1 + 1], len);
 		ret[len] = '\0';
