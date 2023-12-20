@@ -1,2 +1,2 @@
 cd ../examples/one
-../../run/mcot_anchor.exe GSM935411_hg19_k562_no_ifn.seq jun.motif usf1.motif 0 29 .../genomes/ups2kb_hg38.seq 0.0005 5 1.5 > ylog
+../../run/mcot_anchor.exe GSM935411_hg19_k562_no_ifn.seq jun.motif usf1.motif 0 29 ../genomes/ups2kb_hg38.seq 0.0005 5 1.5 > ylog
