@@ -1,2 +1,2 @@
 cd/examples/many
-../run/mcot.exe GSE107719_ZNF341_hg19.seq znf341.motif ../include/h11core_hg38.binary 0 29 ../genomes/hs/ups2kb.seq 0.0005  5 1.5 > ylog
+../run/mcot.exe GSE107719_ZNF341_hg19.seq znf341.motif ../partners/h11core_hg38.binary 0 29 ../genomes/ups2kb_hg38.seq 0.0005  5 1.5 > ylog
