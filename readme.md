@@ -19,7 +19,7 @@ chmod a+x unpack.sh
 ./unpack.sh
 cd ..
 ```
-This unpack required input data.
+This unpacks required input data.
 
 Run in terminal (Packages “build-essential” and “cmake” 
 should be installed on Ubuntu system):
