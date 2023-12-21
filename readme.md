@@ -11,10 +11,19 @@ MCOT implemented in C++ and it can be conventionally compiled in Linux or Window
 ## Installation
 [Use <>code button](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives) to dowload this repository
 
-(Linux) Run in terminal (Packages “build-essential” and “cmake” 
-should be installed on Ubuntu system):
+(Linux) 
 ```
 cd <project>
+cd run
+chmod a+x unpack.sh
+./unpack.sh
+cd ..
+```
+This unpack required input data.
+
+Run in terminal (Packages “build-essential” and “cmake” 
+should be installed on Ubuntu system):
+```
 mkdir cmake
 cd cmake
 cmake ..
