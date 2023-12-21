@@ -32,7 +32,15 @@ make
 
 All executable files for one-partner, many-partners and anchor-pro options will be in src/anchor\_vs\_one, src/anchor\_vs\_many and src/anchor\_pro
 
-(Windows) Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
+(Windows) 
+```
+cd <project>
+cd run
+unpack.bat
+cd ..
+```
+This unpacks required input data.
+Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
 VC -> Native Tools x64. Else, you should install “CMake” module while VS 2017 installing)
 
 ```
