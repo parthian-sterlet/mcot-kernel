@@ -40,6 +40,7 @@ unpack.bat
 cd ..
 ```
 This unpacks required input data.
+
 Run in terminal (Win -> Visual Studio 2017 -> Visual Studio Tools -> 
 VC -> Native Tools x64. Else, you should install “CMake” module while VS 2017 installing)
 
