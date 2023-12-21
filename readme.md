@@ -15,8 +15,8 @@ MCOT implemented in C++ and it can be conventionally compiled in Linux or Window
 should be installed on Ubuntu system):
 ```
 cd <project>
-mkdir tmp
-cd tmp
+mkdir cmake
+cd cmake
 cmake ..
 make
 ```
