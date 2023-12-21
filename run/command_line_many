@@ -1,2 +1,2 @@
 cd ../examples/many
-../../run/src/anchor_vs_many_partners/anchor_vs_many_partners wederell_foxa2_liver_mm8.seq foxa2.motif ../../partners/h11core_mm10.binary 0 30 ../../genomes/mm/ups2kb_mm10.seq 0.0005  5 1.5 > ylog
+../../cmake/src/anchor_vs_many_partners/anchor_vs_many_partners wederell_foxa2_liver_mm8.seq foxa2.motif ../../partners/h11core_mm10.binary 0 30 ../../genomes/mm/ups2kb_mm10.seq 0.0005  5 1.5 > ylog
