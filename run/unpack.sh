@@ -2,14 +2,6 @@ chmod a+x command_line_one
 chmod a+x command_line_many
 chmod a+x command_line_pro
 
-g++ -o mcot_anchor_pro.exe ../src/mcot_anchor_pro.cpp
-g++ -o mcot_anchor.exe ../src/mcot_anchor.cpp
-g++ -o mcot.exe ../src/mcot.cpp
-
-chmod a+x mcot_anchor_pro.exe
-chmod a+x mcot_anchor.exe
-chmod a+x mcot.exe
-
 cd ../partners
 cat h12core_hg38.binary.tar.gz.part* > h12core_hg38.binary.tar.gz
 cat h12core_mm10.binary.tar.gz.part* > h12core_mm10.binary.tar.gz
