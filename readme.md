@@ -157,7 +157,6 @@ Advanced options include:
 MCOT with options one\_partner, many\_partners applies the recognition model of PWM for mapping motifs in peaks, otherwise for option anchor\_pro MCOT takes ready mapping of predicted hits from a file. 
 For each model, MCOT uses five thresholds {T[1],...T[5]} according to the unified set of ERRs for a whole-genome dataset of promoters, e.g. for the option of command line `<pvalue_thr>` = 5E-4, five ERRs are equal to {5.24E-5, 1.02E-04, 1.9E-4, 3.33E-4, 5E-4}. The profile of the most stringent hits contains matrix scores T ≥ T[1], the next profile comprises PWM scores {T} in the range T[2] ≥ T > T[1], etc. Hence, MCOT computes five profiles of hits with certain level of conservation for each input motif. Note that the change of the recognition threshold `<pvalue_thr>` defines the most mild (the fifth) threshold and proportionally shifts the rest four thresholds. The next thresholds (ERR[3] ... ERR[0]) are defined as follows: k[4]= 1.5, {ERR[i]=ERR[i+1]/k[i+1], k[i] = 1 + k[i+1]/2}. If ERR[4] = 5E-4 than {ERR[3], ERR[2], ERR[1], ERR[0]} = {3.33E-4, 1.9E-4, 1.02E-04, 5.24E-5}. If ERR[4] = 1E-3 than {ERR[3], ERR[2], ERR[1], ERR[0]} = {6.67E-4, 3.81E-4, 2.03E-04, 1.05E-4}.
 
-
 ## Composite elements search and annotation
 
 MCOT classifies CEs structure according to the following attributes:
@@ -397,6 +396,9 @@ where $`N(OBS)`$ and $`N(EXP)`$ are total counts of predicted CEs in observed an
 |>5.5|4|2|-1|-2|-3||||||||
 
 The same calculations are performed for Anchor-Anchor CEs, in this case the enrichment of symmetric vs. asymmetric CEs are tested.
+
+## Generation of partner library
+MCOT use several partner libraries including hundreds of motifs for several specific species. Each library includes the list of motifs, for each motifs a PFM and PWM are provided, and for a PWM the table of all recognition threshold values and respective -Log10(ERR) values are provides too. A file of library is written in binary format. The script prepares this library using the list of PFMs/PWMs and the promoters of all protein coding genes from whole-genome for a specific species.
 
 ## References
 [Bailey, T.L. (2021) STREME: accurate and versatile sequence motif discovery. Bioinformatics. 37, 2834–40](https://doi.org/10.1093/bioinformatics/btab203)
