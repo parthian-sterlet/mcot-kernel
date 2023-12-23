@@ -1,6 +1,7 @@
 chmod a+x command_line_one
 chmod a+x command_line_many
 chmod a+x command_line_pro
+chmod a+x command_line_library
 
 cd ../partners
 cat h12core_hg38.binary.tar.gz.part* > h12core_hg38.binary.tar.gz
