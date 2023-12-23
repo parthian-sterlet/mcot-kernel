@@ -399,6 +399,8 @@ The same calculations are performed for Anchor-Anchor CEs, in this case the enri
 
 ## Generation of partner library
 MCOT use several partner libraries including hundreds of motifs for several specific species. Each library includes the list of motifs, for each motifs a PFM and PWM are provided, and for a PWM the table of all recognition threshold values and respective -Log10(ERR) values are provides too. A file of library is written in binary format. The script prepares this library using the list of PFMs/PWMs and the promoters of all protein coding genes from whole-genome for a specific species.
+* The program [pwm_iz_pwm_thr_dist0.cpp](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pfm_to_pwm/pfm_to_pwm_mat.cpp) converts PFM file to PWM file, two formats of PFM file are acceptable, a default one, and transposed one. 
+* The program [pwm_iz_pwm_thr_dist0.cpp](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pwm_thr_err/pwm_iz_pwm_thr_dist0.cpp) takes PFM file, PWM file and FASTA file of promoter to compute a table of PWM thresholds and corresponding -Log10(ERR) values estimating Expected Recognition Rates for PWM. Sequential application of this program to the list of motifs creates the binary file required for the [many-partner option program](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp). [command_line_library](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) shows an example run to construct a library
 
 ## References
 [Bailey, T.L. (2021) STREME: accurate and versatile sequence motif discovery. Bioinformatics. 37, 2834–40](https://doi.org/10.1093/bioinformatics/btab203)
