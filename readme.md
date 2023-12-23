@@ -402,20 +402,31 @@ MCOT use several partner libraries including hundreds of motifs for several spec
 * The program [pfm_to_pwm_mat.cpp](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pfm_to_pwm/pfm_to_pwm_mat.cpp) converts PFM file to PWM file, two formats of PFM file are acceptable, the [default](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/library/partner1.pfm), and [transposed](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/library/partner2.pfm) matrices.
 
 Command line arguments:
+
 `<1 input PFM>` = input PFM format file
+
 `<2 input PWM>` = input PWM format file
 
 * The program [pwm_iz_pwm_thr_dist0.cpp](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pwm_thr_err/pwm_iz_pwm_thr_dist0.cpp) takes PFM file, PWM file and FASTA file of promoter to compute a table of PWM thresholds and corresponding -Log10(ERR) values estimating Expected Recognition Rates for PWM. Sequential application of this program to the list of motifs creates the binary file required for the [many-partner option program](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp). [command_line_library](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) shows an example run to construct a library
 
 Command line arguments:
+
 `<1 input PFM>` = input PFM format file
+
 `<2 input PWM>` = input PWM format file
+
 `<3 input file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters, three files in folders “hs”, “mm”, “at” and “dm” imply application of *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* promoters for setting of thresholds for input motifs.
+
 `<4 output text file pwm.table_thr_err>` = Table **Threshold vs. -Log10(ERR)** for pwm in text format, see [example of distribution](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist)
+
 `<5 output binary file>` = PFM, PWM, and Table **Threshold vs. -Log10(ERR)** for pwm in binary format, this file contains only motifs passing criterion on the minimal ERR values of the best PWM hit (see labels Good/Bad in the log output file)
+
 `<6 pvalue_thr>` = maximal Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value is 0.0025.
+
 `<7 dpvalue_thr>` = step for (ERR), this paramater is required to avoid too long output tables, this parameter means the rounding accuracy of the ERR values, default value is 5E-7.
+
 `<8 output file log>` = log file reporting the number of distinct thresholds of the PWM, and the minimal ERR value, which respects its best hit.
+
 `<9 double best_hit_thr>` = double value of the threshold for the minimal ERR values of the best PWM hit, according to [Levitsky et al., 2019](https://doi.org/10.1093/nar/gkz800), default value is 2E-5
 
 ## References
