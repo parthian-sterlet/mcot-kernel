@@ -419,7 +419,7 @@ MCOT use several partner libraries including hundreds of motifs for several spec
 
 `<4 output text file pwm.table_thr_err>` = Table **Threshold vs. -Log10(ERR)** for pwm in text format, see [example of distribution](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist)
 
-`<5 output binary file>` = PFM, PWM, and Table **Threshold vs. -Log10(ERR)** for pwm in binary format, this file contains only motifs passing criterion on the minimal ERR values of the best PWM hit (see labels Good/Bad in the log output file)
+`<5 output binary file>` = concatenated files of PFM, PWM, and Table **Threshold vs. -Log10(ERR)** in binary format, this file contains only motifs passing criterion on the minimal ERR values of the best PWM hit (see labels Good/Bad in the log output file)
 
 `<6 pvalue_thr>` = maximal Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value is 0.0025.
 
