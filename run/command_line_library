@@ -1,0 +1,6 @@
+cd ../examples/library
+../../cmake/src/pfm_to_pwm/pfm_to_pwm partner1.pfm partner1.pwm
+../../cmake/src/pwm_thr_err/pwm_thr_err partner1.pfm partner1.pwm ../../genomes/at/ups1500_at10.seq partner1.distt library.distb 0.0025 0.00000005 pwm.log 0.00002
+../../cmake/src/pfm_to_pwm/pfm_to_pwm partner2.pfm partner2.pwm
+../../cmake/src/pwm_thr_err/pwm_thr_err partner2.pfm partner2.pwm ../../genomes/at/ups1500_at10.seq partner2.distt library.distb 0.0025 0.00000005 pwm.log 0.00002
+
