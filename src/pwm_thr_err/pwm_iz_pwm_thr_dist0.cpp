@@ -10,6 +10,7 @@
 #define Min(a,b) ((a)>(b))? (b):(a);
 #define Max(a,b) ((a)>(b))? (a):(b);
 #define SEQLEN 5050
+#define PWMLEN 50 // max length of motives
 #define OLIGNUM 4// di 16 mono 4
 double pfm[SEQLEN][OLIGNUM];
 double pwm[SEQLEN][OLIGNUM];
@@ -350,6 +351,7 @@ int main(int argc, char *argv[])
 	}
 	int test;
 	char val[50];
+	char sep = '\t';
 	int lenp = 0;// dlina matricy
 	fgets(d1, sizeof(d1), in_pwm);
 	if (fgets(d1, sizeof(d1), in_pwm) != NULL)
@@ -365,9 +367,9 @@ int main(int argc, char *argv[])
 		}
 		DelChar(d1, '\n');
 		char razdelitel;
-		if (strchr(d1, '\t') != NULL)
+		if (strchr(d1, sep) != NULL)
 		{
-			razdelitel = '\t';
+			razdelitel = sep;
 		}
 		else
 		{
@@ -378,7 +380,7 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 		}
-		if (olig != 4 && olig != 16)
+		if (olig != 4)
 		{
 			printf("Wrong no. of columns in the input matrix!\n");
 			return -1;
@@ -403,44 +405,141 @@ int main(int argc, char *argv[])
 		lenp = j;
 	}
 	fclose(in_pwm);
+	int shift_col, mtype;
 	if ((in_pfm = fopen(file_pfm, "rt")) == NULL)
 	{
 		printf("Input file %s can't be opened!\n", file_pfm);
 		return -1;
-	}	
-	fgets(d1, sizeof(d1), in_pfm);
-	if (fgets(d1, sizeof(d1), in_pfm) != NULL)
-	{
-		DelChar(d1, '\n');
-		char razdelitel;
-		if (strchr(d1, '\t') != NULL)
+	}
+	int alfabet = 0;
+	fgets(head, sizeof(head), in_pfm);
+	fgets(head, sizeof(head), in_pfm);
+	if (strchr("ATGC", head[0]) != NULL)
+	{// jaspar
+		nseq = 1;
+		mtype = 1;
+		shift_col = 1;
+		alfabet++;
+		while (fgets(head, sizeof(head), in_pfm) != NULL)
 		{
-			razdelitel = '\t';
+			if (strchr("ATGC", head[0]) != NULL)alfabet++;
+		}
+		if (alfabet != 4 && alfabet != 16)
+		{
+			printf("Reading error in Jaspar matrix file %s !\n", file_pfm);
+			return -1;
+		}
+	}
+	else
+	{//homer, cis-bp
+		nseq = 1000000000;
+		mtype = 0;
+		//shift_col=0;
+	}
+	if (mtype == 0)
+	{
+		DelChar(head, '\n');
+		DelChar(head, '\r');
+		int headlen = strlen(head);
+		if (head[headlen - 1] == sep)
+		{
+			head[headlen - 1] = '\0';
+			headlen--;
+		}
+		int counttab = 0;
+		for (i = 0; i < headlen; i++)
+		{
+			if (head[i] == '\t')counttab++;
+		}
+		if (counttab == 4)// || counttab == 16
+		{
+			shift_col = 1;
+			alfabet = counttab;
 		}
 		else
 		{
-			if (strchr(d1, ' ') != NULL)razdelitel = ' ';
+			if (counttab == 3)// || counttab == 15
+			{
+				shift_col = 0;
+				alfabet = counttab + 1;
+			}
 			else
 			{
-				printf("Unknown razdelitel v stroke\n%s", d1);
+				printf("Reading errorin Cisbp/Homer matrix file %s !\n", file_pfm);
 				return -1;
 			}
 		}
-		j = 0;//pozicii
-		int fl = 0;
-		do
+	}
+	rewind(in_pfm);
+	int olen = 0;
+	double olen_perf = 0;
+	fgets(head, sizeof(head), in_pfm);
+	if (mtype == 0)
+	{
+		for (i = 0; i < PWMLEN; i++)
 		{
-			for (i = 0; i < olig; i++)
+			if (fgets(d1, sizeof(d1), in_pfm) != NULL)
 			{
-				test = UnderStol(d1, i, val, sizeof(val), razdelitel);
-				if (test == -1) { printf("Wrong format %s\n", d1); exit(1); }
-				pfm[j][i] = atof(val);				
+				DelChar(d1, '\n');
+				DelChar(d1, '\r');
+				char c = d1[0];
+				if (isdigit(c) || (strchr("-ATGC", c) != 0))
+				{
+					olen++;
+					//	 printf("%s",d[i]);						
+					for (j = 0; j < alfabet; j++)
+					{
+						/*if (NthColumn(d, s, j + shift_col) == -1)
+						{
+							break;
+						}*/
+						test = UnderStol(d1, j + shift_col, val, sizeof(val), sep);
+						if (test == -1) { printf("Wrong format %s\n", d1); exit(1); }
+						double score = atof(val);
+						pfm[i][j] = nseq * score;
+					}
+				}
+				else break;
 			}
-			j++;
-			if (fgets(d1, sizeof(d1), in_pfm) == NULL)break;
-			if (*d1 == '\n')fl = 1;
-		} while (fl == 0);
-		lenp = j;
+			else break;
+		}
+	}
+	else
+	{
+		fgets(d1, sizeof(d1), in_pfm);
+		int dlen = strlen(d1);
+		olen = 0;
+		for (i = 1; i < dlen; i++)
+		{
+			if (d1[i - 1] == sep && isdigit(d1[i]))olen++;
+		}
+		rewind(in_pfm);
+		fgets(head, sizeof(head), in_pfm);
+		for (i = 0; i < alfabet; i++)
+		{
+			if (fgets(d1, sizeof(d1), in_pfm) != NULL)
+			{
+				DelChar(d1, '\n');
+				char c = d1[0];
+				if (isdigit(c) || (strchr("-ATGC", c) != 0))
+				{
+					//	 printf("%s",d[i]);	
+					for (j = 0; j < olen; j++)
+					{
+						/*if (NthColumn(d, s, j + shift_col) == -1)
+						{
+							break;
+						}*/
+						test = UnderStol(d1, j + shift_col, val, sizeof(val), sep);
+						if (test == -1) { printf("Wrong format %s\n", d1); exit(1); }
+						double score = atof(val);
+						pfm[j][i] = nseq * score;
+					}
+				}
+				else break;
+			}
+			else break;
+		}
 	}
 	fclose(in_pfm);
 	len1 = lenp + word - 1;//dlina vyborki obu4eniya
