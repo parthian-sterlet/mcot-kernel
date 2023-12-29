@@ -15,6 +15,7 @@
 #define ARGLEN 300 //max argv length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
+#define NUM_LIBRARY 7// 4islo bibliotek
 #define Min(a,b) ((a)>(b))? (b):(a);
 #define Max(a,b) ((a)>(b))? (a):(b);
 
@@ -902,9 +903,9 @@ int main(int argc, char* argv[])
 	//motif library
 	int motif_library = -1;
 	{
-		char library_tag[5][30] = { "h12core_hg38" , "h12core_mm10" , "h11core_hg38" , "h11core_mm10" , "dapseq" };		
-		int motif_count_library[5] = { 1420,1142,391,346,510 };
-		for (i = 0; i < 5; i++)
+		char library_tag[NUM_LIBRARY][30] = { "h12core_hg38" , "h12core_mm10" , "h11core_hg38" , "h11core_mm10" , "dapseq", "jaspar24_at10", "jaspar24_dm6"};
+		int motif_count_library[NUM_LIBRARY] = { 1420,1142,391,346,510,556,151 };
+		for (i = 0; i < NUM_LIBRARY; i++)
 		{
 			if (strstr(partner_db, library_tag[i]) != NULL)
 			{				
@@ -916,8 +917,8 @@ int main(int argc, char* argv[])
 		if (motif_library == -1)
 		{
 			printf("Wrong motif library %s\tAllowed motif library options:\n", partner_db);
-			int i1 = 4;
-			for (i = 0; i < 5; i++)
+			int i1 = NUM_LIBRARY -1;
+			for (i = 0; i < NUM_LIBRARY; i++)
 			{
 				printf("%s", library_tag[i]);
 				if (i == i1)printf("\n");
