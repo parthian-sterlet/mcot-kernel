@@ -3827,7 +3827,7 @@ char dapseq_names[][50] = {
 "ZFHD_tnt.ATHB34_col_a"
 };
 
-char Jaspar24_at10_names[][50] = { //556
+char jaspar24_at10_names[][50] = { //556
 "ABF1_MA1295.2",
 "ABF2_MA1298.2",
 "ABF3_MA1296.2",
@@ -4385,7 +4385,7 @@ char Jaspar24_at10_names[][50] = { //556
 "TCX3_MA1358.2",
 "NLP7_MA1791.1"};
 
-char Jaspar24_dm6_names[][50] = { //151
+char jaspar24_dm6_names[][50] = { //151
 "crc_MA2208.1",
 "Pdp1_MA1702.2",
 "slbo_MA0244.1",
@@ -4395,7 +4395,7 @@ char Jaspar24_dm6_names[][50] = { //151
 "kay_MA2248.1",
 "ewg_MA2309.1",
 "Jra_MA2246.1",
-"cnc::maf-S_MA0530.2",
+"cnc_maf-S_MA0530.2",
 "Xbp1_MA2293.1",
 "bigmax_MA2196.1",
 "crp_MA2303.1",
