@@ -1250,6 +1250,8 @@ int main(int argc, char* argv[])
 			case 2: {strcpy(name_partner, hs_core_11_names[mot]); break; }
 			case 3: {strcpy(name_partner, mm_core_11_names[mot]); break; }
 			case 4: {strcpy(name_partner, dapseq_names[mot]); }
+			case 5: {strcpy(name_partner, jaspar24_at10_names[mot]); }
+			case 6: {strcpy(name_partner, jaspar24_dm6_names[mot]); }
 			}
 			int nlen = strlen(name_partner);
 			name_partner[nlen] = '\0';
