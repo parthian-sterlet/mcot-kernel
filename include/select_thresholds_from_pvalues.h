@@ -3,7 +3,7 @@ int select_thresholds_from_pvalues(int n_thr_touzet, double *thr_touzet, double 
 {
     int i, j;
 
-	if (n_thr_touzet <= NUM_THR) return -1;
+	if (n_thr_touzet < NUM_THR) return -1;
 	if (fp_rate[0] < fpr_select_i[0])
 	{		
 		for (i = 0; i < NUM_THR; i++)index[i] = i;
