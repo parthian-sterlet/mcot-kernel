@@ -148,7 +148,7 @@ For a PWM model the respictive file can be taken as the output files of runs wit
 
 Advanced options include: 
 * the minimal and maximal spacer lengths restricting the search of spaced locations of motifs The default range of spacer length is [0; 29] nt. MCOT allows the variation of the upper limit of spacer length up to 100 base pairs;
-* Expected Recognition Rate (ERR), the frequency of motifs occurrence is required to set the recognition thresholds for motifs, default value 5E-4;
+* Expected Recognition Rate (ERR), the frequency of motifs occurrence is required to set the recognition thresholds for motifs, default value 5E-4, the maximal allowable value is 2.5E-3;
 * CE enrichment, threshold –Log10(p-value(CE)) for CE enrichment, default value 5;
 * Asymmetry ratio, for two value ERR1 and ERR2 for certain CE means Max{-log10(ERR1), -log10(ERR2)} / Min{-log10(ERR1), -log10(ERR2)}
 
