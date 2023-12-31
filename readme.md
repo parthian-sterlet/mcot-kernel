@@ -95,7 +95,7 @@ The command line for many-partner option:
 
 `<4 minimal spacer length>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
-`<5 maximal spacer length>` = integer value from 0 to 100 (the default value 29)
+`<5 maximal spacer length>` = integer value from 0 to 100 (the default value 30)
 
 `<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters, three files in folders “hs”, “mm”, “at” and “dm” imply application of *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* promoters for setting of thresholds for input motifs.
 
