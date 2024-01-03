@@ -125,7 +125,7 @@ The command line for anchor_pro option:
 
 `<8 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
 
-`<9 int spacer_max>` = integer value from 0 to 100 (the default value 29)
+`<9 int spacer_max>` = integer value from 0 to 100 (the default value 30)
 
 `<10 pvalue_thr>` = recognition threshold of motifs transformed to the logarithmic scale, -log10(ERR), default value 0.0005
 
