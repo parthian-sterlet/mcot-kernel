@@ -97,13 +97,13 @@ The command line for many-partner option:
 
 `<5 maximal spacer length>` = integer value from 0 to 100 (the default value 30)
 
-`<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters, three files in folders “hs”, “mm”, “at” and “dm” imply application of *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* promoters for setting of thresholds for input motifs.
+`<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters. Four files in folders “hs”, “mm”, “at” and “dm” imply application of promoters of protein coding genes for *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* for setting of thresholds for input motifs.
 
 `<7 pvalue_thr>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.0025.
 
-`<8 -log10[p-value]_thr>` = threshold to display the significances of enrichment of CEs in output data (the default value 10)
+`<8 -log10[p-value]_thr>` = threshold of -Log10[p-value] to display the significances of enrichment of CEs in output data, p-values are computed fy Fisher exact test (the default value 10)
 
-`<9 asymmetry_ratio(-log10(ERR))>` = the ratio ratio_thr restricting ERR values of two motifs in asymmetric CEs, e.g. for two value ERR1 and ERR2 for certain CE means ratio_thr = Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and ratio > ratio_thr and ratio < ratio_thr mean asymmetric and symmetric CEs, respectively.
+`<9 asymmetry_ratio(-log10(ERR))>` = the threshold for asymmetry ratio (TAR) restricting relationship of ERR values of two motifs in CEs, e.g. for two mofs in CE values ERR1 and ERR2 means the assymetry ratio (AR) is equal to Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and criteria AR  > TAR and AR <= TAR mean asymmetric and symmetric CEs, respectively.
 
 The command line for anchor_pro option:
 
@@ -111,9 +111,9 @@ The command line for anchor_pro option:
 
 `<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
 
-`<2 motif1.profile>` = Profile for the first model, see [example profile of model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49__pwm)
+`<2 motif1.profile>` = Profile for the first model, see [example profile of model 1](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49_pwm)
 
-`<3 motif2.profile>` = Profile for the second model, see [example profile of model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49__sga)
+`<3 motif2.profile>` = Profile for the second model, see [example profile of model 2](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/creb1_49_sga)
 
 `<4 int motif_model1.length>` = integer value, length of the first model
 
