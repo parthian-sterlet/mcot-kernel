@@ -1380,6 +1380,7 @@ int main(int argc, char* argv[])
 		//anchor
 		if (mot == 0)
 		{
+			len_partner = len_anchor;
 			int cop = real_one[0].get_copy_rand(&rand_hom_one, height_permut);
 			if (cop == -1)
 			{
