@@ -3828,6 +3828,7 @@ char dapseq_names[][50] = {
 };
 
 char jaspar24_at10_names[][50] = { //556
+"Anchor",
 "ABF1_MA1295.2",
 "ABF2_MA1298.2",
 "ABF3_MA1296.2",
@@ -4386,6 +4387,7 @@ char jaspar24_at10_names[][50] = { //556
 "NLP7_MA1791.1"};
 
 char jaspar24_dm6_names[][50] = { //151
+"Anchor",
 "crc_MA2208.1",
 "Pdp1_MA1702.2",
 "slbo_MA0244.1",
