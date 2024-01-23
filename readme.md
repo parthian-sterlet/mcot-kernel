@@ -97,7 +97,7 @@ The command line for many-partner option:
 
 `<5 maximal spacer length>` = integer value from 0 to 100 (the default value 30)
 
-`<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters. Four files in folders “hs”, “mm”, “at” and “dm” imply application of promoters of protein coding genes for *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* for setting of thresholds for input motifs.
+`<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters. Four files in subfolders “hs”, “mm”, “at” and “dm” from [genomes](https://github.com/parthian-sterlet/mcot-kernel/tree/master/genomes) folder imply application of promoters of protein coding genes for *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* for setting of thresholds for input motifs.
 
 `<7 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.0025.
 
@@ -415,7 +415,7 @@ MCOT use several partner libraries including hundreds of motifs for several spec
 
 `<2 input PWM>` = input PWM format file
 
-`<3 input file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters, three files in folders “hs”, “mm”, “at” and “dm” imply application of *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* promoters for setting of thresholds for input motifs.
+`<3 input file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters. Four files in subfolders “hs”, “mm”, “at” and “dm” from [genomes](https://github.com/parthian-sterlet/mcot-kernel/tree/master/genomes) folder imply application of promoters of protein coding genes for *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* for setting of thresholds for input motifs.
 
 `<4 output text file pwm.table_thr_err>` = Table **Threshold vs. -Log10(ERR)** for pwm in text format, see [example of distribution](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/pro/GSM2827249_CREB1_hg38_pwm.dist)
 
