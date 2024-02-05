@@ -1404,7 +1404,7 @@ int main(int argc, char* argv[])
 						return -1;
 					}
 				}
-				fprintf(out_proj, "MotA\t%s\tMotP\t%s\tRealNseqBothMot\t%d\tRandNseqBothMot\t%d\tNseqReal\t%d\tNseqRand\t%d\n", file_pfm_anchor[mot_a], file_pfm_anchor[mot_p], nseq_two_sites_real, nseq_two_sites_rand, nseq_real, nseq_rand);
+				fprintf(out_proj, "MotA\t%s\tMotP\t%s\tRealNseqBothMot\t%d\tRandNseqBothMot\t%d\tNseqReal\t%d\tNseqRand\t%d\tNCE_any\t%d\tNCE_overlap\t%d\tNCE_spacer\t%d\n", file_pfm_anchor[mot_a], file_pfm_anchor[mot_p], nseq_two_sites_real, nseq_two_sites_rand, nseq_real, nseq_rand,observed.sit.any, observed.sit.overlap, observed.sit.spacer);
 				fclose(out_proj);
 			}
 			char modew[] = "wt", modea[] = "at";
