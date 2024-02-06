@@ -318,14 +318,14 @@ void Mix(double *a, double *b)
 int main(int argc, char *argv[])
 {
 	int i, j, k, n;
-	char head[1000], d1[SEQLEN], file_out_distt[300], file_out_distb[300], letter[5];
+	char head[1000], d1[SEQLEN], file_out_distt[300], file_out_distb[300], letter[5], binary_mode[3];
 	//char file_out_cpp_arr[80], file_out_cpp_struct_many[80], name[20];
 	char file_pfm[300], file_pwm[300], file_seq[300], file_sta[300];
 	FILE *in,* in_pfm, *in_pwm, * out_distt, * out_distb;// , * out_cpp_arr;
 	
-	if (argc != 10)
+	if (argc != 12)
 	{
-		printf("%s 1 pfm 2pwm 3file_profile_fasta 4file out_dist_text 5file out_dist_binary 6double pvalue_large 7double bin 8file_sta 9double thr_best_pval", argv[0]);		//6file out_cpp_arr 7file out_cpp_struct_many 8char name
+		printf("%s 1 pfm 2pwm 3file_profile_fasta 4file out_dist_text 5file out_dist_binary 6double pvalue_large 7double bin 8file_sta 9double thr_best_pval 10int 1/0 check/don't check Bad&Good PWM 11char wb/ab add/write binary file mode ", argv[0]);		//6file out_cpp_arr 7file out_cpp_struct_many 8char name
 		return -1;
 	}	
 	strcpy(file_pfm, argv[1]);
@@ -340,6 +340,8 @@ int main(int argc, char *argv[])
 	strcpy(file_sta, argv[8]);
 	double thr_best_pval = atof(argv[9]);//2E-5=0.00002
 	double log_thr_best_pval = -log10(thr_best_pval);	
+	int check_bad = atoi(argv[10]); // 0 all results are written, 1 results passing p-value threshold are written only
+	strcpy(binary_mode, argv[11]);// wb / ab create new binary file for output data or add output data to this file
 	int nseq = 0;
 	int len1 = 0;
 	int word;
@@ -747,16 +749,17 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	if (fpr1st > log_thr_best_pval)
+	if ((check_bad == 1 && fpr1st > log_thr_best_pval) || check_bad == 0)
 	{
-		if ((out_distb = fopen(file_out_distb, "ab")) == NULL)
+		if ((out_distb = fopen(file_out_distb, binary_mode)) == NULL)
 		{
 			printf("Out file %s can't be opened!\n", file_out_distb);
 			return -1;
 		}
 		fwrite(&lenp, sizeof(int), 1, out_distb);
-		fwrite(pfm, sizeof(double), 4 * lenp, out_distb);
-		fwrite(pwm, sizeof(double), 4 * lenp, out_distb);
+		int lenp4 = 4 * lenp;
+		fwrite(pfm, sizeof(double), lenp4, out_distb);
+		fwrite(pwm, sizeof(double), lenp4, out_distb);
 		fwrite(&count, sizeof(int), 1, out_distb);
 		fwrite(thr_dist, sizeof(double), count, out_distb);
 		fwrite(fpr_dist, sizeof(double), count, out_distb);
