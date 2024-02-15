@@ -431,7 +431,6 @@ MCOT use several partner libraries including hundreds of motifs for several spec
 
 `<10 int check PWM quality>` = int 1/0 means to check / don't check the quialy of PWM model accordinf the preceding parameter (#9) of this command line
 
-`<11 open mode for binary file>` = values wb / ab mean creating a new file / adding data to existing file
 
 ## References
 [Bailey, T.L. (2021) STREME: accurate and versatile sequence motif discovery. Bioinformatics. 37, 2834–40](https://doi.org/10.1093/bioinformatics/btab203)
