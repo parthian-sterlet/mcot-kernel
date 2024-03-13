@@ -1,3 +1,3 @@
-add_executable(pfm_to_pwm pfm_to_pwm_mat.cpp)
+add_executable(denovo mcot_denovo.cpp)
 
-target_include_directories(pfm_to_pwm PRIVATE ../../include)
+target_include_directories(denovo PRIVATE ../../include)
