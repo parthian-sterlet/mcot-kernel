@@ -1,0 +1,17 @@
+cd ../examples/denovo
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif1.pfm motif1.pwm
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif2.pfm motif2.pwm
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif3.pfm motif3.pwm
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif4.pfm motif4.pwm
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif5.pfm motif5.pwm
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif6.pfm motif6.pwm
+../../cmake/src/pfm_to_pwm/pfm_to_pwm motif7.pfm motif7.pwm
+ rem all.binary
+../../cmake/src/pwm_thr_err/pwm_thr_err motif1.pfm motif1.pwm ../genomes/mm/ups2kb_mm10.seq motif1.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/pwm_thr_err/pwm_thr_err motif2.pfm motif2.pwm ../genomes/mm/ups2kb_mm10.seq motif2.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/pwm_thr_err/pwm_thr_err motif3.pfm motif3.pwm ../genomes/mm/ups2kb_mm10.seq motif3.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/pwm_thr_err/pwm_thr_err motif4.pfm motif4.pwm ../genomes/mm/ups2kb_mm10.seq motif4.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/pwm_thr_err/pwm_thr_err motif5.pfm motif5.pwm ../genomes/mm/ups2kb_mm10.seq motif5.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/pwm_thr_err/pwm_thr_err motif6.pfm motif6.pwm ../genomes/mm/ups2kb_mm10.seq motif6.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/pwm_thr_err/pwm_thr_err motif7.pfm motif7.pwm ../genomes/mm/ups2kb_mm10.seq motif7.dist all.binary 0.002 pwm.log 0.00002 0
+../../cmake/src/denovo/denovo PEAKS039234_BHLHA15_Q9QYC3_MACS2.fa all.binary 7 0 30 0.001 5 1.5 >ylog
