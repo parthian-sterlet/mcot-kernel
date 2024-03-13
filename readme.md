@@ -140,7 +140,7 @@ The command line for denovo option:
 
 `<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
 
-`<2 binary file of motifs>` = binary file motifs' frequencies, weightsm and lists of thresholds (preliminary computed in pipeline)
+`<2 binary file of motifs>` = binary file motifs' nucleotide frequencies (PFM), weights (PWM), and lists of thresholds (preliminary computed in the pipeline)
 
 `<3 number of motifs>` = number of motifs
 
