@@ -99,7 +99,7 @@ The command line for many-partner option:
 
 `<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters. Four files in subfolders “hs”, “mm”, “at” and “dm” from [genomes](https://github.com/parthian-sterlet/mcot-kernel/tree/master/genomes) folder imply application of promoters of protein coding genes for *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* for setting of thresholds for input motifs.
 
-`<7 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.0025.
+`<7 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.002.
 
 `<8 threshold CE pvalue>` = threshold of -Log10[p-value] to display the significances of enrichment of CEs in output data, p-values are computed fy Fisher exact test (the default value 5)
 
@@ -127,11 +127,32 @@ The command line for anchor_pro option:
 
 `<9 int spacer_max>` = integer value from 0 to 100 (the default value 30)
 
-`<10 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.0025.
+`<10 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.002.
 
 `<11 threshold CE pvalue>` = threshold of -Log10[p-value] to display the significances of enrichment of CEs in output data, p-values are computed fy Fisher exact test (the default value 5)
 
 `<12 threshold asymmetry ratio>` = threshold for asymmetry ratio (TAR) restricting relationship of ERR values of two motifs in CEs, e.g. for two mofs in CE values ERR1 and ERR2 means the assymetry ratio (AR) is equal to Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and criteria AR  > TAR and AR <= TAR mean asymmetric and symmetric CEs, respectively. Default value 1.5
+
+The command line for denovo option:
+
+
+`./mcot_denovo.exe <1 file_fasta> <2 binary file motifs> <3 number of motifs> <4 minimal spacer length> <5 maximal spacer length> <6 threshold ERR> <7 threshold СE pvalue> <8 threshold asymmetry ratio>`
+
+`<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
+
+`<2 binary file of motifs>` = binary file motifs' frequencies, weightsm and lists of thresholds (preliminary computed in pipeline)
+
+`<3 number of motifs>` = number of motifs
+
+`<4 int spacer_min>` = integer value from 0 to \<maximal spacer length>  (the default value 0 is recommended, any positive value restricts short spacers)
+
+`<5 int spacer_max>` = integer value from 0 to 100 (the default value 30)
+
+`<6 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.0025.
+
+`<7 threshold CE pvalue>` = threshold of -Log10[p-value] to display the significances of enrichment of CEs in output data, p-values are computed fy Fisher exact test (the default value 5)
+
+`<8 threshold asymmetry ratio>` = threshold for asymmetry ratio (TAR) restricting relationship of ERR values of two motifs in CEs, e.g. for two mofs in CE values ERR1 and ERR2 means the assymetry ratio (AR) is equal to Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and criteria AR  > TAR and AR <= TAR mean asymmetric and symmetric CEs, respectively. Default value 1.5
 
 ## Input data
 
