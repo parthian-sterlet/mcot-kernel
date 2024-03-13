@@ -12,16 +12,16 @@ int projoin(char *rera, char *motif,profile prf_a, profile prf_p, int shift_min,
 	strcat(filebest,"_");
 //	strcat(filebest,motif);//hocomoco or dapseq
 	char buf[10];
-	sprintf(buf,"%d",prf_a.mot);
+	sprintf(buf,"%d",prf_a.mot+1);
 	strcat(filebest,buf);
-	sprintf(buf,"%d",prf_p.mot);
+	sprintf(buf,"%d",prf_p.mot+1);
 	strcat(filebest,buf);
-	strcat(filebest,"_thr");
-	sprintf(buf,"%d",prf_a.nam);
+	/*strcat(filebest,"_thr");
+	sprintf(buf,"%d",prf_a.nam+1);
 	strcat(filebest,buf);
-	sprintf(buf,"%d",prf_p.nam);
+	sprintf(buf,"%d",prf_p.nam+1);
 	strcat(filebest,buf);
-	strcpy(file_nsit_anc,filebest);
+	*/strcpy(file_nsit_anc, filebest);
 	strcpy(file_nsit_par,filebest);
 	strcat(filebest,".best");
 	strcat(file_nsit_anc,".anchor");
