@@ -2,6 +2,7 @@ chmod a+x command_line_one
 chmod a+x command_line_many
 chmod a+x command_line_pro
 chmod a+x command_line_library
+chmod a+x command_line_denovo
 
 cd ../partners
 cat h12core_hg38.binary.tar.gz.part* > h12core_hg38.binary.tar.gz
