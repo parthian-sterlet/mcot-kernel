@@ -1,1 +1,1 @@
-./demc.pl ../../cmake/src/ ../../examples/de_novo/ ../../examples/de_novo_out/ motif .pfm 7 ../../genomes/mm/ups2kb_mm10.seq ../../examples/PEAKS039234_BHLHA15_Q9QYC3_MACS2.fa 0 30 0.001 5 1.5
+./demc.pl ../../cmake/src/ ../../examples/de_novo/ ../../examples/de_novo_out/ motif .pfm 7 ../../genomes/mm/ups2kb_mm10.seq PEAKS039234_BHLHA15_Q9QYC3_MACS2.fa 0 30 0.001 5 1.5
