@@ -739,6 +739,7 @@ int main(int argc, char *argv[])
 	}
 	fprintf(out_cpp_struct_many, "case %d:{if(mem_ini(n[%d],%s_%d_thr_list,%s_%d_fpr_list,%s_%d_thr_sel,%s_%d_thr_inx)==-1)return -1;}\n", matnum, matnum - 1, name, matnum, name, matnum, name, matnum, name, matnum);
 	fclose(out_cpp_struct_many);*/
+	for (i = 0; i < 4; i++)for (j = 0; j < lenp; j++)pfm[j][i] /= nseq;
 	fpr_pred = (double)1 / all_pos_rec;
 	double fpr1st = 0;
 	for (j = 1; j < nthr; j++)
