@@ -99,7 +99,7 @@ The command line for many-partner option:
 
 `<6 file of whole-genome promoters with its path>` =  fasta file of whole-genome dataset of promoters. Four files in subfolders “hs”, “mm”, “at” and “dm” from [genomes](https://github.com/parthian-sterlet/mcot-kernel/tree/master/genomes) folder imply application of promoters of protein coding genes for *H. sapiens*, *M. musculus*, *A. thaliana* and *D. melanogater* for setting of thresholds for input motifs.
 
-`<7 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as a recognition rate for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.002.
+`<7 threshold ERR>` = recognition threshold of motifs, Expected Recognition Rate (ERR), ERR is computed as the fraction of all positions that contain predicted sites for the whole-genome set of promoters of protein-coding genes, default value 0.0005, the maximal allowable value is 0.002.
 
 `<8 threshold CE pvalue>` = threshold of -Log10[p-value] to display the significances of enrichment of CEs in output data, p-values are computed fy Fisher exact test (the default value 5)
 
