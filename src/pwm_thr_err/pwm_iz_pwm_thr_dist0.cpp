@@ -10,7 +10,7 @@
 #define Min(a,b) ((a)>(b))? (b):(a);
 #define Max(a,b) ((a)>(b))? (a):(b);
 #define SEQLEN 5050
-#define PWMLEN 50 // max length of motives
+#define PWMLEN 50 // max length of motifs
 #define OLIGNUM 4// di 16 mono 4
 double pfm[SEQLEN][OLIGNUM];
 double pwm[SEQLEN][OLIGNUM];
@@ -88,7 +88,7 @@ sost[i_sost]++;
 }
 }
 */
-void GetSostPro(char *d, int word, int *sost, char *letter)
+int GetSostPro(char *d, int word, int *sost, char *letter)
 {
 	int i, j, k, i_sost, let;
 	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
@@ -99,16 +99,19 @@ void GetSostPro(char *d, int word, int *sost, char *letter)
 	for (i = 0; i<lens - word + 1; i++)
 	{
 		i_sost = 0;
+		let = -1;
 		for (j = word - 1; j >= 0; j--)
 		{
 			for (k = 0; k<4; k++)
 			{
 				if (d[i + j] == letter[k]){ let = k; break; }
 			}
+			if (let == -1)return -1;
 			i_sost += ten[word - 1 - j] * let;
 		}
 		sost[i] = i_sost;
 	}
+	return 0;
 }
 void PWMScore(double &min, double &raz, int len1, int olig)
 {
@@ -318,7 +321,7 @@ void Mix(double *a, double *b)
 int main(int argc, char *argv[])
 {
 	int i, j, k, n;
-	char head[1000], d1[SEQLEN], file_out_distt[300], file_out_distb[300], file_out_distb_one[300], letter[5], binary_ext[] = ".binary";
+	char head[1000], d1[SEQLEN], file_out_distt[300], file_out_distb[300], letter[5], binary_ext[] = ".binary";
 	//char file_out_cpp_arr[80], file_out_cpp_struct_many[80], name[20];
 	char file_pfm[300], file_pwm[300], file_seq[300], file_sta[300];
 	FILE *in,* in_pfm, *in_pwm, * out_distt, * out_distb;// , * out_cpp_arr;
@@ -331,7 +334,8 @@ int main(int argc, char *argv[])
 	strcpy(file_pfm, argv[1]);
 	strcpy(file_pwm, argv[2]);
 	strcpy(file_seq, argv[3]);
-	strcpy(letter, "acgt");//atgc 
+	strcpy(letter, "acgt");//atgc
+	letter[4] = '\0';
 	strcpy(file_out_distt, argv[4]);
 	strcpy(file_out_distb, argv[5]);
 	double pvalue_large = atof(argv[6]);
@@ -548,95 +552,105 @@ int main(int argc, char *argv[])
 	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
 	double min = 0, raz = 0;
 	PWMScore(min, raz, lenp, olig);
-	double min0 = min, raz0 = raz;
-	int cod[SEQLEN];
+	double min0 = min, raz0 = raz;	
 	int nseq_pro = 0, len_pro = 0;
 	int all_pos = 0;
 	ReadSeq(file_seq, nseq_pro, len_pro,all_pos);
 	double pvalue_large1 = pvalue_large*1.001;
-	int nthr = 2*(int)(pvalue_large1*all_pos);
+	int nthr = (int)(pvalue_large1*all_pos);
 	double *thr;
 	thr = new double[nthr];
 	if (thr == NULL) { puts("Out of memory..."); return -1; }
 	for (i = 0; i < nthr; i++)thr[i] = 0;
 	int nthr_max = nthr - 1;
-	char *dp;
-	dp = new char[len_pro + 10];
+	char **dp;
+	dp = new char*[2];
 	if (dp == NULL) { puts("Out of memory..."); return -1; }
+	for (n = 0; n < 2; n++)
+	{
+		dp[n] = new char[len_pro + 1];
+		if (dp[n] == NULL) { puts("Out of memory..."); return -1; }
+	}
 	if ((in = fopen(file_seq, "rt")) == NULL)
 	{
 		printf("Input file %s can't be opened!", file_seq);
 		return -1;
 	}	
 	double all_pos_rec = 0;
-	double score_min = 0.75;
-	double pvalue2 = pvalue_large * 1.25;
+	double score_min = 0;	
 	int count_val= 0;
+	double thr_bot = 0;
+	for (i = 0; i < nthr; i++)thr[i] = thr_bot;
 	for (n = 0; n<nseq_pro; n++)
 	{		
 		fgets(head, sizeof(head), in);
-		memset(dp, 0, len_pro + 1);
-		fgets(dp, len_pro + 2, in);
-		DelChar(dp, '\n');
-		TransStr(dp);
-		int len_pro1 = strlen(dp);
+		memset(dp[0], 0, len_pro + 1);
+		fgets(dp[0], len_pro + 1, in);
+		DelChar(dp[0], '\n');
+		TransStr(dp[0]);
+		int len_pro1 = strlen(dp[0]);
+		strcpy(dp[1], dp[0]);
+		ComplStr(dp[1]);
 		int len21 = len_pro1 - len1;
-		double thresh_min;
-		if (n == 0)thresh_min = score_min;//double thresh_min = Max(thr[nthr_max], score_min);
-		else
+		if (n % 100 == 0)
 		{
-			if (count_val >= nthr)thresh_min = thr[nthr_max];
-			else
-			{
-				int n_check = (int)(all_pos*pvalue2) - 1;
-				n_check = (int)((n*n_check + count_val) / (n + 1));
-				thresh_min = thr[n_check];
-			}
+			int di = nthr_max / 10;
+			printf("%d\t", n + 1);
+			for (i = 0; i < nthr_max; i += di)printf("%d %f ", i + 1, thr[i]);
+			printf("\n");
+			//printf("%5d %f\n", n, thr[nthr_max]);
 		}
-		//if (n % 50 == 0)printf("%5d %f\n", n, thresh_min);
-		for (int compl1 = 0; compl1<2; compl1++)
-		{			
-			if (compl1 == 1) if (ComplStr(dp) != 1)  { puts("Out of memory..."); return -1; }
-			char d2[SEQLEN];
-			double p = -1000;
-			for (i = 0; i <= len21; i++)
+		for (i = 0; i <= len21; i++)
+		{						
+			char d2[PWMLEN];
+			int cod[PWMLEN];
+			int gom = 0;
+			double sco2 = -1000;
+			for (k = 0; k < 2; k++)
 			{
-				strncpy(d2, &dp[i], len1);
+				int kpos;
+				if (k == 0)kpos = i;
+				else kpos = len21 - i;
+				strncpy(d2, &dp[k][i], len1);
 				d2[len1] = '\0';
-				if (strstr(d2, "n") != NULL) { continue; }
-				GetSostPro(d2, word, cod, letter);				
-				all_pos_rec++;
+				if (strstr(d2, "n") != NULL) { gom = -1; break; }
+				gom = GetSostPro(d2, word, cod, letter);
+				if (gom == -1)break;
 				double score = 0;
-				for (j = 0; j<lenp; j++)
+				for (j = 0; j < lenp; j++)
 				{
 					score += pwm[j][cod[j]];
 				}
 				score -= min0;
 				score /= raz0;
-				double thr_min=Max(thr[nthr_max],score_min);
-				if (score >= thresh_min)
+				if (score > sco2)sco2 = score;
+			}
+			if (gom == 0)
+			{
+				all_pos_rec++;
+				double thr_check = Max(thr_bot, thr[nthr_max]);
+				if (sco2 >= thr_check)
 				{
-					int gom = 0;
+					int gomt = 0;
 					for (j = 0; j < nthr; j++)
 					{
-						if (score >= thr[j])
+						if (sco2 >= thr[j])
 						{
-							//if (thr[j] != 0)
+							int ksta = Min(nthr_max, count_val);
+							for (k = ksta; k > j; k--)
 							{
-								int ksta = Min(nthr_max, count_val);
-								for (k = ksta; k > j; k--)
-								{
-									Mix(&thr[k - 1], &thr[k]);
-								}
+								//									if (thr[k] == 0)continue;
+								Mix(&thr[k - 1], &thr[k]);
 							}
-							thr[j] = score;
-							gom = 1;
+							thr[j] = sco2;
+							gomt = 1;
 							break;
 						}
-						if (gom == 1)break;
+						if (gomt == 1)break;
 					}
 					count_val++;
 				}
+				all_pos_rec++;
 			}
 		}
 		//fprintf(out_distt, "%d\t%.1f\n", n+1,all_pos_rec);
@@ -752,24 +766,25 @@ int main(int argc, char *argv[])
 	}
 	if ((check_bad == 1 && fpr1st > log_thr_best_pval) || check_bad == 0)
 	{
-		if ((out_distb = fopen(file_out_distb, "ab")) == NULL)
+		int lenp4 = 4 * lenp;
+		/*if ((out_distb = fopen(file_out_distb, "ab")) == NULL)
 		{
 			printf("Out file %s can't be opened!\n", file_out_distb);
 			return -1;
 		}
-		fwrite(&lenp, sizeof(int), 1, out_distb);
-		int lenp4 = 4 * lenp;
+		fwrite(&lenp, sizeof(int), 1, out_distb);		
 		fwrite(pfm, sizeof(double), lenp4, out_distb);
 		fwrite(pwm, sizeof(double), lenp4, out_distb);
 		fwrite(&count, sizeof(int), 1, out_distb);
 		fwrite(thr_dist, sizeof(double), count, out_distb);
 		fwrite(fpr_dist, sizeof(double), count, out_distb);
-		fclose(out_distb);
-		strcpy(file_out_distb_one, file_pfm);
-		strcat(file_out_distb_one, binary_ext);
-		if ((out_distb = fopen(file_out_distb_one, "wb")) == NULL)
+		fclose(out_distb);*/
+		//char  file_out_distb_one[300];
+	//	strcpy(file_out_distb_one, file_pfm);
+	//	strcat(file_out_distb_one, binary_ext);
+		if ((out_distb = fopen(file_out_distb, "wb")) == NULL)
 		{
-			printf("Out file %s can't be opened!\n", file_out_distb_one);
+			printf("Out file %s can't be opened!\n", file_out_distb);
 			return -1;
 		}
 		fwrite(&lenp, sizeof(int), 1, out_distb);		
@@ -794,6 +809,7 @@ int main(int argc, char *argv[])
 	delete[] thr_dist;
 	delete[] fpr_dist;
 	delete[] thr;	
+	for(n=0;n<2;n++)delete[] dp[n];
 	delete[] dp;
 	return 1;
 }
