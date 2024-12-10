@@ -321,14 +321,14 @@ void Mix(double *a, double *b)
 int main(int argc, char *argv[])
 {
 	int i, j, k, n;
-	char head[1000], d1[SEQLEN], file_out_distt[300], file_out_distb[300], letter[5], binary_ext[] = ".binary";
+	char head[1000], d1[SEQLEN], file_out_distt[300], file_out_distb[300], letter[5], binary_ext[] = ".binary", binary_mode[3];
 	//char file_out_cpp_arr[80], file_out_cpp_struct_many[80], name[20];
 	char file_pfm[300], file_pwm[300], file_seq[300], file_sta[300];
 	FILE *in,* in_pfm, *in_pwm, * out_distt, * out_distb;// , * out_cpp_arr;
 	
-	if (argc != 11)
+	if (argc != 12)
 	{
-		printf("%s 1 pfm 2pwm 3file_profile_fasta 4file out_dist_text 5file out_dist_binary 6double pvalue_large 7double bin 8file_sta 9double thr_best_pval 10int 1/0 check/don't check Bad&Good PWM ", argv[0]);		//6file out_cpp_arr 7file out_cpp_struct_many 8char name
+		printf("%s 1 pfm 2pwm 3file_profile_fasta 4file out_dist_text 5file out_dist_binary 6double pvalue_large 7double bin 8file_sta 9double thr_best_pval 10int 1/0 check/don't check Bad&Good PWM 11char wb OR ab mode for output binary", argv[0]);
 		return -1;
 	}	
 	strcpy(file_pfm, argv[1]);
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 	double thr_best_pval = atof(argv[9]);//2E-5=0.00002
 	double log_thr_best_pval = -log10(thr_best_pval);	
 	int check_bad = atoi(argv[10]); // 0 all results are written, 1 results passing p-value threshold are written only
-	//strcpy(binary_mode, argv[11]);// wb / ab create new binary file for output data or add output data to this file
+	strcpy(binary_mode, argv[11]);// wb / ab create new binary file for output data or add output data to this file
 	int nseq = 0;
 	int len1 = 0;
 	int word;
@@ -661,11 +661,6 @@ int main(int argc, char *argv[])
 		printf("Out file %s can't be opened!\n", file_out_distt);
 		return -1;
 	}
-	/*if ((out_cpp_arr = fopen(file_out_cpp_arr, "at")) == NULL)
-	{
-		printf("Out file %s can't be opened!\n", file_out_cpp_arr);
-		return -1;
-	}*/	
 	int nthr_dist = 0;
 	int nthr_final = nthr-1;
 	double fpr_pred = (double)1 / all_pos_rec;
@@ -723,36 +718,6 @@ int main(int argc, char *argv[])
 		fpr_pred = fpr;
 	}
 	fclose(out_distt);
-	/*
-	int nval = 16;
-	nthr_dist=count;
-	fprintf(out_cpp_arr, "double %s_%d_thr_list[%d] = {\n", name, matnum, nthr_dist);
-	int nthr_dist1 = nthr_dist - 1;
-	for (j = 0; j <nthr_dist; j++)
-	{		
-		fprintf(out_cpp_arr, "%.12f", thr_dist[j]);
-		if (j == nthr_dist1)fprintf(out_cpp_arr, "};\n");
-		else fprintf(out_cpp_arr, ",");
-		if ((j + 1) % nval == 0)fprintf(out_cpp_arr, "\n");
-	}
-	fprintf(out_cpp_arr, "double %s_%d_fpr_list[%d] = {\n", name, matnum, nthr_dist);
-	for (j = 0; j <nthr_dist; j++)
-	{
-		fprintf(out_cpp_arr, "%.12f", fpr_dist[j]);
-		if (j == nthr_dist1)fprintf(out_cpp_arr, "};\n");
-		else fprintf(out_cpp_arr, ",");
-		if ((j + 1) % nval == 0)fprintf(out_cpp_arr, "\n");
-	}
-	//for(j=n_thr_max;j>=0;j--)fprintf(out_cpp,"%f\t%.f\t%.f\t%g\n",thr[j],rec_pos[j],all_pos,rec_pos[j]/all_pos);	
-	fclose(out_cpp_arr);
-	FILE *out_cpp_struct_many;
-	if ((out_cpp_struct_many = fopen(file_out_cpp_struct_many, "at")) == NULL)
-	{
-		printf("Out file %s can't be opened!\n", file_out_cpp_struct_many);
-		return -1;
-	}
-	fprintf(out_cpp_struct_many, "case %d:{if(mem_ini(n[%d],%s_%d_thr_list,%s_%d_fpr_list,%s_%d_thr_sel,%s_%d_thr_inx)==-1)return -1;}\n", matnum, matnum - 1, name, matnum, name, matnum, name, matnum, name, matnum);
-	fclose(out_cpp_struct_many);*/
 	for (i = 0; i < 4; i++)for (j = 0; j < lenp; j++)pfm[j][i] /= nseq;
 	fpr_pred = (double)1 / all_pos_rec;
 	double fpr1st = 0;
@@ -782,7 +747,7 @@ int main(int argc, char *argv[])
 		//char  file_out_distb_one[300];
 	//	strcpy(file_out_distb_one, file_pfm);
 	//	strcat(file_out_distb_one, binary_ext);
-		if ((out_distb = fopen(file_out_distb, "wb")) == NULL)
+		if ((out_distb = fopen(file_out_distb, binary_mode)) == NULL)
 		{
 			printf("Out file %s can't be opened!\n", file_out_distb);
 			return -1;
