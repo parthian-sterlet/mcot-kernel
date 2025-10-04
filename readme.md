@@ -107,7 +107,7 @@ The command line for many-partner option:
 
 The command line for anchor_pro option:
 
-`./mcor_anchor_pro.exe <1 file_fasta> <2 motif_model1.profile> <3 motif_model2.profile> <4 int motif_model1.length> <5 int motif_model2.length> <6 int motif_model1.table_thr_err> <7 int motif_model2.table_thr_err> <8 int spacer_min> <9 int spacer_max> <10double threshold ERR> <11double threshold CE pvalue> <12double threshold asymmetry ratio>`
+`./mcot_anchor_pro.exe <1 file_fasta> <2 motif_model1.profile> <3 motif_model2.profile> <4 int motif_model1.length> <5 int motif_model2.length> <6 int motif_model1.table_thr_err> <7 int motif_model2.table_thr_err> <8 int spacer_min> <9 int spacer_max> <10double threshold ERR> <11double threshold CE pvalue> <12double threshold asymmetry ratio>`
 
 `<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
 
