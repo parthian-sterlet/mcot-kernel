@@ -59,7 +59,7 @@ There are two basic options:
 - [One-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp) tests one input motif versus another input motif, it is proposed that both motifs are represented by Position Weight Matrices (PWMs), i.e. they are [nucleotide frequency matrices](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/foxa2.motif);
 - [Many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) tests one input motif versus a library of motifs, a collection either from [Hocomoco](https://hocomoco.autosome.org/) or [Jaspar](https://jaspar.elixir.no/).
 
-These two options are implemented as [Web application(https://webmcot.sysbio.cytogen.ru/).
+These two options are implemented as [MCOT web application](https://webmcot.sysbio.cytogen.ru/).
 
 Two additional option are more specific:
 
