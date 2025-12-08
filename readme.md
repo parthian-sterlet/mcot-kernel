@@ -53,8 +53,25 @@ MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 Programs `anchor_vs_many`, `anchor_vs_one` and `anchor_pro` for one\_partner, many\_partners and arbitrary\_models\_one\_partner
 options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/` and  `src/anchor_pro/Release/`
 
+## Main and additional supporting options to run tool
 
-## Command line arguments
+There are four main options:
+
+- [One-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp) tests one input motif versus another input motif, it is proposed that both motifs are represented by Position Weight Matrices (PWMs), i.e. they are [nucleotide frequency matrices](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/foxa2.motif);
+- [Many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) tests one input motif versus a library of motifs, a collection either from [Hocomoco](https://hocomoco.autosome.org/) or [Jaspar](https://jaspar.elixir.no/);
+- [Denovo option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/denovo/mcot_denovo.cpp) test a list of motifs, e.g. prepared as a result of _de novo _ motif search for a set of ChIP-seq peaks;
+- [Anchor_pro option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_pro/mcot_anchor_pro.cpp) works similar to the [one-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp), but uses [ready profiles of predicted sites] as input data for both motifs, this makes MCOT applicable for any non-traditional motif model beside the traditional PWM.
+
+Additionally, [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) constructs a library of user-defined PWM motifs in addition to those from [many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) that were prepared in advance, source codes [to convert nucleotide frequency matrix to weight matrix](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pfm_to_pwm/pfm_to_pwm_mat.cpp) and [to compute uniformly the recognition thresholds of a weight matrix by calculating the expected recognition rate of a motif for the whole-genome set pf promoters](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pwm_thr_err/pwm_iz_pwm_thr_dist0.cpp) are used by [this perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library).
+
+## Command line and script examples for test input data
+
+- [command_line_one](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_one) - one-partner option;
+- [command_line_many](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_many) - many partners option;
+- [command_line_library](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) - preparation of a binary file for given list of motifs, this script can be modified to generate a binary file for any other list of motifs;
+- [command_line_denovo](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_denovo) - denovo option, this command uses [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/demc.pl) to work with a list of input motifs, e.g. derived from _de novo_ motif search for test ChIP-seq data
+
+ ## Command line arguments
 
 The command line for one-partner option:
 
@@ -135,7 +152,6 @@ The command line for anchor_pro option:
 
 The command line for denovo option:
 
-
 `./mcot_denovo.exe <1 file_fasta> <2 binary file motifs> <3 number of motifs> <4 minimal spacer length> <5 maximal spacer length> <6 threshold ERR> <7 threshold СE pvalue> <8 threshold asymmetry ratio>`
 
 `<1 file_fasta>` = DNA sequences of tested peaks in FASTA format
@@ -158,7 +174,7 @@ The command line for denovo option:
 
 MCOT requires (a) DNA sequences of ChIP-seq peaks and (b) anchor and partner motifs. We recommend application of a conventional *de novo* motif search tool, e.g. [Homer](http://homer.ucsd.edu/homer/) ([Heinz et al., 2010](https://doi.org/10.1016/j.molcel.2010.05.004)) and [STREME](https://meme-suite.org/meme/tools/streme) ([Bailey et al., 2021](https://doi.org/10.1093/bioinformatics/btab203)) to define an anchor motif. 
 
-MCOT have two options for definition of the partner motif:
+MCOT have two basis options for definition of the partner motif:
 
 * a matrix of partner motif (one-partner option);
 
