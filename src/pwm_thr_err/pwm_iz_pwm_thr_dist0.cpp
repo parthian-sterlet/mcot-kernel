@@ -18,7 +18,7 @@ double pwm[SEQLEN][OLIGNUM];
 char *TransStr(char *d)
 {
 	int i, c, lens;
-	lens = strlen(d);
+	lens = (int)strlen(d);
 	for (i = 0; i<lens; i++)
 	{
 		c = int(d[i]);
@@ -30,7 +30,7 @@ char *TransStr(char *d)
 char *TransStrBack(char *d)//a->A
 {
 	int i, c, lens;
-	lens = strlen(d);
+	lens = (int)strlen(d);
 	for (i = 0; i<lens; i++)
 	{
 		c = int(d[i]);
@@ -44,7 +44,7 @@ void DelChar(char *str, char c)
 	int i, lens, size;
 
 	size = 0;
-	lens = strlen(str);
+	lens = (int)strlen(str);
 	for (i = 0; i<lens; i++)
 	{
 		if (str[i] != c)str[size++] = str[i];
@@ -92,7 +92,7 @@ int GetSostPro(char *d, int word, int *sost, char *letter)
 {
 	int i, j, k, i_sost, let;
 	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
-	int lens = strlen(d);
+	int lens = (int)strlen(d);
 	int size = 1;
 	for (k = 0; k<word; k++)size *= 4;
 	for (i = 0; i<size; i++)sost[i] = 0;
@@ -134,7 +134,7 @@ int ComplStr(char *d)
 {
 	char d1[SEQLEN];
 	int i, len;
-	len = strlen(d);
+	len = (int)strlen(d);
 	strcpy(d1, d);
 	//	memset(d,0,sizeof(d));
 	for (i = 0; i<len; i++)
@@ -160,7 +160,7 @@ int CheckStr(char *d)
 {
 	int i, len, ret, size;
 	ret = size = 0;
-	len = strlen(d);
+	len = (int)strlen(d);
 	for (i = 0; i<len; i++)
 	{
 		if (strchr("atgcn", (int)d[i]) != NULL){ continue; }
@@ -263,7 +263,7 @@ int ReadSeq(char *file, int &n, int &len1, int &all_pos)
 }
 void ReplaceChar(char *str, char c1, char c2)
 {
-	int i, len = strlen(str);
+	int i, len = (int)strlen(str);
 	for (i = 0; i<len; i++)
 	{
 		if (str[i] == c1) str[i] = c2;
@@ -271,7 +271,7 @@ void ReplaceChar(char *str, char c1, char c2)
 }
 int StrNStr(char *str, char c, int n)
 {
-	int i, len = strlen(str);
+	int i, len = (int)strlen(str);
 	int k = 1;
 	for (i = 0; i<len; i++)
 	{
@@ -290,7 +290,7 @@ int UnderStol(char* str, int nstol, char* ret, size_t size, char sep)
 	if (nstol == 0)
 	{
 		p2 = StrNStr(str, sep, 1);
-		if (p2 == -1)p2 = strlen(str);
+		if (p2 == -1)p2 = (int)strlen(str);
 		if (p2 == 0) return -1;
 		strncpy(ret, str, p2);
 		ret[p2] = '\0';
@@ -302,7 +302,7 @@ int UnderStol(char* str, int nstol, char* ret, size_t size, char sep)
 		p2 = StrNStr(str, sep, nstol + 1);
 		if (p2 == -1)
 		{
-			p2 = strlen(str);
+			p2 = (int)strlen(str);
 			if (p2 == 0) return -1;
 		}
 		if (p1 == -1 || p2 == -1) return -1;
@@ -346,6 +346,14 @@ int main(int argc, char *argv[])
 	double log_thr_best_pval = -log10(thr_best_pval);	
 	int check_bad = atoi(argv[10]); // 0 all results are written, 1 results passing p-value threshold are written only
 	strcpy(binary_mode, argv[11]);// wb / ab create new binary file for output data or add output data to this file
+	int check_mode = 0;
+	if (strcmp(binary_mode, "ab") == 0)check_mode = 1;
+	else if (strcmp(binary_mode, "wb") == 0)check_mode = 1;
+	if (check_mode == 0)
+	{
+		printf("Binary file %s mode is wrong!\t ab OR wb is allowed\n", file_out_distb);
+		return -1;
+	}
 	int nseq = 0;
 	int len1 = 0;
 	int word;
@@ -446,7 +454,7 @@ int main(int argc, char *argv[])
 	{
 		DelChar(head, '\n');
 		DelChar(head, '\r');
-		int headlen = strlen(head);
+		int headlen = (int)strlen(head);
 		if (head[headlen - 1] == sep)
 		{
 			head[headlen - 1] = '\0';
@@ -513,7 +521,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		fgets(d1, sizeof(d1), in_pfm);
-		int dlen = strlen(d1);
+		int dlen = (int)strlen(d1);
 		olen = 0;
 		for (i = 1; i < dlen; i++)
 		{
@@ -588,11 +596,11 @@ int main(int argc, char *argv[])
 		fgets(dp[0], len_pro + 1, in);
 		DelChar(dp[0], '\n');
 		TransStr(dp[0]);
-		int len_pro1 = strlen(dp[0]);
+		int len_pro1 = (int)strlen(dp[0]);
 		strcpy(dp[1], dp[0]);
 		ComplStr(dp[1]);
 		int len21 = len_pro1 - len1;
-		if (n % 100 == 0)
+		if (n % 5000 == 0)
 		{
 			int di = nthr_max / 10;
 			printf("%d\t", n + 1);
@@ -732,26 +740,12 @@ int main(int argc, char *argv[])
 	if ((check_bad == 1 && fpr1st > log_thr_best_pval) || check_bad == 0)
 	{
 		int lenp4 = 4 * lenp;
-		/*if ((out_distb = fopen(file_out_distb, "ab")) == NULL)
-		{
-			printf("Out file %s can't be opened!\n", file_out_distb);
-			return -1;
-		}
-		fwrite(&lenp, sizeof(int), 1, out_distb);		
-		fwrite(pfm, sizeof(double), lenp4, out_distb);
-		fwrite(pwm, sizeof(double), lenp4, out_distb);
-		fwrite(&count, sizeof(int), 1, out_distb);
-		fwrite(thr_dist, sizeof(double), count, out_distb);
-		fwrite(fpr_dist, sizeof(double), count, out_distb);
-		fclose(out_distb);*/
-		//char  file_out_distb_one[300];
-	//	strcpy(file_out_distb_one, file_pfm);
-	//	strcat(file_out_distb_one, binary_ext);
 		if ((out_distb = fopen(file_out_distb, binary_mode)) == NULL)
 		{
 			printf("Out file %s can't be opened!\n", file_out_distb);
 			return -1;
 		}
+		fwrite(&lenp, sizeof(int), 1, out_distb);
 		fwrite(&lenp, sizeof(int), 1, out_distb);		
 		fwrite(pfm, sizeof(double), lenp4, out_distb);
 		fwrite(pwm, sizeof(double), lenp4, out_distb);
