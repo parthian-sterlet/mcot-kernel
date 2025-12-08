@@ -50,8 +50,7 @@ cd cmake
 cmake ..
 MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 ```
-Programs `anchor_vs_many`, `anchor_vs_one` and `anchor_pro` for one\_partner, many\_partners and arbitrary\_models\_one\_partner
-options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/` and  `src/anchor_pro/Release/`
+Programs `anchor_vs_many_partners`, `anchor_vs_one_partner`, `anchor_pro` and `denovo` for one_partner, many_partners and anchor_pro and denovo options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/`, `src/anchor_pro/Release/` and `src/denovo/Release/` folders
 
 ## Basic and additional options to run tool
 
