@@ -53,13 +53,18 @@ MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 Programs `anchor_vs_many`, `anchor_vs_one` and `anchor_pro` for one\_partner, many\_partners and arbitrary\_models\_one\_partner
 options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/` and  `src/anchor_pro/Release/`
 
-## Main and additional supporting options to run tool
+## Basic and additional options to run tool
 
-There are four main options:
+There are two basic options:
 
 - [One-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp) tests one input motif versus another input motif, it is proposed that both motifs are represented by Position Weight Matrices (PWMs), i.e. they are [nucleotide frequency matrices](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/foxa2.motif);
-- [Many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) tests one input motif versus a library of motifs, a collection either from [Hocomoco](https://hocomoco.autosome.org/) or [Jaspar](https://jaspar.elixir.no/);
-- [Denovo option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/denovo/mcot_denovo.cpp) tests a list of motifs, e.g. prepared as a result of _de novo _ motif search for a set of ChIP-seq peaks;
+- [Many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) tests one input motif versus a library of motifs, a collection either from [Hocomoco](https://hocomoco.autosome.org/) or [Jaspar](https://jaspar.elixir.no/).
+
+These two options are implemented as [Web application(https://webmcot.sysbio.cytogen.ru/).
+
+Two additional option are more specific:
+
+- [Denovo option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/denovo/mcot_denovo.cpp) tests a list of motifs, e.g. prepared as a result of _de novo _ motif search for a given set of ChIP-seq peaks;
 - [Anchor_pro option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_pro/mcot_anchor_pro.cpp) works similar to the [one-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp), but uses [ready profiles of predicted sites] as input data for both motifs, this makes MCOT applicable for any non-traditional motif model beside the traditional PWM.
 
 Additionally, [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) constructs a library of user-defined PWM motifs in addition to those from [many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) that were prepared in advance, source codes [to convert nucleotide frequency matrix to weight matrix](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pfm_to_pwm/pfm_to_pwm_mat.cpp) and [to compute uniformly the recognition thresholds of a weight matrix by calculating the expected recognition rate of a motif for the whole-genome set pf promoters](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pwm_thr_err/pwm_iz_pwm_thr_dist0.cpp) are used by [this perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library).
