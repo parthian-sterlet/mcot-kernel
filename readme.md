@@ -8,6 +8,29 @@ MCOT (Motifs Co-Occurrence Tool) is a software package for recognition of compos
 
 MCOT implemented in C++ and it can be conventionally compiled in Linux or Windows operating system. To run MCOT user should compile the corresponding source code file. Files mcot_anchor.cpp and mcot.cpp respect to one-partner and many partners options for Position Weight Matrix (PWM) model of a binding site. File anchor_pro.cpp respects to one-partner option, but it runs with arbitrary models of site, including not-PWM ones, e.g. [BaMM](https://github.com/soedinglab/BaMM_webserver) [(Siebert and Söding, 2016)](https://doi.org/10.1093/nar/gkw521), and [SiteGA](https://github.com/parthian-sterlet/sitega) [(Tsukanov et al., 2022)](https://doi.org/10.3389/fpls.2022.938545)
 
+## Basic and additional options to run tool
+
+There are two basic options:
+
+- [One-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp) tests one input motif versus another input motif, it is proposed that both motifs are represented by Position Weight Matrices (PWMs), i.e. they are [nucleotide frequency matrices](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/foxa2.motif);
+- [Many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) tests one input motif versus a library of motifs, a collection either from [Hocomoco](https://hocomoco.autosome.org/) or [Jaspar](https://jaspar.elixir.no/).
+
+These two options are implemented as [MCOT web application](https://webmcot.sysbio.cytogen.ru/).
+
+Two additional option are more specific:
+
+- [Denovo option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/denovo/mcot_denovo.cpp) tests a list of motifs, e.g. prepared as a result of _de novo _ motif search for a given set of ChIP-seq peaks;
+- [Anchor_pro option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_pro/mcot_anchor_pro.cpp) works similar to the [one-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp), but uses [ready profiles of predicted sites] as input data for both motifs, this makes MCOT applicable for any non-traditional motif model beside the traditional PWM.
+
+Additionally, [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) constructs a library of user-defined PWM motifs in addition to those from [many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) that were prepared in advance, source codes [to convert nucleotide frequency matrix to weight matrix](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pfm_to_pwm/pfm_to_pwm_mat.cpp) and [to compute uniformly the recognition thresholds of a weight matrix by calculating the expected recognition rate of a motif for the whole-genome set pf promoters](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pwm_thr_err/pwm_iz_pwm_thr_dist0.cpp) are used by [this perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library).
+
+## Command line and script examples for test input data
+
+- [command_line_one](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_one) - one-partner option;
+- [command_line_many](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_many) - many partners option;
+- [command_line_library](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) - preparation of a binary file for given list of motifs, this script can be modified to generate a binary file for any other list of motifs;
+- [command_line_denovo](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_denovo) - denovo option, this command uses [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/demc.pl) to work with a list of input motifs, e.g. derived from _de novo_ motif search for test ChIP-seq data
+
 ## Install
 [Use <>code button](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives) to dowload this repository
 
@@ -51,29 +74,6 @@ cmake ..
 MSBuild mcot-kernel.sln /p:Configuration=Release /p:Platform=Win32
 ```
 Programs `anchor_vs_many_partners`, `anchor_vs_one_partner`, `anchor_pro` and `denovo` for one_partner, many_partners and anchor_pro and denovo options should be in `src/anchor_vs_one_partner/Release/`,  `src/anchor_vs_many_partners/Release/`, `src/anchor_pro/Release/` and `src/denovo/Release/` folders
-
-## Basic and additional options to run tool
-
-There are two basic options:
-
-- [One-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp) tests one input motif versus another input motif, it is proposed that both motifs are represented by Position Weight Matrices (PWMs), i.e. they are [nucleotide frequency matrices](https://github.com/parthian-sterlet/mcot-kernel/blob/master/examples/one/foxa2.motif);
-- [Many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) tests one input motif versus a library of motifs, a collection either from [Hocomoco](https://hocomoco.autosome.org/) or [Jaspar](https://jaspar.elixir.no/).
-
-These two options are implemented as [MCOT web application](https://webmcot.sysbio.cytogen.ru/).
-
-Two additional option are more specific:
-
-- [Denovo option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/denovo/mcot_denovo.cpp) tests a list of motifs, e.g. prepared as a result of _de novo _ motif search for a given set of ChIP-seq peaks;
-- [Anchor_pro option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_pro/mcot_anchor_pro.cpp) works similar to the [one-partner option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_one_partner/mcot_anchor.cpp), but uses [ready profiles of predicted sites] as input data for both motifs, this makes MCOT applicable for any non-traditional motif model beside the traditional PWM.
-
-Additionally, [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) constructs a library of user-defined PWM motifs in addition to those from [many-partners option](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/anchor_vs_many_partners/mcot.cpp) that were prepared in advance, source codes [to convert nucleotide frequency matrix to weight matrix](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pfm_to_pwm/pfm_to_pwm_mat.cpp) and [to compute uniformly the recognition thresholds of a weight matrix by calculating the expected recognition rate of a motif for the whole-genome set pf promoters](https://github.com/parthian-sterlet/mcot-kernel/blob/master/src/pwm_thr_err/pwm_iz_pwm_thr_dist0.cpp) are used by [this perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library).
-
-## Command line and script examples for test input data
-
-- [command_line_one](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_one) - one-partner option;
-- [command_line_many](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_many) - many partners option;
-- [command_line_library](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_library) - preparation of a binary file for given list of motifs, this script can be modified to generate a binary file for any other list of motifs;
-- [command_line_denovo](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/command_line_denovo) - denovo option, this command uses [perl script](https://github.com/parthian-sterlet/mcot-kernel/blob/master/run/demc.pl) to work with a list of input motifs, e.g. derived from _de novo_ motif search for test ChIP-seq data
 
  ## Command line arguments
 
