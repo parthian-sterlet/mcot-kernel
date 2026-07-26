@@ -473,35 +473,3 @@ MCOT use several partner libraries including hundreds of motifs for several spec
 `<10 int check PWM quality>` = int 1/0 means to check / don't check the quialy of PWM model accordinf the preceding parameter (#9) of this command line
 
 `<11 char wb OR ab>` = value wb OR ab, type of access requested for the output binary file
-
-
-## References
-[Bailey, T.L. (2021) STREME: accurate and versatile sequence motif discovery. Bioinformatics. 37, 2834–40](https://doi.org/10.1093/bioinformatics/btab203)
-
-[Levitsky, V., Zemlyanskaya, E., Oshchepkov, D., Podkolodnaya, O., Ignatieva, E., Grosse, I., et al. (2019) A single ChIP-seq dataset is sufficient for comprehensive analysis of motifs co-occurrence with MCOT package. Nucleic Acids Res. 47, e139.](https://doi.org/10.1093/nar/gkz800)
-
-[Levitsky, V., Oshchepkov, D., Zemlyanskaya, E., Merkulova, T. (2020) Asymmetric conservation within pairs of co-occurred motifs mediates weak direct transcription factor binding in ChIP-seq data. Int J Mol Sci. 21, 6023.](https://doi.org/10.3390/ijms21176023)
-
-[Levitsky, V.G., Mukhin, A.M., Oshchepkov, D.Y., Zemlyanskaya, E.V., Lashin, S.A. (2022) Web-MCOT Server for Motif Co-Occurrence Search in ChIP-Seq Data. Int. J. Mol. Sci., 23, 8981.](https://doi.org/10.3390/ijms23168981)
-
-[Levitsky, V.G., Raditsa, V.V., Tsukanov, A., Mukhin, A.M., Merkulova, T.I. (2025) Asymmetry of Motifs Conservation within Homotypic Composite Elements Differentiates DNA-Binding Domains of Target Transcription Factors in ChIP-Seq Data. Int J Mol Sci. 26(1):386.(https://doi.org/10.3390/ijms26010386)
-
-[Heinz, S., Benner, C., Spann, N., Bertolino, E., Lin, Y.C., Laslo, P., et al. (2010) Simple combinations of lineage-determining transcription factors prime cis-regulatory elements required for macrophage and B cell identities. Mol Cell, 38, 576-589.](https://doi.org/10.1016/j.molcel.2010.05.004)
-
-[Kulakovskiy, I.V., Vorontsov, I.E., Yevshin, I.S., Sharipov, R.N., Fedorova, A.D., Rumynskiy, E.I., et al. (2018) HOCOMOCO: expansion and enhancement of the collection of transcription factor binding sites models. Nucleic Acids Res., 46, D252-D259.](https://doi.org/10.1093/nar/gkx1106)
-
-[O'Malley, R.C., Huang, S.C., Song, L., Lewsey, M.G., Bartlett, A., Nery, J.R., et al. (2016) Cistrome and epicistrome features shape the regulatory DNA landscape. Cell, 165, 1280-1292.](https://doi.org/10.1016/j.cell.2016.08.063)
-
-[Pietrokovski, S. (1996) Searching databases of conserved sequence regions by aligning protein multiple-alignments. Nucleic Acids Res., 24, 3836-3845.](https://academic.oup.com/nar/article/24/19/3836/2384639)
-
-[Ovek Baydar D, Rauluseviciute I, Aronsen DR. et al. JASPAR 2026: expansion of transcription factor binding profiles and integration of deep learning models. Nucleic Acids Res. 2026: 54(D1), D184–D193](https://doi.org/10.1093/nar/gkaf1209)
-
-[Sandelin, A., Wasserman, W.W. (2004) Constrained binding site diversity within families of transcription factors enhances pattern discovery bioinformatics. J Mol Biol., 338, 207-215.](https://doi.org/10.1016/j.jmb.2004.02.048)
-
-[Siebert, M., Söding, J. (2016). Bayesian Markov models consistently outperform PWMs at predicting motifs in nucleotide sequences. Nucleic Acids Res., 44, 6055–69.](https://doi.org/10.1093/nar/gkw521)
-
-[Tsukanov, A. V., Mironova, V. V., Levitsky, V. G. (2022) Motif models proposing independent and interdependent impacts of nucleotides are related to high and low affinity transcription factor binding sites in Arabidopsis. Front Plant Sci., 13, 938545.](https://doi.org/10.3389/fpls.2022.938545)
-
-[Vorontsov, I. E., Eliseeva, I. A., Zinkevich, A., Nikonov, M., Abramov, S., Boytsov, A., Kamenets, V., Kasianova, A., Kolmykov, S., Yevshin, I. S., et al. (2024). HOCOMOCO in 2024: a rebuild of the curated collection of binding models for human and mouse transcription factors. Nucleic Acids Res, gkad1077](https://doi.org/10.1093/nar/gkad1077)
-
-[Wederell, E.D., Bilenky, M., Cullum, R., Thiessen, N., Dagpinar, M., Delaney, A., et al. (2008) Global analysis of in vivo Foxa2-binding sites in mouse adult liver using massively parallel sequencing. Nucleic Acids Res., 36, 4549-4564.](https://doi.org/10.1093/nar/gkn382) 
