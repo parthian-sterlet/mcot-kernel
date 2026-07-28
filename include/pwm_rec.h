@@ -11,7 +11,7 @@ int pwm_rec0(matrices *mat, double thr, int len_pro, int nseq_pro, char ***seq, 
 	for(n=0;n<nseq_pro;n++)
 	{		
 		real->nsit[n]=0;
-		int len_pro1=strlen(seq[0][n]);				
+		int len_pro1= (int)strlen(seq[0][n]);
 		int len21=len_pro1-len1;				
 		for(compl1=0;compl1<2;compl1++)
 		{		
@@ -84,7 +84,7 @@ int pwm_rec1(matrices *mat,double thr,int len_pro,int nseq_pro,char ***seq, prof
 	char cepx[3]="+-";			
 	for(n=0;n<nseq_pro;n++)
 	{		
-		int len_pro1=strlen(seq[0][n]);				
+		int len_pro1= (int)strlen(seq[0][n]);
 		int len21=len_pro1-len1;							
 		int x=0;
 		for(i=0;i<=len21;i++)

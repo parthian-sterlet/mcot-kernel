@@ -15,6 +15,35 @@ void PWMScore(double &min, double &raz, int len1, double(*pwm)[OLIGNUM])
 	}
 	raz -= min;
 }
+// ras4et 4asot oligonukleotidov po stroke (zdes' - nukleotidov)
+int GetSostPro(char* d, int word, int* sost)
+{
+	int i, j, k, i_sost, let;
+	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
+	char letter[5];
+	strcpy(letter, "acgt");//atgc
+	letter[4] = '\0';
+	int lens = (int)strlen(d);
+	int size = 1;
+	for (k = 0; k < word; k++)size *= 4;
+	for (i = 0; i < size; i++)sost[i] = 0;
+	for (i = 0; i < lens - word + 1; i++)
+	{
+		i_sost = 0;
+		let = -1;
+		for (j = word - 1; j >= 0; j--)
+		{
+			for (k = 0; k < 4; k++)
+			{
+				if (d[i + j] == letter[k]) { let = k; break; }
+			}
+			if (let == -1)return -1;
+			i_sost += ten[word - 1 - j] * let;
+		}
+		sost[i] = i_sost;
+	}
+	return 0;
+}
 void Mix(double *a, double *b)
 {
 	double buf = *a;
@@ -24,8 +53,7 @@ void Mix(double *a, double *b)
 int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro, int nthr, int &nthr_dist, double *thr, double *fpr, char *species, int nseq_pro, int len_pro, double pvalue, double dpvalue)
 {
 	int i, j, k, n;
-	char head[1000], dp[SEQLEN];
-	double p;
+	char head[1000], dp[2][SEQLEN];
 	FILE *in;
 
 	int nseq = 0;
@@ -42,45 +70,45 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 		printf("Input file %s can't be opened!", file_pro);
 		return -1;
 	}
-	double all_pos = 0;
+	int all_pos = 0;
 	int count_val = 0;
 	int nthr_max = nthr - 1;
-	double score_min = 0.7;
-	double pvalue2 = pvalue * 2;
+	double thr_bot = 0;
+	for (i = 0; i < nthr; i++)thr[i] = thr_bot;	
 	for (n = 0; n < nseq_pro; n++)
 	{
 		fgets(head, sizeof(head), in);
-		fgets(dp, len_pro + 2, in);
-		DelChar(dp, '\n');
-		int len_pro1 = strlen(dp);
+		fgets(dp[0], len_pro + 2, in);
+		DelChar(dp[0], '\n');
+		int len_pro1 = (int)strlen(dp[0]);
 		int len21 = len_pro1 - len1;
-		TransStr(dp);
-		double thresh_min;
-		if (n == 0)thresh_min = score_min;//double thresh_min = Max(thr[nthr_max], score_min);
-		else
+		TransStr(dp[0]);
+		strcpy(dp[1], dp[0]);
+		ComplStr(dp[1]);				
+	//	if (n % 50 == 0)printf("%5d %f\t%d\n", n, thr[nthr_max], count_val);
+		/*if (n % 1000 == 0)
 		{
-			if (count_val >= nthr)thresh_min = thr[nthr_max];
-			else
-			{
-				int n_check = (int)(all_pos*pvalue2) - 1;
-				n_check = (int)((n*n_check + count_val) / (n + 1));
-				thresh_min = thr[n_check];
-			}
-		}
-	//	if (n % 50 == 0)printf("%5d %f\t%f\t%d\n", n, thresh_min, thr[nthr_max], count_val);
-		int compl1;
-		for (compl1 = 0; compl1 < 2; compl1++)
-		{
-			if (compl1 == 1) if (ComplStr(dp) != 1) { puts("Out of memory..."); return -1; }
+			int di = nthr_max / 10;
+			printf("%d\t", n + 1);
+			for (i = 0; i < nthr_max; i += di)printf("%d %f ", i + 1, thr[i]);
+			printf("\n");			
+		}*/
+		for (i = 0; i <= len21; i++)
+		{			
 			char d2[SEQLEN];
-			p = -1000;
-			for (i = 0; i <= len21; i++)
+			int gom = 0;
+			double sco2 = -1000;
+			int compl1;
+			for (compl1 = 0; compl1 < 2; compl1++)
 			{
-				strncpy(d2, &dp[i], len1);
+				int kpos;
+				if (compl1 == 0)kpos = i;
+				else kpos = len21 - i;
+				strncpy(d2, &dp[compl1][i], len1);
 				d2[len1] = '\0';
-				if (strstr(d2, "n") != NULL) { continue; }
-				GetSostPro(d2, word, cod);
-				all_pos++;
+				if (strstr(d2, "n") != NULL) { gom = -1; break; }
+				gom = GetSostPro(d2, word, cod);
+				if (gom == -1)break;
 				double score = 0;
 				for (j = 0; j < lenp; j++)
 				{
@@ -88,12 +116,18 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 				}
 				score -= min0;
 				score /= raz0;
-				if (score >= thresh_min)
+				if (score > sco2)sco2 = score;
+			}
+			if (gom == 0)
+			{
+				all_pos++;
+				double thr_check = Max(thr_bot, thr[nthr_max]);
+				if (sco2 >= thr_check)
 				{
-					int gom = 0;
+					int gomc = 0;
 					for (j = 0; j < nthr; j++)
 					{
-						if (score >= thr[j])
+						if (sco2 >= thr[j])
 						{
 							//if (thr[j] != 0)
 							{
@@ -103,15 +137,15 @@ int pwm_iz_pwm_thr_dist0(double pwm_source[][OLIGNUM], int lenp, char *file_pro,
 									Mix(&thr[k - 1], &thr[k]);
 								}
 							}
-							thr[j] = score;
-							gom = 1;
+							thr[j] = sco2;
+							gomc = 1;
 							break;
 						}
-						if (gom == 1)break;
+						if (gomc == 1)break;
 					}
 					count_val++;
 				}
-			}
+			}						
 		}
 	}
 	fclose(in);
