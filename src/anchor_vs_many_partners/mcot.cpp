@@ -15,14 +15,14 @@
 #define ARGLEN 300 //max argv length
 #define OLIGNUM 4// di 16 mono 4
 #define NUM_THR 5 //4islo porogov
-#define NUM_LIBRARY 7// 4islo bibliotek
+#define NUM_LIBRARY 5// 4islo bibliotek
 #define Min(a,b) ((a)>(b))? (b):(a);
 #define Max(a,b) ((a)>(b))? (a):(b);
 
 //return n-th occurrence of a certain symbol c in a string str
 int StrNStr(char* str, char c, int n)
 {
-	int i, len = strlen(str);
+	int i, len = (int)strlen(str);
 	int k = 1;
 	for (i = 0; i < len; i++)
 	{
@@ -38,7 +38,7 @@ int StrNStr(char* str, char c, int n)
 char* TransStr(char* d)
 {
 	int i, c, lens;
-	lens = strlen(d);
+	lens = (int)strlen(d);
 	for (i = 0; i < lens; i++)
 	{
 		c = int(d[i]);
@@ -50,7 +50,7 @@ char* TransStr(char* d)
 char* TransStrBack(char* d)
 {
 	int i, c, lens;
-	lens = strlen(d);
+	lens = (int)strlen(d);
 	for (i = 0; i < lens; i++)
 	{
 		c = int(d[i]);
@@ -65,43 +65,19 @@ void DelChar(char* str, char c)
 	int i, lens, size;
 
 	size = 0;
-	lens = strlen(str);
+	lens = (int)strlen(str);
 	for (i = 0; i < lens; i++)
 	{
 		if (str[i] != c)str[size++] = str[i];
 	}
 	str[size] = '\0';
 }
-// ras4et 4asot oligonukleotidov po stroke (zdes' - nukleotidov)
-void GetSostPro(char* d, int word, int* sost)
-{
-	int i, j, k, i_sost, let;
-	char letter[] = "acgt";
-	int ten[6] = { 1, 4, 16, 64, 256, 1024 };
-	int lens = strlen(d);
-	int size = 1;
-	for (k = 0; k < word; k++)size *= 4;
-	for (i = 0; i < size; i++)sost[i] = 0;
-	for (i = 0; i < lens - word + 1; i++)
-	{
-		i_sost = 0;
-		for (j = word - 1; j >= 0; j--)
-		{
-			for (k = 0; k < 4; k++)
-			{
-				if (d[i + j] == letter[k]) { let = k; break; }
-			}
-			i_sost += ten[word - 1 - j] * let;
-		}
-		sost[i] = i_sost;
-	}
-}
 //komplementaciya stroki
 int ComplStr(char* d)
 {
 	char* d1;
 	int i, len;
-	len = strlen(d);
+	len = (int)strlen(d);
 	d1 = new char[len + 1];
 	if (d1 == NULL)
 	{
@@ -145,7 +121,7 @@ void Mix(char* a, char* b)
 void BigMix1(char* d)//me6alka
 {
 	int r;
-	int len = strlen(d);
+	int len = (int)strlen(d);
 	for (r = 0; r < len - 1; r++) Mix(&d[r], &d[1 + r + (rand() % (len - 1 - r))]);
 }
 void BigMix1(int* d1, int len) // pereme6ivanie stroki
@@ -834,21 +810,18 @@ int main(int argc, char* argv[])
 	char file_fasta[ARGLEN], genome_promoters[ARGLEN], partner_db[ARGLEN], file_pfm_anchor[ARGLEN];
 	char*** seq;// peaks
 
-	char file_hist[ARGLEN], file_hist_rand[ARGLEN], file_hist_spacer[ARGLEN], file_hist_rand_spacer[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN];
+	char file_hist[ARGLEN], file_hist_rand[ARGLEN], file_hist_spacer[ARGLEN], file_hist_rand_spacer[ARGLEN], file_pval[5][ARGLEN], file_pval_table[ARGLEN], path_out[ARGLEN];
 	char name_anchor[50], name_partner[50], name[2][50];
-	char xreal[] = "real", xrand[] = "rand", xreal_one[] = "real_one";
-	char file_fpr[ARGLEN];
-	strcpy(file_fpr, "err_anchor.txt");
-
-	if (argc != 10)
+	
+	if (argc != 11)
 	{
 		fprintf(stderr, "Error: %s 1file_fasta 2char anchor_motif 3char partner_db 4int spacer_min 5int spacer_max ", argv[0]);//1int thresh_num_min 2int thresh_num_max
-		fprintf(stderr, "6char genome_fasta 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_ratio(-log10(ERR)) in CE\n");//9char mot_anchor 
+		fprintf(stderr, "6char genome_fasta 7double pvalue_thr 8double -log10[p-value]_thr 9double asymmetry_ratio(-log10(ERR)) in CE 10char path_out\n");//9char mot_anchor 
 		return -1;
 	}
 	for (i = 1; i < argc; i++)
 	{
-		int alen = strlen(argv[i]);
+		int alen = (int)strlen(argv[i]);
 		if (alen > ARGLEN)
 		{
 			fprintf(stderr, "Error: Argument number %d %s\nof command line is too long!\nMaximim %d symbols allowed\n", i, argv[i], ARGLEN);
@@ -869,7 +842,22 @@ int main(int argc, char* argv[])
 	double pvalue = atof(argv[7]); //expected recogntion rate
 	double bonf_user = atof(argv[8]);
 	double fold_asy = log10(atof(argv[9]));//threshold for log10(frp) fold asymmentry
+	strcpy(path_out, argv[10]);
+
+	char xreal0[] = "real", xrand0[] = "rand", xreal_one0[] = "real_one";
+	char xreal[ARGLEN], xrand[ARGLEN], xreal_one[ARGLEN];
+	strcpy(xreal, path_out);
+	strcpy(xrand, path_out);
+	strcpy(xreal_one, path_out);
+	strcat(xreal, xreal0);
+	strcat(xrand, xrand0);
+	strcat(xreal_one, xreal_one0);
+	char file_fpr[ARGLEN];
+	strcpy(file_fpr, path_out);
+	strcat(file_fpr, "err_anchor.txt");
+
 	double pvalue_mult = 1.5, fpr_select_i[NUM_THR], dpvalue = 0.0000005; // 0.0005 1.5
+	//int overlap_spacer = 3;
 	{
 		double ratio_cur = pvalue_mult;
 		fpr_select_i[NUM_THR - 1] = pvalue;
@@ -903,8 +891,8 @@ int main(int argc, char* argv[])
 	//motif library
 	int motif_library = -1;
 	{
-		char library_tag[NUM_LIBRARY][30] = { "h12core_hg38" , "h12core_mm10" , "h11core_hg38" , "h11core_mm10" , "dapseq", "jaspar24_at10", "jaspar24_dm6"};
-		int motif_count_library[NUM_LIBRARY] = { 1420,1142,391,346,510,556,151 };
+		char library_tag[NUM_LIBRARY][30] = { "h14core_hs1594" , "h14core_mm1245", "dapseq", "jaspar26_at869", "jaspar26_dm272"};
+		int motif_count_library[NUM_LIBRARY] = { 1595,1246,498,870,273 };
 		for (i = 0; i < NUM_LIBRARY; i++)
 		{
 			if (strstr(partner_db, library_tag[i]) != NULL)
@@ -933,23 +921,34 @@ int main(int argc, char* argv[])
 		printf("Input file %s can't be opened!\n", partner_db);
 		return -1;
 	}	
-	
-	strcpy(file_hist, "out_hist");
-	strcpy(file_hist_rand, "out_hist_rand");
-	strcpy(file_hist_spacer, "out_hist_spacer");
-	strcpy(file_hist_rand, "out_hist_rand");
-	strcpy(file_hist_rand_spacer, "out_hist_rand_spacer");
-	strcpy(file_pval[0], "fisher_any_mot");
-	strcpy(file_pval[1], "fisher_full_mot");
-	strcpy(file_pval[2], "fisher_part_mot");
-	strcpy(file_pval[3], "fisher_over_mot");
-	strcpy(file_pval[4], "fisher_spac_mot");
-	strcpy(file_pval_table, "out_pval");
+	strcpy(file_hist, path_out);
+	strcpy(file_hist_rand, path_out);
+	strcpy(file_hist_spacer, path_out);
+	strcpy(file_hist_rand, path_out);
+	strcpy(file_hist_rand_spacer, path_out);
+	strcpy(file_pval[0], path_out);
+	strcpy(file_pval[1], path_out);
+	strcpy(file_pval[2], path_out);
+	strcpy(file_pval[3], path_out);
+	strcpy(file_pval[4], path_out);
+	strcpy(file_pval_table, path_out);
+	strcat(file_hist, "out_hist");
+	strcat(file_hist_rand, "out_hist_rand");
+	strcat(file_hist_spacer, "out_hist_spacer");
+	strcat(file_hist_rand, "out_hist_rand");
+	strcat(file_hist_rand_spacer, "out_hist_rand_spacer");
+	strcat(file_pval[0], "fisher_any_mot");
+	strcat(file_pval[1], "fisher_full_mot");
+	strcat(file_pval[2], "fisher_part_mot");
+	strcat(file_pval[3], "fisher_over_mot");
+	strcat(file_pval[4], "fisher_spac_mot");
+	strcat(file_pval_table, "out_pval");
 
 	{
 		memset(name_anchor, '\0', sizeof(name_anchor));
-		int len = strlen(file_pfm_anchor);
-		k = 0;
+		strcpy(name_anchor, "Anchor");
+		//int len = (int)strlen(file_pfm_anchor);
+		/*k = 0;
 		for (j = 0; j < len; j++)
 		{
 			char cc = file_pfm_anchor[j];
@@ -960,10 +959,10 @@ int main(int argc, char* argv[])
 			}
 			name_anchor[k++] = cc;
 		}
-		TransStrBack(name_anchor);
+		TransStrBack(name_anchor);*/
 	}
 
-	int nlen = strlen(name_anchor);//name_anchor[nlen]='\0';
+	int nlen = (int)strlen(name_anchor);//name_anchor[nlen]='\0';
 	double pvalue_equal = 0.01;
 	double pvalue_similarity_tot;
 
@@ -992,7 +991,7 @@ int main(int argc, char* argv[])
 			if (seq[k][i] == NULL) { fprintf(stderr, "Error: Out of memory..."); return -1; }
 			memset(seq[k][i], '\0', length_fasta_max1);
 		}
-	}
+	}	
 	ftp = fasta_to_plain1(file_fasta, length_fasta_max, nseq_real, seq, peak_len_real);
 	if (ftp == -1)
 	{
@@ -1110,7 +1109,7 @@ int main(int argc, char* argv[])
 	fprintf(out_pval_table, "Overlap, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
 	fprintf(out_pval_table, "Spacer, Sites Asymmetry/Symmetry, -Log10[P-value]\t");
 	//	fprintf(out_pval_table, "Any, Asymmetry to Anchor+/Partner-, -Log10[P-value]\t");
-	fprintf(out_pval_table, "Bonferroni_CE\tBonferroni_CE(AncPar)\tBonferroni_Asym\n");
+	fprintf(out_pval_table, "Bon_ferroni_CE\tBonferroni_CE(AncPar)\tBonferroni_Asym\n");
 	fclose(out_pval_table);
 
 	FILE* out_pval[5];
@@ -1122,13 +1121,18 @@ int main(int argc, char* argv[])
 	rand_plot.mem_in(nthr_asy, thr_asy_min, thr_asy_max, dthr_asy);
 
 	FILE* out_stat;
-	if ((out_stat = fopen("rec_pos.txt", "wt")) == NULL)
+	char file_rec_pos[ARGLEN];
+	strcpy(file_rec_pos, path_out);
+	strcat(file_rec_pos, "rec_pos.txt");
+	if ((out_stat = fopen(file_rec_pos, "wt")) == NULL)
 	{
 		fprintf(stderr, "Error: Input file can't be opened!\n");
 		return -1;
 	}
 	fprintf(out_stat, "# Motif\tMotif Name\t# Threshold\tThreshold\t%% of peaks\tRec. peaks\tTotal peaks\tRate of hits\tRec. hits\tTotal positions\n");
-	char file_err[] = "throw_prediction.txt";
+	char file_err[ARGLEN];
+	strcpy(file_err, path_out);
+	strcat(file_err, "rec_pos.txt");	
 	{
 		FILE* out_err;
 		if ((out_err = fopen(file_err, "wt")) == NULL)
@@ -1137,7 +1141,9 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 	}
-	char file_log[] = "mcot.log";
+	char file_log[ARGLEN];
+	strcpy(file_log, path_out);
+	strcat(file_log, "mcot.log");	
 	{
 		FILE* out_log;
 		if ((out_log = fopen(file_log, "wt")) == NULL)
@@ -1159,7 +1165,7 @@ int main(int argc, char* argv[])
 	}
 	double* thr_all;
 	double* fp_rate;
-	int all_pos_rec = (int)(pvalue * all_pos_genome);
+	int all_pos_rec = (int)(pvalue * all_pos_genome* 1.001);
 	thr_all = new double[all_pos_rec];
 	if (thr_all == NULL) { fprintf(stderr, "Error: Out of memory..."); return -1; }
 	fp_rate = new double[all_pos_rec];
@@ -1181,16 +1187,7 @@ int main(int argc, char* argv[])
 		if (mot == 0)
 		{			
 			len_anchor=pfm_to_pwm(file_pfm_anchor, &matrix[0]);
-			for (i = 0; i < len_anchor; i++)for (j = 0; j < OLIGNUM; j++)pwm_mot[i][j] = matrix[0].wei[i][j];
-			int piptd = pwm_iz_pwm_thr_dist0(pwm_mot, len_anchor, genome_promoters, all_pos_rec, nthr_dist, thr_all, fp_rate, genome_promoters, nseq_genome, len_genome, pvalue, dpvalue);
-			if (piptd == -1)
-			{
-				fprintf(stderr, "Error: FP rate table error\n");
-				return -1;
-			}	
-			/*
-			printf("\nLen %d\tNthr %d\n", len_anchor, nthr_dist);
-			printf("\nPFM\n");
+			/*printf("\nPFM\n");
 			for (i = 0; i < len_anchor; i++)
 			{
 				for (j = 0; j < OLIGNUM; j++)printf("%d\t%f", i + 1, matrix[0].fre[i][j]);
@@ -1202,6 +1199,19 @@ int main(int argc, char* argv[])
 				for (j = 0; j < OLIGNUM; j++)printf("%d\t%f", i + 1, matrix[0].wei[i][j]);
 				printf("\n");
 			}*/
+			for (i = 0; i < len_anchor; i++)for (j = 0; j < OLIGNUM; j++)pwm_mot[i][j] = matrix[0].wei[i][j];
+			int piptd = pwm_iz_pwm_thr_dist0(pwm_mot, len_anchor, genome_promoters, all_pos_rec, nthr_dist, thr_all, fp_rate, genome_promoters, nseq_genome, len_genome, pvalue, dpvalue);
+			if (piptd == -1)
+			{
+				fprintf(stderr, "Error: FP rate table error\n");
+				return -1;
+			}				
+			/*printf("\nLen %d\tNthr %d\n", len_anchor, nthr_dist);			
+			for (i = 0; i < nthr_dist; i++)
+			{
+				printf("%d\t%f\t%f", i + 1, thr_all[i], fp_rate[i]);
+				printf("\n");
+			}*/
 			if (len_anchor <= 0 || len_anchor >= MATLEN)
 			{
 				fprintf(stderr, "Error: PFM to PWM conversion error, file %s\n", file_pfm_anchor);
@@ -1209,7 +1219,7 @@ int main(int argc, char* argv[])
 			}
 			memset(name_partner, '\0', sizeof(name_partner));
 			strcpy(name_partner, name_anchor);
-			int nlen = strlen(name_anchor);
+			int nlen = (int)strlen(name_anchor);
 			name_partner[nlen] = '\0';
 			for (i = 0; i < 2; i++)strcpy(name[i], name_anchor);
 			pvalue_similarity_tot = 1E-300;
@@ -1245,15 +1255,13 @@ int main(int argc, char* argv[])
 			}*/
 			matrix[1].len = len_partner;
 			switch(motif_library) {
-			case 0: {strcpy(name_partner, hs_core_12_names[mot]); break; }
-			case 1: {strcpy(name_partner, mm_core_12_names[mot]); break; }
-			case 2: {strcpy(name_partner, hs_core_11_names[mot]); break; }
-			case 3: {strcpy(name_partner, mm_core_11_names[mot]); break; }
-			case 4: {strcpy(name_partner, dapseq_names[mot]); break; }
-			case 5: {strcpy(name_partner, jaspar24_at10_names[mot]); break; }
-			case 6: {strcpy(name_partner, jaspar24_dm6_names[mot]); break; }
+			case 0: {strcpy(name_partner, hc14_hs1594_names[mot]); break; }
+			case 1: {strcpy(name_partner, hc14_mm1245_names[mot]); break; }
+			case 2: {strcpy(name_partner, dapseq_names[mot]); break; }
+			case 3: {strcpy(name_partner, jaspar26_at869_names[mot]); break; }
+			case 4: {strcpy(name_partner, jaspar26_dm272_names[mot]); break; }
 			}
-			int nlen = strlen(name_partner);
+			int nlen = (int)strlen(name_partner);
 			name_partner[nlen] = '\0';
 			strcpy(name[1], name_partner);
 			for (i = 0; i < 4; i++)pval_sim[i] = 1;
@@ -1515,7 +1523,8 @@ int main(int argc, char* argv[])
 				char rzd = ',';
 				if (real_plot.total_full != 0 && rand_plot.total_full != 0)
 				{
-					strcpy(file_plot[0], "plot_");
+					strcpy(file_plot[0], path_out);
+					strcat(file_plot[0], "plot_");
 					strcat(file_plot[0], flow[0]);
 					strcat(file_plot[0], "_Anchor");
 					if (mot != 0)strcat(file_plot[0], "_Partner");
@@ -1564,7 +1573,8 @@ int main(int argc, char* argv[])
 				}
 				if (real_plot.total_partial != 0 && rand_plot.total_partial != 0)
 				{
-					strcpy(file_plot[1], "plot_");
+					strcpy(file_plot[1], path_out);
+					strcat(file_plot[1], "plot_");
 					strcat(file_plot[1], flow[1]);
 					strcat(file_plot[1], "_Anchor");
 					if (mot != 0)strcat(file_plot[1], "_Partner");
@@ -1613,7 +1623,8 @@ int main(int argc, char* argv[])
 				}
 				if (real_plot.total_overlap != 0 && rand_plot.total_overlap != 0)
 				{
-					strcpy(file_plot[2], "plot_");
+					strcpy(file_plot[2], path_out);
+					strcat(file_plot[2], "plot_");
 					strcat(file_plot[2], flow[2]);
 					strcat(file_plot[2], "_Anchor");
 					if (mot != 0)strcat(file_plot[2], "_Partner");
@@ -1662,7 +1673,8 @@ int main(int argc, char* argv[])
 				}
 				if (real_plot.total_spacer != 0 && rand_plot.total_spacer != 0)
 				{
-					strcpy(file_plot[3], "plot_");
+					strcpy(file_plot[3], path_out);
+					strcat(file_plot[3], "plot_");
 					strcat(file_plot[3], flow[3]);
 					strcat(file_plot[3], "_Anchor");
 					if (mot != 0)strcat(file_plot[3], "_Partner");
@@ -1711,7 +1723,8 @@ int main(int argc, char* argv[])
 				}
 				if (real_plot.total_any != 0 && rand_plot.total_any != 0)
 				{
-					strcpy(file_plot[4], "plot_");
+					strcpy(file_plot[4], path_out);
+					strcat(file_plot[4], "plot_");
 					strcat(file_plot[4], flow[4]);
 					strcat(file_plot[4], "_Anchor");
 					if (mot != 0)strcat(file_plot[4], "_Partner");
