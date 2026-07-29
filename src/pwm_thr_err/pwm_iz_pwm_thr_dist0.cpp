@@ -328,7 +328,8 @@ int main(int argc, char *argv[])
 	
 	if (argc != 12)
 	{
-		printf("%s 1 pfm 2pwm 3file_profile_fasta 4file out_dist_text 5file out_dist_binary 6double pvalue_large 7double bin 8file_sta 9double thr_best_pval 10int 1/0 check/don't check Bad&Good PWM 11char wb OR ab mode for output binary", argv[0]);
+		printf("%s 1 pfm 2pwm 3file_profile_fasta 4file out_dist_text 5file out_dist_binary 6double pvalue_large 7double bin 8file_sta 9double thr_best_pval", argv[0]);
+		printf("10int 1/0 check/don't check Bad&Good PWM 11char wb OR ab mode for output binary\n");
 		return -1;
 	}	
 	strcpy(file_pfm, argv[1]);
@@ -446,7 +447,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{//homer, cis-bp
-		nseq = 1000000000;
+		nseq = 1;
 		mtype = 0;
 		//shift_col=0;
 	}
@@ -576,7 +577,7 @@ int main(int argc, char *argv[])
 	if (dp == NULL) { puts("Out of memory..."); return -1; }
 	for (n = 0; n < 2; n++)
 	{
-		dp[n] = new char[len_pro + 1];
+		dp[n] = new char[len_pro + 5];
 		if (dp[n] == NULL) { puts("Out of memory..."); return -1; }
 	}
 	if ((in = fopen(file_seq, "rt")) == NULL)
@@ -592,22 +593,22 @@ int main(int argc, char *argv[])
 	for (n = 0; n<nseq_pro; n++)
 	{		
 		fgets(head, sizeof(head), in);
-		memset(dp[0], 0, len_pro + 1);
-		fgets(dp[0], len_pro + 1, in);
+		memset(dp[0], 0, len_pro + 4);
+		fgets(dp[0], len_pro + 4, in);
 		DelChar(dp[0], '\n');
 		TransStr(dp[0]);
 		int len_pro1 = (int)strlen(dp[0]);
 		strcpy(dp[1], dp[0]);
 		ComplStr(dp[1]);
 		int len21 = len_pro1 - len1;
-		if (n % 5000 == 0)
+		/*if (n % 5000 == 0)
 		{
 			int di = nthr_max / 10;
 			printf("%d\t", n + 1);
-			for (i = 0; i < nthr_max; i += di)printf("%d %f ", i + 1, thr[i]);
-			printf("\n");
-			//printf("%5d %f\n", n, thr[nthr_max]);
+			for (i = 0; i < 5; i ++)printf("%f\n", thr[i]);
+			printf("\n");			
 		}
+		*/
 		for (i = 0; i <= len21; i++)
 		{						
 			char d2[PWMLEN];
@@ -657,11 +658,10 @@ int main(int argc, char *argv[])
 						if (gomt == 1)break;
 					}
 					count_val++;
-				}
-				all_pos_rec++;
+				}				
 			}
 		}
-		//fprintf(out_distt, "%d\t%.1f\n", n+1,all_pos_rec);
+		//printf("%d\t%.1f\n", n+1,all_pos_rec);
 	}
 	fclose(in);
 	if ((out_distt = fopen(file_out_distt, "wt")) == NULL)
