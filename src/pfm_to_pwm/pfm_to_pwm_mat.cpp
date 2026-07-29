@@ -20,7 +20,7 @@ void DelChar(char *str,char c)
 	int i, lens, size;
 
 	size=0;
-	lens=strlen(str);
+	lens=(int)strlen(str);
 	for(i=0;i<lens;i++)
 	{
 		if(str[i]!=c)str[size++]=str[i];
@@ -29,7 +29,7 @@ void DelChar(char *str,char c)
 }
 int StrNStr(char *str,char c, int n)
 {
-	int i, len=strlen(str);
+	int i, len= (int)strlen(str);
 	int k=1;
 	for(i=0;i<len;i++)
 	{
@@ -48,7 +48,7 @@ int UnderStol(char* str, int nstol, char* ret, size_t size, char sep)
 	if (nstol == 0)
 	{
 		p2 = StrNStr(str, sep, 1);
-		if (p2 == -1)p2 = strlen(str);
+		if (p2 == -1)p2 = (int)strlen(str);
 		if (p2 == 0) return -1;
 		strncpy(ret, str, p2);
 		ret[p2] = '\0';
@@ -60,7 +60,7 @@ int UnderStol(char* str, int nstol, char* ret, size_t size, char sep)
 		p2 = StrNStr(str, sep, nstol + 1);
 		if (p2 == -1)
 		{
-			p2 = strlen(str);
+			p2 = (int)strlen(str);
 			if (p2 == 0) return -1;
 		}
 		if (p1 == -1 || p2 == -1) return -1;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         printf ("Syntax: 1file in pfm 2file out pwm txt");
         return -1;
     }
-	double nseq;//=atoi(argv[3]);
+	//double nseq;//=atoi(argv[3]);
 	int shift_col;//=atoi(argv[4]);
 	//3 int virtual_sample_size 4int shift_column(homer 0 cis-db 1) 5char Rr=row(Jaspar) Cc=column
 	int mtype;
@@ -103,8 +103,7 @@ int main(int argc, char *argv[])
 	fgets(head,sizeof(head),in_pfm);			 
 	fgets(head,sizeof(head),in_pfm);			 
 	if(strchr("ATGC",head[0])!=NULL)
-	{// jaspar
-		nseq=1;
+	{// jaspar		
 		mtype=1;
 		shift_col=1;
 		alfabet++;
@@ -119,8 +118,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	else
-	{//homer, cis-bp
-		nseq=1000000000;
+	{//homer, cis-bp		
 		mtype=0;
 		//shift_col=0;
 	}	
@@ -128,7 +126,7 @@ int main(int argc, char *argv[])
 	{
 		DelChar(head,'\n');
 		DelChar(head,'\r');
-		int headlen= strlen(head);
+		int headlen= (int)strlen(head);
 		if(head[headlen-1]=='\t')
 		{
 			head[headlen-1]='\0';
@@ -192,7 +190,7 @@ int main(int argc, char *argv[])
 						test = UnderStol(d, j + shift_col, s, sizeof(s), sep);
 						if (test == -1) { printf("Wrong format %s\n", d); exit(1); }
 						double score=atof(s);
-						pfm[i][j]=nseq*score;										
+						pfm[i][j]=score;										
 					}					
 				}
 				else break;
@@ -203,7 +201,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		fgets(d,sizeof(d),in_pfm);
-		int dlen=strlen(d);
+		int dlen= (int)strlen(d);
 		olen=0;
 		for(i=1;i<dlen;i++)
 		{
@@ -229,7 +227,7 @@ int main(int argc, char *argv[])
 						test = UnderStol(d, j + shift_col, s, sizeof(s), sep);
 						if (test == -1) { printf("Wrong format %s\n", d); exit(1); }
 						double score=atof(s);
-						pfm[j][i]=nseq*score;					
+						pfm[j][i]=score;					
 					}
 				}
 				else break;
@@ -238,6 +236,16 @@ int main(int argc, char *argv[])
 		}
 	}
 	fclose(in_pfm);
+	{
+		double maxfre = 0;
+		for (i = 0; i < alfabet; i++)
+		{
+			for (j = 0; j < olen; j++)
+			{
+				if (pfm[j][i] > maxfre)maxfre = pfm[j][i];
+			}
+		}		
+	}
 	int alfabet_m1=alfabet-1;
 	for(j=0;j<olen;j++)
 	{		
@@ -250,15 +258,15 @@ int main(int argc, char *argv[])
 	}
 	fprintf(out_log,"%s\t%d\t%.f\n",argv[1],olen,olen_perf);
 	fclose(out_log);
-	//printf("matrix length %d\n",olen);
-/*	for(i=0;i<4;i++)
+	/*printf("matrix length %d\n",olen);
+	for(i=0;i<4;i++)
 	{
 		for(j=0;j<olen;j++)
 		{
-			printf("%d\t",pfm[j][i]);
+			printf("%f\t",pfm[j][i]);
 		}
 		printf("\n");
-	}*/	
+	}*/
 /*	int nmat = 0;
 	int mlen=strlen(argv[1]);
 	for(i=0;i<mlen;i++)
@@ -365,5 +373,14 @@ int main(int argc, char *argv[])
 	fprintf(out_len,"%d",olen);
 	fclose(out_len);
 	printf("%d",olen);*/
+	/*printf("\n");
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < olen; j++)
+		{
+			printf("%f\t", pwm[j][i]);
+		}
+		printf("\n");
+	}*/
 	return 1;
 }
