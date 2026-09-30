@@ -152,7 +152,7 @@ The command line for anchor_pro option:
 
 `<11 threshold CE pvalue>` = threshold of -Log10[p-value] to display the significances of enrichment of CEs in output data, p-values are computed fy Fisher exact test (the default value 5)
 
-`<12 threshold asymmetry ratio>` = threshold for asymmetry ratio (TAR) restricting relationship of ERR values of two motifs in CEs, e.g. for two mofs in CE values ERR1 and ERR2 means the assymetry ratio (AR) is equal to Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and criteria AR  > TAR and AR <= TAR mean asymmetric and symmetric CEs, respectively. Default value 1.5
+`<12 threshold asymmetry ratio>` = threshold for asymmetry ratio (TAR) restricting relationship of ERR values of two motifs in CEs, e.g. for two mofs in CE values ERR1 and ERR2 means the asymetry ratio (AR) is equal to Max\{-log10(ERR1), -log10(ERR2)\} / Min\{-log10(ERR1), -log10(ERR2)\}, and criteria AR  > TAR and AR <= TAR mean asymmetric and symmetric CEs, respectively. Default value 1.5
 
 The command line for denovo option:
 
