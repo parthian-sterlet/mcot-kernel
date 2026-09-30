@@ -86,7 +86,7 @@ The command line for one-partner option:
 The command line for many-partner option:
 
 
-`./mcot.exe <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 path to whole-genome promoters with its path> <7 threshold ERR> <8 threshold CE pvalue> <9 threshold asymmetry ratio>`
+`./mcot.exe <1 fasta> <2 anchor.motif> <3 partners.library> <4 minimal spacer length> <5 maximal spacer length> <6 file to whole-genome promoters with its path> <7 threshold ERR> <8 threshold CE pvalue> <9 threshold asymmetry ratio>`
 
 
 `<1 fasta>` = DNA sequences of peaks in FASTA format, a minimum recommended number of peaks is about 300-500, the maximum number is not restricted, however 5000-10000 or higher number of peaks requires a higher computation time than several thousands of peaks, hence about 1000-2000 peaks are enough. Sequences should have lengths substatially higher than lengths of recognition models for anchor and partner motifs to contain possible composite elememnts with an overlap or spacer.
